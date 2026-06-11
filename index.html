@@ -29,6 +29,9 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;color:#111827;}
 
 /* HERO */
 .hero{background:#0A1F0F;padding:40px 24px 44px;position:relative;overflow:hidden;}
+.hero-loterias{display:flex;gap:8px;flex-wrap:wrap;margin-bottom:22px;}
+.loteria-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.07);border:0.5px solid rgba(255,255,255,0.12);border-radius:99px;padding:5px 12px;font-family:'Bebas Neue',sans-serif;font-size:13px;letter-spacing:.8px;color:rgba(255,255,255,0.7);}
+.loteria-badge span{font-size:14px;}
 .hero::before{content:'';position:absolute;top:-60px;right:-60px;width:240px;height:240px;border-radius:50%;background:rgba(255,140,0,0.06);pointer-events:none;}
 .hero::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:40px;background:#F5F5F3;clip-path:polygon(0 100%,100% 0,100% 100%);}
 .hero-inner{max-width:680px;margin:0 auto;}
@@ -195,7 +198,7 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
   <div class="bubbles">
     <div class="brow">
       <div class="bub bub-red"><span class="e">😤</span>¿Me has hecho el Bizum?</div>
-      <div class="bub bub-gold"><span class="e">🤔</span>¿A quién le toca tirar?</div>
+      <div class="bub bub-gold"><span class="e">🤔</span>¿A quién le toca tirar la quiniela?</div>
     </div>
     <div class="brow">
       <div class="bub bub-green"><span class="e">🎰</span>¿Hemos ganado algo?</div>
@@ -209,6 +212,11 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
   <div class="hero-inner">
     <div class="hero-logo">Loto<span>Grupo</span></div>
     <div class="hero-tagline">Gestión de lotería en grupo · España</div>
+    <div class="hero-loterias">
+      <div class="loteria-badge"><span>🌟</span>Euromillones</div>
+      <div class="loteria-badge"><span>🍀</span>Primitiva</div>
+      <div class="loteria-badge"><span>🎱</span>Bonoloto</div>
+    </div>
     <div class="hero-headline">Tu peña,<br><em>sin líos<br>ni olvidos</em></div>
     <div class="hero-sub">Controla <strong>a quién le toca tirar la quiniela</strong>, a quién hacer el <strong>Bizum</strong>, comprueba los <strong>premios</strong>, los <strong>beneficios acumulados</strong>...</div>
     <div class="mas-row">
@@ -218,41 +226,14 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
       </div>
     </div>
     <a href="#configurar" class="cta">
-      <span class="cta-text">🎰 CREAR MI PEÑA GRATIS</span>
+      <span class="cta-text">🎰 CREAR MI PEÑA GRATIS EN 2 MINUTOS</span>
       <div class="cta-arrow">→</div>
     </a>
-    <div class="hero-stats">
-      <div><div class="stat-num">0€</div><div class="stat-lbl">Coste</div></div>
-      <div><div class="stat-num">2 min</div><div class="stat-lbl">Configuración</div></div>
-      <div><div class="stat-num">∞</div><div class="stat-lbl">Grupos</div></div>
-    </div>
+
   </div>
 </div>
 
-<!-- LOTERIAS -->
-<div style="background:#fff;padding:32px 24px;">
-  <div style="max-width:680px;margin:0 auto;">
-    <div class="eyebrow">Compatible con</div>
-    <div class="sec-title">Las loterías más jugadas</div>
-    <div class="loteria-grid">
-      <div class="loteria-card card-euro">
-        <div class="loteria-icon"><i class="ti ti-stars" style="font-size:24px;color:#fff;" aria-hidden="true"></i></div>
-        <div class="loteria-name">Euromillones</div>
-        <div class="loteria-days">Mar · Vie</div>
-      </div>
-      <div class="loteria-card card-prim">
-        <div class="loteria-icon"><i class="ti ti-circle-dotted" style="font-size:24px;color:#fff;" aria-hidden="true"></i></div>
-        <div class="loteria-name">Primitiva</div>
-        <div class="loteria-days">Jue · Sáb</div>
-      </div>
-      <div class="loteria-card card-bono">
-        <div class="loteria-icon"><i class="ti ti-ticket" style="font-size:24px;color:#fff;" aria-hidden="true"></i></div>
-        <div class="loteria-name">Bonoloto</div>
-        <div class="loteria-days">Lun–Vie</div>
-      </div>
-    </div>
-  </div>
-</div>
+
 
 <!-- ACORDEON -->
 <div class="accordion">
@@ -317,128 +298,6 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
   </div>
 </div>
 
-<!-- CONFIGURADOR -->
-<div class="config-section" id="configurar">
-  <div class="config-inner">
-    <div class="config-eyebrow">Empieza ahora</div>
-    <div class="config-title">Crea tu peña<br>en <em>2 minutos</em></div>
-    <div class="config-sub">Configura tu grupo y comparte el enlace con tus compañeros.</div>
-    <div class="config-card">
-      <div class="config-header">
-        <h3 id="cfg-title">Información del grupo</h3>
-        <p id="cfg-sub">Paso 1 de 4</p>
-      </div>
-      <div class="config-body">
-        <div class="step-dots" id="step-dots"></div>
-
-        <div class="config-step active" id="cs-1">
-          <div class="field">
-            <label>Nombre del grupo</label>
-            <input type="text" id="f-name" placeholder="Ej: Peña del trabajo, Los afortunados..." maxlength="30">
-          </div>
-          <div class="field">
-            <label>Lotería que jugáis</label>
-            <div class="lottery-opts">
-              <div class="lottery-opt selected" data-l="euromillones" onclick="selLottery(this)">
-                <span class="lottery-opt-emoji">🌟</span>
-                <div class="lottery-opt-name">Euromillones</div>
-                <div class="lottery-opt-days">Mar · Vie</div>
-              </div>
-              <div class="lottery-opt" data-l="primitiva" onclick="selLottery(this)">
-                <span class="lottery-opt-emoji">🍀</span>
-                <div class="lottery-opt-name">Primitiva</div>
-                <div class="lottery-opt-days">Jue · Sáb</div>
-              </div>
-              <div class="lottery-opt" data-l="bonoloto" onclick="selLottery(this)">
-                <span class="lottery-opt-emoji">🎱</span>
-                <div class="lottery-opt-name">Bonoloto</div>
-                <div class="lottery-opt-days">Lun–Vie</div>
-              </div>
-            </div>
-          </div>
-          <div class="btn-row"><button class="btn-next" onclick="goStep(2)">SIGUIENTE →</button></div>
-        </div>
-
-        <div class="config-step" id="cs-2">
-          <div class="field">
-            <label id="lbl-main">Números principales (elige 5)</label>
-            <div class="num-grid" id="grid-main"></div>
-          </div>
-          <div class="field">
-            <label id="lbl-star">Estrellas (elige 2)</label>
-            <div class="num-grid" id="grid-star"></div>
-          </div>
-          <div class="btn-row">
-            <button class="btn-back" onclick="goStep(1)">←</button>
-            <button class="btn-next" onclick="goStep(3)">SIGUIENTE →</button>
-          </div>
-        </div>
-
-        <div class="config-step" id="cs-3">
-          <div class="field">
-            <label>Miembros del grupo</label>
-            <div class="member-list" id="member-list"></div>
-            <div class="add-row">
-              <input type="text" id="new-member" placeholder="Nombre del miembro..." maxlength="20" onkeydown="if(event.key==='Enter')addMember()">
-              <button onclick="addMember()">+ Añadir</button>
-            </div>
-            <div class="field-hint">Mínimo 2 personas. El primero será el primer pagador.</div>
-          </div>
-          <div class="btn-row">
-            <button class="btn-back" onclick="goStep(2)">←</button>
-            <button class="btn-next" onclick="goStep(4)">SIGUIENTE →</button>
-          </div>
-        </div>
-
-        <div class="config-step" id="cs-4">
-          <div class="field-row">
-            <div class="field">
-              <label>Coste del boleto (€)</label>
-              <input type="number" id="f-cost" value="20" min="1" max="500" step="0.5">
-            </div>
-            <div class="field">
-              <label>Bizum por persona (€)</label>
-              <input type="number" id="f-bizum" value="4" min="0.5" max="100" step="0.5">
-            </div>
-          </div>
-          <div class="field">
-            <label>Rotación de pagos</label>
-            <div class="rotation-opts">
-              <div class="rotation-opt selected" data-r="draws" onclick="selRotation(this)">
-                <div class="rotation-opt-title">Cada X sorteos</div>
-                <div class="rotation-opt-desc">Un miembro paga varios sorteos seguidos</div>
-              </div>
-              <div class="rotation-opt" data-r="week" onclick="selRotation(this)">
-                <div class="rotation-opt-title">Cada semana</div>
-                <div class="rotation-opt-desc">El pagador cambia cada semana</div>
-              </div>
-            </div>
-          </div>
-          <div class="field" id="draws-field">
-            <label>Sorteos por turno</label>
-            <input type="number" id="f-draws" value="4" min="1" max="20">
-          </div>
-          <div class="btn-row">
-            <button class="btn-back" onclick="goStep(3)">←</button>
-            <button class="btn-next" onclick="createGroup()">🎰 CREAR MI PEÑA</button>
-          </div>
-        </div>
-
-        <div class="config-step" id="cs-result">
-          <div class="result-box">
-            <div class="result-emoji">🎉</div>
-            <div class="result-title" id="res-title">¡Tu peña está lista!</div>
-            <div class="result-desc">Comparte este enlace con tu grupo. Cada miembro lo añade a su pantalla de inicio.</div>
-            <div class="result-link" id="res-link">—</div>
-            <button class="btn-copy" onclick="copyLink()">📋 COPIAR ENLACE</button>
-            <button class="btn-wa" onclick="shareWA()">📲 COMPARTIR POR WHATSAPP</button>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
-
 <footer>
   <div class="footer-logo">Loto<span>Grupo</span></div>
   <div class="footer-text">Hecho con 🍀 para España<br>lotogrupo.es · Gratis para siempre</div>
@@ -447,79 +306,7 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
 <div class="toast" id="toast"></div>
 
 <script>
-const LOTTERIES={
-  euromillones:{mainCount:5,mainMax:50,starCount:2,starMax:12,mainLabel:'Números principales (elige 5)',starLabel:'Estrellas (elige 2)'},
-  primitiva:{mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales (elige 6)',starLabel:'Complementario (elige 1)'},
-  bonoloto:{mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales (elige 6)',starLabel:'Complementario (elige 1)'},
-};
-const AVATARS_BG=['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];
-const AVATARS_FG=['#0C447C','#3B6D11','#854F0B','#7A2443','#534AB7','#1B6B4E','#A0430A','#6B2E90'];
-const STEP_TITLES=['Información del grupo','Vuestros números','Miembros de la peña','Importes y rotación'];
-let selLot='euromillones',selMain=new Set(),selStars=new Set(),members=[],selRot='draws';
-
-function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
 function toggleAcc(id){document.getElementById('acc-'+id).classList.toggle('open');}
-
-function updateStepUI(s){
-  document.querySelectorAll('.config-step').forEach(el=>el.classList.remove('active'));
-  document.getElementById(s==='result'?'cs-result':`cs-${s}`).classList.add('active');
-  if(s==='result'){document.getElementById('cfg-title').textContent='¡Peña creada!';document.getElementById('cfg-sub').textContent='Comparte el enlace';return;}
-  document.getElementById('cfg-title').textContent=STEP_TITLES[s-1];
-  document.getElementById('cfg-sub').textContent=`Paso ${s} de 4`;
-  const dots=document.getElementById('step-dots');dots.innerHTML='';
-  for(let i=1;i<=4;i++){const d=document.createElement('div');d.className='dot'+(i===s?' active':i<s?' done':'');dots.appendChild(d);}
-}
-
-function goStep(s){
-  if(s===2&&!document.getElementById('f-name').value.trim()){showToast('Escribe el nombre del grupo');return;}
-  if(s===2) buildNumGrids();
-  if(s===3){const lot=LOTTERIES[selLot];if(selMain.size!==lot.mainCount){showToast(`Elige ${lot.mainCount} números principales`);return;}if(selStars.size!==lot.starCount){showToast(`Elige ${lot.starCount} estrellas`);return;}renderMembers();}
-  if(s===4&&members.length<2){showToast('Añade al menos 2 miembros');return;}
-  if(s===4){const cost=parseFloat(document.getElementById('f-cost').value)||20;document.getElementById('f-bizum').value=(cost/members.length).toFixed(2);}
-  updateStepUI(s);
-}
-
-function selLottery(el){document.querySelectorAll('.lottery-opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selLot=el.dataset.l;selMain.clear();selStars.clear();}
-
-function buildNumGrids(){
-  const lot=LOTTERIES[selLot];
-  document.getElementById('lbl-main').textContent=lot.mainLabel;
-  document.getElementById('lbl-star').textContent=lot.starLabel;
-  const mg=document.getElementById('grid-main');mg.innerHTML='';
-  for(let i=1;i<=lot.mainMax;i++){const b=document.createElement('button');b.className='num-btn'+(selMain.has(i)?' sel-main':'');b.textContent=i;b.onclick=()=>toggleNum(i,'main',lot.mainCount,b);mg.appendChild(b);}
-  const sg=document.getElementById('grid-star');sg.innerHTML='';
-  for(let i=1;i<=lot.starMax;i++){const b=document.createElement('button');b.className='num-btn'+(selStars.has(i)?' sel-star':'');b.textContent=i;b.onclick=()=>toggleNum(i,'star',lot.starCount,b);sg.appendChild(b);}
-}
-
-function toggleNum(n,type,max,el){
-  if(type==='main'){if(selMain.has(n)){selMain.delete(n);el.className='num-btn';}else if(selMain.size<max){selMain.add(n);el.className='num-btn sel-main';}else showToast(`Máximo ${max} números`);}
-  else{if(selStars.has(n)){selStars.delete(n);el.className='num-btn';}else if(selStars.size<max){selStars.add(n);el.className='num-btn sel-star';}else showToast(`Máximo ${max} estrellas`);}
-}
-
-function renderMembers(){
-  const list=document.getElementById('member-list');list.innerHTML='';
-  members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVATARS_BG[i%8]};color:${AVATARS_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-name">${m}${i===0?' <span style="font-size:10px;color:#FF8C00;">(primer pagador)</span>':''}</div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
-}
-
-function addMember(){const inp=document.getElementById('new-member');const name=inp.value.trim();if(!name){showToast('Escribe un nombre');return;}if(members.includes(name)){showToast('Ese nombre ya existe');return;}if(members.length>=12){showToast('Máximo 12 miembros');return;}members.push(name);inp.value='';renderMembers();}
-function removeMember(i){members.splice(i,1);renderMembers();}
-function selRotation(el){document.querySelectorAll('.rotation-opt').forEach(o=>o.classList.remove('selected'));el.classList.add('selected');selRot=el.dataset.r;document.getElementById('draws-field').style.display=selRot==='draws'?'block':'none';}
-
-function createGroup(){
-  if(members.length<2){showToast('Añade al menos 2 miembros');return;}
-  const cfg={name:document.getElementById('f-name').value.trim(),lottery:selLot,main:[...selMain].sort((a,b)=>a-b),stars:[...selStars].sort((a,b)=>a-b),members,ticketCost:parseFloat(document.getElementById('f-cost').value)||20,bizum:parseFloat(document.getElementById('f-bizum').value)||4,rotation:selRot,drawsPerTurn:selRot==='draws'?parseInt(document.getElementById('f-draws').value)||4:2,epoch:new Date().toISOString()};
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
-  const base=window.location.origin+window.location.pathname.replace('index.html','');
-  window._link=`${base}app.html#${encoded}`;
-  document.getElementById('res-title').textContent=`¡${cfg.name} está lista!`;
-  document.getElementById('res-link').textContent=window._link;
-  updateStepUI('result');
-}
-
-function copyLink(){navigator.clipboard.writeText(window._link).then(()=>showToast('✅ Enlace copiado')).catch(()=>showToast('Copia el enlace manualmente'));}
-function shareWA(){const name=document.getElementById('res-title').textContent.replace('¡','').replace(' está lista!','');const msg=`🎰 *${name}* — LotoGrupo\n\nYa tenemos nuestra app de lotería lista.\n\n👉 Ábrela y añádela a tu pantalla de inicio:\n${window._link}`;window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');}
-
-updateStepUI(1);
 </script>
 </body>
 </html>
