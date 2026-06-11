@@ -7,25 +7,12 @@
 <meta name="theme-color" content="#0A1F0F">
 <meta name="description" content="Gestiona la lotería de tu grupo. Controla turnos, Bizums, resultados y ganancias. Gratis, sin registro.">
 <title>LotoGrupo — La lotería en grupo, sin líos</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 html{scroll-behavior:smooth;}
 body{font-family:'Inter',sans-serif;background:#F5F5F3;color:#111827;}
-
-/* HOOK */
-.hook{background:#0A1F0F;padding:28px 24px 52px;position:relative;overflow:hidden;}
-.hook::after{content:'';position:absolute;bottom:-1px;left:0;right:0;height:48px;background:#0A1F0F;clip-path:polygon(0 100%,100% 0,100% 100%);}
-.hook::before{content:'?';position:absolute;right:-10px;top:-20px;font-family:'Bebas Neue',sans-serif;font-size:200px;color:rgba(255,255,255,0.04);pointer-events:none;line-height:1;}
-.hook-tag{display:inline-block;background:#FF8C00;color:#fff;font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.1em;padding:4px 14px;border-radius:99px;margin-bottom:18px;}
-.bubbles{display:flex;flex-direction:column;gap:9px;}
-.brow{display:flex;gap:9px;}
-.bub{border-radius:99px;padding:9px 16px;border:0.5px solid;display:inline-flex;align-items:center;gap:10px;font-size:13px;font-weight:600;flex:1;}
-.bub .e{font-size:22px;flex-shrink:0;}
-.bub-red{background:rgba(220,38,38,0.15);border-color:rgba(220,38,38,0.3);color:#FCA5A5;}
-.bub-gold{background:rgba(255,140,0,0.15);border-color:rgba(255,140,0,0.3);color:#FCD34D;}
-.bub-green{background:rgba(82,183,136,0.15);border-color:rgba(82,183,136,0.3);color:#6EE7B7;}
-.bub-purple{background:rgba(167,139,250,0.15);border-color:rgba(167,139,250,0.3);color:#C4B5FD;}
 
 /* HERO */
 .hero{background:#0A1F0F;padding:40px 24px 44px;position:relative;overflow:hidden;}
@@ -86,7 +73,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;color:#111827;}
 .acc-item{border-bottom:0.5px solid rgba(0,0,0,0.08);}
 .acc-header{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;cursor:pointer;user-select:none;}
 .acc-title{font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;color:#111827;}
-.acc-icon{width:28px;height:28px;border-radius:50%;background:#0A1F0F;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .25s;}
+.acc-icon{width:28px;height:28px;border-radius:50%;background:#FF8C00;display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:transform .25s;}
 .acc-icon i{color:#FF8C00;font-size:14px;}
 .acc-item.open .acc-icon{transform:rotate(180deg);}
 .acc-body{display:none;padding:0 24px 20px;}
@@ -110,10 +97,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;color:#111827;}
 .feat-card.c-teal{background:#E1F5EE;border-color:#5DCAA5;}
 .feat-title{font-size:11px;font-weight:700;color:#111827;margin-top:8px;line-height:1.3;}
 .carousel-hint{font-size:10px;color:#9CA3AF;margin-top:8px;text-align:center;}
-.para-quien-box{background:#0A1F0F;border-radius:12px;padding:24px;text-align:center;}
-.para-quien-title{font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;color:#fff;line-height:1.2;margin-bottom:10px;}
+.para-quien-box{background:#FFF5E6;border-radius:12px;padding:24px;text-align:center;border:1px solid #FAC775;}
+.para-quien-title{font-family:'Inter',sans-serif;font-size:17px;font-weight:700;color:#111827;line-height:1.4;margin-bottom:10px;}
 .para-quien-title em{color:#FF8C00;font-style:normal;}
-.para-quien-sub{font-size:13px;color:rgba(255,255,255,0.45);line-height:1.6;}
+.para-quien-sub{font-size:13px;color:#6B7280;line-height:1.6;}
 
 /* CONFIGURADOR */
 .config-section{background:#0A1F0F;padding:48px 24px;}
@@ -192,21 +179,6 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
 </head>
 <body>
 
-<!-- HOOK -->
-<div class="hook">
-  <div class="hook-tag">¿Te suena esto?</div>
-  <div class="bubbles">
-    <div class="brow">
-      <div class="bub bub-red"><span class="e">😤</span>¿Me has hecho el Bizum?</div>
-      <div class="bub bub-gold"><span class="e">🤔</span>¿A quién le toca tirar la quiniela?</div>
-    </div>
-    <div class="brow">
-      <div class="bub bub-green"><span class="e">🎰</span>¿Hemos ganado algo?</div>
-      <div class="bub bub-purple"><span class="e">😅</span>¿Cuánto llevamos gastado?</div>
-    </div>
-  </div>
-</div>
-
 <!-- HERO -->
 <div class="hero">
   <div class="hero-inner">
@@ -225,8 +197,8 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
         <span class="exp-item">🎉</span><span class="exp-item">🏆</span><span class="exp-item">💸</span><span class="exp-item">🎰</span><span class="exp-item">🍀</span>
       </div>
     </div>
-    <a href="#configurar" class="cta">
-      <span class="cta-text">🎰 CREAR MI PEÑA GRATIS EN 2 MINUTOS</span>
+    <a href="crear.html" class="cta">
+      <span class="cta-text">🎰 CREAR MI PEÑA GRATIS</span>
       <div class="cta-arrow">→</div>
     </a>
 
@@ -280,7 +252,7 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
           <div class="feat-card c-green"><i class="ti ti-circle-check" style="font-size:26px;color:#3B6D11;" aria-hidden="true"></i><div class="feat-title">Confirmación Bizums</div></div>
         </div>
       </div>
-      <div class="carousel-hint">← Desliza para ver más →</div>
+      <div class="carousel-hint">← Desliza hacia la izquierda para ver más</div>
     </div>
   </div>
 
