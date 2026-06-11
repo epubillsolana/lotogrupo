@@ -1,0 +1,700 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" id="app-title-meta">
+<meta name="theme-color" content="#1B4332">
+<title>PeñaFácil</title>
+<style>
+:root{
+  --forest:#1B4332;--green:#2D6A4F;--lime:#52B788;--mint:#D8F3DC;
+  --gold:#F4A261;--gold-dark:#E76F51;--gold-light:#FEF0E0;
+  --ink:#111827;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF8;--surface:#FFFFFF;--surface2:#F3F4F0;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
+  --red:#DC2626;--red-light:#FEF2F2;
+  --radius:16px;--radius-sm:10px;
+  --wa:#25D366;
+}
+@media(prefers-color-scheme:dark){:root{
+  --paper:#0F1410;--surface:#1A211C;--surface2:#242E26;
+  --ink:#F0EEE8;--ink2:#A8B5AB;--ink3:#6B7A6E;
+  --border:rgba(255,255,255,0.08);--border2:rgba(255,255,255,0.15);
+  --mint:#0D2E18;--gold-light:#2A1D06;--red-light:#2A0A0A;
+}}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;padding-bottom:env(safe-area-inset-bottom,24px);}
+
+/* SETUP SCREEN */
+.setup-screen{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;background:var(--forest);}
+.setup-emoji{font-size:64px;margin-bottom:20px;}
+.setup-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:8px;}
+.setup-sub{font-size:15px;color:rgba(255,255,255,0.65);margin-bottom:32px;line-height:1.6;}
+.setup-card{background:#fff;border-radius:var(--radius);padding:24px;width:100%;max-width:340px;}
+.setup-card label{display:block;font-size:12px;font-weight:700;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;text-align:left;}
+.setup-card select{width:100%;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--paper);color:var(--ink);font-size:15px;margin-bottom:16px;-webkit-appearance:none;}
+.setup-card button{width:100%;padding:14px;background:var(--forest);color:#fff;border:none;border-radius:var(--radius-sm);font-size:16px;font-weight:700;cursor:pointer;}
+
+/* HEADER */
+.header{background:var(--forest);color:#fff;padding:52px 20px 18px;text-align:center;position:relative;}
+.header-group{font-size:11px;opacity:.6;text-transform:uppercase;letter-spacing:.1em;margin-bottom:4px;}
+.header h1{font-size:20px;font-weight:800;letter-spacing:-.3px;}
+.header-lottery{display:inline-flex;align-items:center;gap:5px;background:rgba(255,255,255,0.12);border-radius:99px;padding:3px 10px;font-size:11px;margin-top:6px;}
+
+/* TABBAR */
+.tabbar{display:flex;background:var(--surface);border-bottom:.5px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 0 var(--border);}
+.tab-btn{flex:1;padding:12px 2px 10px;font-size:10px;font-weight:600;color:var(--ink3);border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:2px solid transparent;transition:color .15s;}
+.tab-btn .icon{font-size:18px;}
+.tab-btn.active{color:var(--green);border-bottom-color:var(--green);}
+
+/* SECTIONS */
+.section{display:none;padding:16px;max-width:680px;margin:0 auto;}
+.section.active{display:block;}
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:.5px solid var(--border);}
+.card-label{font-size:11px;font-weight:600;color:var(--ink3);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;}
+
+/* BALLS */
+.ball-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center;}
+.ball{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;}
+.ball.our{background:var(--green);color:#fff;}
+.ball.our-star{background:var(--gold);color:#fff;}
+.ball.draw{background:var(--surface2);color:var(--ink2);border:1px solid var(--border2);}
+.ball.draw-star{background:var(--surface2);color:var(--ink2);border:1px solid var(--border2);}
+.ball.hit{background:#DC2626;color:#fff;}
+.ball.no-hit{background:var(--surface2);color:var(--ink3);border:1px solid var(--border2);opacity:.4;}
+.star-sep{font-size:11px;color:var(--ink3);}
+
+/* BUTTONS */
+.btn{width:100%;padding:14px;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;border:none;margin-top:8px;transition:opacity .15s,transform .1s;}
+.btn:active{transform:scale(.98);}
+.btn-green{background:var(--green);color:#fff;}
+.btn-gray{background:var(--surface2);color:var(--ink);border:.5px solid var(--border2);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* PRIZE BOX */
+.prize-box{border-radius:var(--radius);padding:20px;text-align:center;margin-bottom:12px;}
+.prize-box.none{background:var(--surface2);border:.5px solid var(--border);}
+.prize-box.small{background:var(--mint);border:.5px solid var(--lime);}
+.prize-box.medium{background:var(--gold-light);border:.5px solid var(--gold);}
+.prize-box.big{background:#EFF6FF;border:.5px solid #3B82F6;}
+.prize-emoji{font-size:40px;margin-bottom:8px;}
+.prize-title{font-size:17px;font-weight:700;}
+.prize-title.none{color:var(--ink);}
+.prize-title.small{color:var(--green);}
+.prize-title.medium{color:var(--gold-dark);}
+.prize-title.big{color:#1D4ED8;}
+.prize-amount{font-size:26px;font-weight:800;margin:6px 0 4px;}
+.prize-amount.small{color:var(--green);}
+.prize-amount.medium{color:var(--gold-dark);}
+.prize-amount.big{color:#1D4ED8;}
+.prize-sub{font-size:13px;color:var(--ink3);margin-top:4px;}
+
+/* WA */
+.wa-box{background:var(--surface2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--ink);line-height:1.7;white-space:pre-wrap;border:.5px solid var(--border);font-family:'Courier New',monospace;margin-bottom:10px;}
+.wa-btns{display:flex;gap:8px;}
+.btn-wa{flex:1;padding:11px 8px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;cursor:pointer;border:none;}
+.btn-wa-green{background:var(--wa);color:#fff;}
+.btn-wa-copy{background:var(--surface2);color:var(--ink);border:.5px solid var(--border2);}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.metric{background:var(--surface);border-radius:var(--radius);padding:14px;border:.5px solid var(--border);text-align:center;}
+.metric-val{font-size:20px;font-weight:700;}
+.metric-lbl{font-size:11px;color:var(--ink3);margin-top:3px;}
+
+/* PEOPLE */
+.person-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:.5px solid var(--border);}
+.person-row:last-child{border-bottom:none;}
+.avatar{width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.person-info{flex:1;}
+.person-name{font-size:14px;font-weight:600;}
+.person-sub{font-size:11px;color:var(--ink3);margin-top:1px;}
+.badge{font-size:11px;font-weight:600;padding:3px 10px;border-radius:99px;}
+.badge-active{background:var(--mint);color:var(--green);}
+.badge-next{background:var(--gold-light);color:var(--gold-dark);}
+.badge-wait{background:var(--surface2);color:var(--ink3);}
+
+/* INFO BOX */
+.info-box{border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.6;}
+.info-box.green{background:var(--mint);color:var(--green);border:.5px solid var(--lime);}
+.info-box.gold{background:var(--gold-light);color:var(--gold-dark);border:.5px solid var(--gold);}
+.info-box.blue{background:#EFF6FF;color:#1D4ED8;border:.5px solid #93C5FD;}
+
+/* PRIZES */
+.total-box{background:var(--green);color:#fff;border-radius:var(--radius);padding:24px 16px;text-align:center;margin-bottom:12px;}
+.total-label{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.total-amount{font-size:44px;font-weight:800;letter-spacing:-1px;}
+.total-sub{font-size:12px;opacity:.7;margin-top:5px;}
+.add-prize-row{display:flex;gap:8px;margin-top:8px;}
+.add-prize-row input{flex:1;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--ink);font-size:15px;font-weight:600;}
+.add-prize-row button{padding:10px 14px;border-radius:var(--radius-sm);background:var(--green);color:#fff;border:none;font-size:14px;font-weight:600;cursor:pointer;}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:.5px solid var(--border);}
+.history-item:last-child{border-bottom:none;}
+.history-label{font-size:13px;font-weight:600;color:var(--ink);}
+.history-date{font-size:11px;color:var(--ink3);margin-top:1px;}
+.history-amount{font-size:16px;font-weight:700;color:var(--green);}
+.history-del{background:none;border:none;color:var(--ink3);font-size:16px;cursor:pointer;padding:4px 8px;}
+.empty-state{text-align:center;padding:32px 16px;color:var(--ink3);font-size:14px;}
+
+/* NOTIF */
+.notif-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:500;margin-bottom:10px;}
+.notif-status.ok{background:var(--mint);color:var(--green);}
+.notif-status.warn{background:var(--gold-light);color:var(--gold-dark);}
+.notif-status.off{background:var(--red-light);color:var(--red);}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot.green{background:var(--green);}.dot.gold{background:var(--gold);}.dot.red{background:var(--red);}
+.schedule-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:6px;font-size:13px;}
+select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px solid var(--border2);background:var(--surface2);color:var(--ink);font-size:15px;margin-top:6px;-webkit-appearance:none;}
+
+/* LOADER */
+.loader{text-align:center;padding:20px;color:var(--ink3);font-size:14px;}
+.spinner{display:inline-block;width:18px;height:18px;border:2px solid var(--border2);border-top-color:var(--green);border-radius:50%;animation:spin .8s linear infinite;margin-right:6px;vertical-align:middle;}
+@keyframes spin{to{transform:rotate(360deg);}}
+.draw-meta{display:flex;justify-content:space-between;font-size:12px;color:var(--ink3);margin-bottom:10px;}
+
+/* PRIZE TABLE */
+.prize-table{width:100%;border-collapse:collapse;font-size:12px;}
+.prize-table th{text-align:left;padding:6px 5px;color:var(--ink3);font-weight:600;border-bottom:.5px solid var(--border);}
+.prize-table td{padding:7px 5px;border-bottom:.5px solid var(--border);color:var(--ink);}
+.prize-table tr:last-child td{border-bottom:none;}
+.prize-table .amt{text-align:right;font-weight:600;color:var(--green);}
+
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- SETUP SCREEN (shown if no config in hash) -->
+<div id="setup-screen" class="setup-screen" style="display:none;">
+  <div class="setup-emoji">🎰</div>
+  <div class="setup-title">PeñaFácil</div>
+  <div class="setup-sub">No se ha encontrado la configuración de tu peña.<br>Pide al administrador del grupo que te reenvíe el enlace.</div>
+  <div class="setup-card">
+    <a href="index.html" style="display:block;padding:14px;background:var(--forest);color:#fff;border-radius:10px;font-size:15px;font-weight:700;text-decoration:none;text-align:center;">Crear una peña nueva →</a>
+  </div>
+</div>
+
+<!-- MAIN APP (hidden until config loaded) -->
+<div id="main-app" style="display:none;">
+  <div class="header">
+    <div class="header-group" id="header-group">— · —</div>
+    <h1 id="header-title">PeñaFácil</h1>
+    <div class="header-lottery" id="header-lottery">🌟 Euromillones</div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tab-btn active" onclick="switchTab('comprobar',this)"><span class="icon">🔍</span>Comprobar</button>
+    <button class="tab-btn" onclick="switchTab('turnos',this)"><span class="icon">👥</span>Turnos</button>
+    <button class="tab-btn" onclick="switchTab('premios',this)"><span class="icon">💰</span>Premios</button>
+    <button class="tab-btn" onclick="switchTab('avisos',this)"><span class="icon">🔔</span>Avisos</button>
+    <button class="tab-btn" onclick="switchTab('info',this)"><span class="icon">🎱</span>Info</button>
+  </div>
+
+  <!-- COMPROBAR -->
+  <div class="section active" id="tab-comprobar">
+    <div class="card">
+      <div class="card-label">Vuestros números</div>
+      <div class="ball-row" id="our-numbers"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Último sorteo oficial</div>
+      <div id="sorteo-area"><div class="loader"><span class="spinner"></span>Consultando resultados...</div></div>
+      <button class="btn btn-green" id="btn-check" onclick="checkPrize()" disabled>Comprobar premio</button>
+    </div>
+    <div id="result-area" style="display:none;">
+      <div id="prize-box" class="prize-box none">
+        <div id="prize-emoji" class="prize-emoji">🎱</div>
+        <div id="prize-title" class="prize-title none">—</div>
+        <div id="prize-amount" class="prize-amount" style="display:none;"></div>
+        <div id="prize-sub" class="prize-sub">—</div>
+        <div id="hit-balls" class="ball-row" style="margin-top:14px;"></div>
+      </div>
+      <div id="add-prize-box" class="card" style="display:none;">
+        <div class="card-label">¿Añadir al historial de premios?</div>
+        <div class="add-prize-row">
+          <input type="number" id="real-amount" placeholder="€ importe real" min="0" step="0.01">
+          <button onclick="addPrizeFromResult()">Añadir</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label">Mensaje para el grupo</div>
+        <div class="wa-box" id="wa-text">—</div>
+        <div class="wa-btns">
+          <button class="btn-wa btn-wa-copy" onclick="copyMsg()">📋 Copiar</button>
+          <button class="btn-wa btn-wa-green" onclick="openWA()">📲 WhatsApp</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TURNOS -->
+  <div class="section" id="tab-turnos">
+    <div class="metrics">
+      <div class="metric"><div class="metric-val" id="m-payer">—</div><div class="metric-lbl">Paga esta ronda</div></div>
+      <div class="metric"><div class="metric-val" id="m-bizum">—</div><div class="metric-lbl">Bizum por persona</div></div>
+    </div>
+    <div class="info-box green" id="bizum-info"><p id="bizum-text">—</p></div>
+    <div class="card">
+      <div class="card-label">Rotación del grupo</div>
+      <div id="turns-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Aviso de cambio de turno</div>
+      <div class="wa-box" id="wa-turn">—</div>
+      <div class="wa-btns">
+        <button class="btn-wa btn-wa-copy" onclick="copyTurn()">📋 Copiar</button>
+        <button class="btn-wa btn-wa-green" onclick="openWATurn()">📲 WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- PREMIOS -->
+  <div class="section" id="tab-premios">
+    <div class="total-box">
+      <div class="total-label">Total ganado por el grupo</div>
+      <div class="total-amount" id="total-amount">0,00 €</div>
+      <div class="total-sub" id="total-sub">Sin premios registrados todavía</div>
+    </div>
+    <div class="card">
+      <div class="card-label">Añadir premio manualmente</div>
+      <div class="add-prize-row">
+        <input type="number" id="manual-amount" placeholder="€ importe" min="0" step="0.01">
+        <button onclick="addManualPrize()">Añadir</button>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label">Historial</div>
+      <div id="history-list"></div>
+    </div>
+    <button class="btn btn-gray" id="reset-btn" onclick="resetPrizes()" style="display:none;margin-top:4px;">🗑️ Borrar historial</button>
+  </div>
+
+  <!-- AVISOS -->
+  <div class="section" id="tab-avisos">
+    <div class="card">
+      <div class="card-label">¿Quién eres tú?</div>
+      <p style="font-size:13px;color:var(--ink3);margin-bottom:8px;">Selecciona tu nombre para personalizar los avisos.</p>
+      <select id="who-select" onchange="onPersonChange()">
+        <option value="">— Selecciona tu nombre —</option>
+      </select>
+    </div>
+    <div id="notif-status-box" style="display:none;">
+      <div id="notif-status-row" class="notif-status warn">
+        <div class="dot gold" id="notif-dot"></div>
+        <span id="notif-status-text">—</span>
+      </div>
+      <button class="btn btn-green" id="btn-notif" onclick="requestNotifPermission()" style="margin-bottom:12px;">🔔 Activar notificaciones</button>
+    </div>
+    <div id="notif-preview" style="display:none;">
+      <div class="card">
+        <div class="card-label">Tu próximo aviso</div>
+        <div id="preview-msg" class="info-box green"></div>
+      </div>
+      <div class="card">
+        <div class="card-label">Próximos avisos (lunes 10:00h)</div>
+        <div id="schedule-list"></div>
+      </div>
+      <div class="info-box gold">⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para que las notificaciones funcionen aunque el móvil esté bloqueado.<br><br><strong>iPhone:</strong> Safari → Compartir ⬆️ → "Añadir a pantalla de inicio"<br><strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"</div>
+      <button class="btn btn-gray" onclick="testNotif()" style="margin-bottom:12px;">🧪 Notificación de prueba</button>
+    </div>
+  </div>
+
+  <!-- INFO -->
+  <div class="section" id="tab-info">
+    <div class="card">
+      <div class="card-label">Datos de la peña</div>
+      <div id="group-info-rows"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Miembros</div>
+      <div id="members-info"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Tabla de premios</div>
+      <table class="prize-table" id="prize-table"></table>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── CONFIG ───────────────────────────────────────────────────────────────────
+const LOTTERIES = {
+  euromillones:{name:'Euromillones',emoji:'🌟',mainCount:5,mainMax:50,starCount:2,starMax:12,starLabel:'Estrellas',notifDay:1},
+  primitiva:   {name:'Primitiva',   emoji:'🍀',mainCount:6,mainMax:49,starCount:1,starMax:9, starLabel:'Complementario',notifDay:3},
+  bonoloto:    {name:'Bonoloto',    emoji:'🎱',mainCount:6,mainMax:49,starCount:1,starMax:9, starLabel:'Complementario',notifDay:1},
+};
+const FALLBACKS={
+  euromillones:{fecha:'09/06/2026',numeros:[2,7,23,44,46],estrellas:[3,5],bote:'17 millones €'},
+  primitiva:   {fecha:'07/06/2026',numeros:[3,12,19,31,43,48],estrellas:[7],bote:'—'},
+  bonoloto:    {fecha:'06/06/2026',numeros:[5,14,22,35,40,47],estrellas:[4],bote:'—'},
+};
+const AVATARS_BG=['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];
+const AVATARS_FG=['#0C447C','#3B6D11','#854F0B','#7A2443','#534AB7','#1B6B4E','#A0430A','#6B2E90'];
+
+let CFG=null, drawData=null, lastWAMsg='', lastWATurn='';
+
+// ── LOAD CONFIG ───────────────────────────────────────────────────────────────
+function loadConfig(){
+  const hash=window.location.hash.slice(1);
+  if(!hash){document.getElementById('setup-screen').style.display='flex';return;}
+  try{
+    CFG=JSON.parse(decodeURIComponent(escape(atob(hash))));
+    document.getElementById('main-app').style.display='block';
+    // Save to localStorage for offline
+    localStorage.setItem('pf_config',JSON.stringify(CFG));
+    initApp();
+  }catch(e){
+    // Try localStorage fallback
+    const saved=localStorage.getItem('pf_config');
+    if(saved){try{CFG=JSON.parse(saved);document.getElementById('main-app').style.display='block';initApp();return;}catch(e2){}}
+    document.getElementById('setup-screen').style.display='flex';
+  }
+}
+
+// ── INIT ──────────────────────────────────────────────────────────────────────
+function initApp(){
+  const lot=LOTTERIES[CFG.lottery];
+  document.title=CFG.name+' · PeñaFácil';
+  document.getElementById('header-group').textContent=CFG.name;
+  document.getElementById('header-title').textContent='PeñaFácil';
+  document.getElementById('header-lottery').textContent=`${lot.emoji} ${lot.name}`;
+  // Our numbers
+  const nr=document.getElementById('our-numbers');
+  CFG.main.forEach(n=>{const b=document.createElement('div');b.className='ball our';b.textContent=n;nr.appendChild(b);});
+  const sep=document.createElement('span');sep.className='star-sep';sep.textContent='⭐';nr.appendChild(sep);
+  CFG.stars.forEach(n=>{const b=document.createElement('div');b.className='ball our-star';b.textContent=n;nr.appendChild(b);});
+  // Who selector
+  const sel=document.getElementById('who-select');
+  CFG.members.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;sel.appendChild(o);});
+  buildTurns();
+  renderHistory();
+  buildInfo();
+  initDraw();
+  restoreWho();
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).catch(()=>{});
+}
+
+// ── PAYER ─────────────────────────────────────────────────────────────────────
+function getCurrentPayerIdx(){
+  const epoch=new Date(CFG.epoch||CFG.created);
+  const ms=Math.max(0,new Date()-epoch);
+  const draws=Math.floor(ms/(3.5*24*3600*1000));
+  return Math.floor(draws/CFG.drawsPerTurn)%CFG.members.length;
+}
+
+// ── FETCH DRAW ────────────────────────────────────────────────────────────────
+function parseNums(html){
+  const m=html.match(/[Nn][úu]meros?:?\s*([\d,\s]+)[Ee]strellas?:?\s*([\d,\s]+)/);
+  if(m){
+    const nums=m[1].split(/[,\s]+/).map(Number).filter(n=>n>=1&&n<=50).slice(0,CFG.main.length);
+    const stars=m[2].split(/[,\s]+/).map(Number).filter(n=>n>=1&&n<=12).slice(0,CFG.stars.length);
+    if(nums.length===CFG.main.length&&stars.length===CFG.stars.length)
+      return{numeros:nums.sort((a,b)=>a-b),estrellas:stars.sort((a,b)=>a-b)};
+  }
+  return null;
+}
+function parseFecha(html){
+  const meses={enero:'01',febrero:'02',marzo:'03',abril:'04',mayo:'05',junio:'06',julio:'07',agosto:'08',septiembre:'09',octubre:'10',noviembre:'11',diciembre:'12'};
+  const m=html.match(/(\d{1,2})\s+de\s+(\w+)\s+de\s+(\d{4})/i);
+  if(m){const mes=meses[m[2].toLowerCase()]||'01';return`${m[1].padStart(2,'0')}/${mes}/${m[3]}`;}
+  return null;
+}
+async function fetchLatestDraw(){
+  const FB=FALLBACKS[CFG.lottery];
+  try{
+    const urls={
+      euromillones:'https://www.euromillones.com.es/',
+      primitiva:'https://www.loteriasyapuestas.es/es/primitiva',
+      bonoloto:'https://www.loteriasyapuestas.es/es/bonoloto',
+    };
+    const r=await fetch('https://api.allorigins.win/get?url='+encodeURIComponent(urls[CFG.lottery]),{cache:'no-store'});
+    if(!r.ok) throw new Error();
+    const html=(await r.json()).contents||'';
+    const parsed=parseNums(html);
+    if(parsed){
+      const fecha=parseFecha(html)||FB.fecha;
+      const result={fecha,...parsed,bote:'—'};
+      localStorage.setItem('pf_draw_'+CFG.lottery,JSON.stringify(result));
+      return result;
+    }
+  }catch(e){}
+  try{const s=localStorage.getItem('pf_draw_'+CFG.lottery);if(s)return JSON.parse(s);}catch(e){}
+  return FB;
+}
+async function initDraw(){
+  drawData=await fetchLatestDraw();
+  const{fecha,numeros,estrellas,bote}=drawData;
+  const area=document.getElementById('sorteo-area');
+  area.innerHTML=`
+    <div class="draw-meta"><span>📅 ${fecha}</span><span>💰 ${bote}</span></div>
+    <div class="ball-row">
+      ${numeros.map(n=>`<div class="ball draw" id="sn-${n}">${n}</div>`).join('')}
+      <span class="star-sep">⭐</span>
+      ${estrellas.map(n=>`<div class="ball draw-star" id="ss-${n}">${n}</div>`).join('')}
+    </div>`;
+  document.getElementById('btn-check').disabled=false;
+}
+
+// ── PRIZE ─────────────────────────────────────────────────────────────────────
+function getPrize(nm,ns,lottery){
+  const t={
+    euromillones:[
+      {m:5,s:2,emoji:'🏆',label:'¡JACKPOT! 5+2⭐',approx:'El bote',cat:'big'},
+      {m:5,s:1,emoji:'🥇',label:'2ª — 5+1⭐',approx:'~500.000€',cat:'big'},
+      {m:5,s:0,emoji:'🥈',label:'3ª — 5 números',approx:'~100.000€',cat:'big'},
+      {m:4,s:2,emoji:'🎉',label:'4ª — 4+2⭐',approx:'~3.000€',cat:'medium'},
+      {m:4,s:1,emoji:'🎊',label:'5ª — 4+1⭐',approx:'~150€',cat:'medium'},
+      {m:3,s:2,emoji:'🎊',label:'6ª — 3+2⭐',approx:'~80€',cat:'medium'},
+      {m:4,s:0,emoji:'🍀',label:'7ª — 4 números',approx:'~40€',cat:'small'},
+      {m:2,s:2,emoji:'🍀',label:'8ª — 2+2⭐',approx:'~18€',cat:'small'},
+      {m:3,s:1,emoji:'🍀',label:'9ª — 3+1⭐',approx:'~14€',cat:'small'},
+      {m:3,s:0,emoji:'🍀',label:'10ª — 3 números',approx:'~10€',cat:'small'},
+      {m:1,s:2,emoji:'🍀',label:'11ª — 1+2⭐',approx:'~9€',cat:'small'},
+      {m:2,s:1,emoji:'🍀',label:'12ª — 2+1⭐',approx:'~6€',cat:'small'},
+    ],
+    primitiva:[
+      {m:6,s:1,emoji:'🏆',label:'1ª — 6+C',approx:'Bote',cat:'big'},
+      {m:6,s:0,emoji:'🥇',label:'2ª — 6 números',approx:'~500.000€',cat:'big'},
+      {m:5,s:1,emoji:'🎉',label:'3ª — 5+C',approx:'~15.000€',cat:'medium'},
+      {m:5,s:0,emoji:'🎊',label:'4ª — 5 números',approx:'~2.000€',cat:'medium'},
+      {m:4,s:0,emoji:'🍀',label:'5ª — 4 números',approx:'~50€',cat:'small'},
+      {m:3,s:0,emoji:'🍀',label:'6ª — 3 números',approx:'~1€',cat:'small'},
+    ],
+    bonoloto:[
+      {m:6,s:1,emoji:'🏆',label:'1ª — 6+C',approx:'Bote',cat:'big'},
+      {m:6,s:0,emoji:'🥇',label:'2ª — 6 números',approx:'~300.000€',cat:'big'},
+      {m:5,s:1,emoji:'🎉',label:'3ª — 5+C',approx:'~10.000€',cat:'medium'},
+      {m:5,s:0,emoji:'🎊',label:'4ª — 5 números',approx:'~1.000€',cat:'medium'},
+      {m:4,s:0,emoji:'🍀',label:'5ª — 4 números',approx:'~30€',cat:'small'},
+      {m:3,s:0,emoji:'🍀',label:'6ª — 3 números',approx:'~1€',cat:'small'},
+    ],
+  };
+  for(const p of(t[lottery]||t.euromillones)) if(p.m===nm&&p.s===ns) return p;
+  return{emoji:'😅',label:'Sin premio esta vez',approx:'',cat:'none'};
+}
+
+function checkPrize(){
+  if(!drawData) return;
+  const{fecha,numeros,estrellas}=drawData;
+  const hitM=CFG.main.filter(n=>numeros.includes(n));
+  const hitS=CFG.stars.filter(n=>estrellas.includes(n));
+  CFG.main.forEach(n=>{const el=document.getElementById('sn-'+n);if(el)el.className='ball draw';});
+  CFG.stars.forEach(n=>{const el=document.getElementById('ss-'+n);if(el)el.className='ball draw-star';});
+  const prize=getPrize(hitM.length,hitS.length,CFG.lottery);
+  const payerIdx=getCurrentPayerIdx(), payer=CFG.members[payerIdx];
+  const others=CFG.members.filter((_,i)=>i!==payerIdx);
+  document.getElementById('prize-box').className='prize-box '+prize.cat;
+  document.getElementById('prize-emoji').textContent=prize.emoji;
+  const pt=document.getElementById('prize-title'); pt.className='prize-title '+prize.cat; pt.textContent=prize.label;
+  const pa=document.getElementById('prize-amount');
+  if(prize.cat!=='none'){pa.style.display='block';pa.className='prize-amount '+prize.cat;pa.textContent=prize.approx;}
+  else pa.style.display='none';
+  document.getElementById('prize-sub').textContent=
+    hitM.length===0&&hitS.length===0?'Ningún acierto. ¡Suerte la próxima!':`Núm: ${hitM.length>0?hitM.join(', '):'—'} · Estrellas: ${hitS.length>0?hitS.join(', '):'—'}`;
+  const hb=document.getElementById('hit-balls'); hb.innerHTML='';
+  const lbl=document.createElement('div');
+  lbl.style.cssText='width:100%;text-align:center;font-size:11px;font-weight:600;color:var(--ink3);margin-bottom:6px;text-transform:uppercase;letter-spacing:.05em;';
+  lbl.textContent=hitM.length===0&&hitS.length===0?'Sin aciertos':`✅ ${hitM.length} número${hitM.length!==1?'s':''}${hitS.length>0?' + '+hitS.length+' estrella'+(hitS.length!==1?'s':''):''}`;
+  hb.appendChild(lbl);
+  [...numeros].sort((a,b)=>a-b).forEach(n=>{const b=document.createElement('div');b.className='ball '+(hitM.includes(n)?'hit':'no-hit');b.textContent=n;hb.appendChild(b);});
+  const s=document.createElement('span');s.className='star-sep';s.textContent='⭐';hb.appendChild(s);
+  [...estrellas].sort((a,b)=>a-b).forEach(n=>{const b=document.createElement('div');b.className='ball '+(hitS.includes(n)?'hit':'no-hit');b.textContent=n;hb.appendChild(b);});
+  if(prize.cat!=='none'){
+    document.getElementById('add-prize-box').style.display='block';
+    const approxNum=parseFloat(prize.approx.replace(/[~€\s.]/g,'').replace(',','.'));
+    if(!isNaN(approxNum)) document.getElementById('real-amount').value=approxNum;
+  }
+  const lot=LOTTERIES[CFG.lottery];
+  const numLine=[...numeros].sort((a,b)=>a-b).map(n=>hitM.includes(n)?`🔵${n}`:`⚪${n}`).join(' ');
+  const starLine=[...estrellas].sort((a,b)=>a-b).map(n=>hitS.includes(n)?`🟡${n}`:`⚪${n}`).join(' ');
+  const emo=prize.cat==='big'?'🏆':prize.cat==='medium'?'🎉':prize.cat==='small'?'🍀':'😅';
+  const msg=`${emo} *${CFG.name}* — ${lot.name} ${fecha}\n\n🎱 Nuestros números:\n${CFG.main.join(' · ')}  ⭐ ${CFG.stars.join(' · ')}\n\n🔢 Sorteo premiado:\n${numLine}  ⭐ ${starLine}\n\n${hitM.length===0&&hitS.length===0?'❌ Sin aciertos esta vez':`✅ ${hitM.map(n=>`*${n}*`).join(', ')||'—'} ${hitS.length>0?'⭐'+hitS.map(n=>`*${n}*`).join(', '):''}`}\n🏅 ${prize.label}${prize.approx?' · '+prize.approx:''}\n\n💳 Paga esta ronda: *${payer}*\n💸 Bizum de ${CFG.bizum}€ a ${payer}:\n${others.map(o=>'   · '+o).join('\n')}`;
+  document.getElementById('wa-text').textContent=msg; lastWAMsg=msg;
+  document.getElementById('result-area').style.display='block';
+  setTimeout(()=>document.getElementById('result-area').scrollIntoView({behavior:'smooth',block:'start'}),100);
+}
+
+// ── TURNS ─────────────────────────────────────────────────────────────────────
+function buildTurns(){
+  const idx=getCurrentPayerIdx(), payer=CFG.members[idx];
+  const others=CFG.members.filter((_,i)=>i!==idx);
+  document.getElementById('m-payer').textContent=payer;
+  document.getElementById('m-bizum').textContent=CFG.bizum+'€';
+  document.getElementById('bizum-text').innerHTML=`<strong>${payer}</strong> paga esta ronda (${CFG.drawsPerTurn} sorteos).<br>El resto hacéis <strong>Bizum de ${CFG.bizum}€</strong> a ${payer}: ${others.join(', ')}.`;
+  const list=document.getElementById('turns-list'); list.innerHTML='';
+  CFG.members.forEach((m,i)=>{
+    const isActive=i===idx, isNext=i===(idx+1)%CFG.members.length;
+    const row=document.createElement('div'); row.className='person-row';
+    row.innerHTML=`<div class="avatar" style="background:${AVATARS_BG[i%8]};color:${AVATARS_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div>
+      <div class="person-info"><div class="person-name">${m}</div>
+      <div class="person-sub">${isActive?'Paga '+CFG.ticketCost+'€ · activo':isNext?'Siguiente turno':'En espera'}</div></div>
+      <span class="badge ${isActive?'badge-active':isNext?'badge-next':'badge-wait'}">${isActive?'Activo':isNext?'Siguiente':'Espera'}</span>`;
+    list.appendChild(row);
+  });
+  const turnMsg=`🔄 ¡Nuevo turno ${CFG.name}!\n\n➡️ Ahora paga: ${payer}\n📅 Próximos ${CFG.drawsPerTurn} sorteos\n💰 Total: ${CFG.ticketCost}€\n\n💸 Bizum de ${CFG.bizum}€ a ${payer}:\n${others.map(o=>'   · '+o).join('\n')}\n\n¡Suerte a todos! 🍀🎰`;
+  document.getElementById('wa-turn').textContent=turnMsg; lastWATurn=turnMsg;
+}
+
+// ── PRIZES ────────────────────────────────────────────────────────────────────
+function loadHistory(){try{return JSON.parse(localStorage.getItem('pf_prizes_'+btoa(CFG.name).slice(0,10))||'[]');}catch(e){return[];}}
+function saveHistory(h){localStorage.setItem('pf_prizes_'+btoa(CFG.name).slice(0,10),JSON.stringify(h));}
+function formatEur(n){return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
+function renderHistory(){
+  const h=loadHistory(), total=h.reduce((s,e)=>s+e.amount,0);
+  document.getElementById('total-amount').textContent=formatEur(total);
+  document.getElementById('total-sub').textContent=h.length===0?'Sin premios registrados todavía':`${h.length} premio${h.length!==1?'s':''} registrado${h.length!==1?'s':''}`;
+  const list=document.getElementById('history-list');
+  if(h.length===0){list.innerHTML='<div class="empty-state">Todavía no hay premios 🍀<br><span style="font-size:12px;">Cuando toque algo, aparecerá aquí</span></div>';document.getElementById('reset-btn').style.display='none';return;}
+  document.getElementById('reset-btn').style.display='block';
+  list.innerHTML='';
+  [...h].reverse().forEach((e,ri)=>{
+    const i=h.length-1-ri;
+    const row=document.createElement('div'); row.className='history-item';
+    row.innerHTML=`<div><div class="history-label">${e.label}</div><div class="history-date">${e.fecha}</div></div>
+      <div style="display:flex;align-items:center;gap:8px;"><span class="history-amount">+${formatEur(e.amount)}</span><button class="history-del" onclick="deletePrize(${i})">✕</button></div>`;
+    list.appendChild(row);
+  });
+}
+function addPrize(amount,label,fecha){
+  if(!amount||amount<=0){showToast('Introduce un importe válido');return false;}
+  const h=loadHistory(); h.push({amount,label,fecha}); saveHistory(h); renderHistory();
+  showToast(`✅ +${formatEur(amount)} añadido`); return true;
+}
+function addPrizeFromResult(){
+  const input=document.getElementById('real-amount');
+  const amount=parseFloat(input.value);
+  const label=document.getElementById('prize-title').textContent;
+  if(addPrize(amount,label,drawData?.fecha||'—')){input.value='';document.getElementById('add-prize-box').style.display='none';}
+}
+function addManualPrize(){
+  const input=document.getElementById('manual-amount');
+  if(addPrize(parseFloat(input.value),'Premio manual',new Date().toLocaleDateString('es-ES'))) input.value='';
+}
+function deletePrize(idx){const h=loadHistory();h.splice(idx,1);saveHistory(h);renderHistory();showToast('Entrada eliminada');}
+function resetPrizes(){if(!confirm('¿Borrar todo el historial?'))return;saveHistory([]);renderHistory();showToast('Historial borrado');}
+
+// ── INFO ──────────────────────────────────────────────────────────────────────
+function buildInfo(){
+  const lot=LOTTERIES[CFG.lottery];
+  const rows=[
+    ['Nombre','CFG.name'],['Lotería',`${lot.emoji} ${lot.name}`],
+    ['Coste boleto',CFG.ticketCost+'€'],['Bizum por persona',CFG.bizum+'€'],
+    ['Sorteos por turno',CFG.drawsPerTurn],['Nº miembros',CFG.members.length],
+  ];
+  const info=document.getElementById('group-info-rows');
+  rows.forEach(([k,v])=>{
+    const row=document.createElement('div');
+    row.style.cssText='display:flex;justify-content:space-between;padding:9px 0;border-bottom:.5px solid var(--border);font-size:13px;';
+    row.innerHTML=`<span style="color:var(--ink3);">${k}</span><strong>${k==='Nombre'?CFG.name:v}</strong>`;
+    info.appendChild(row);
+  });
+  info.lastChild.style.borderBottom='none';
+  // Members
+  const ml=document.getElementById('members-info');
+  CFG.members.forEach((m,i)=>{
+    const row=document.createElement('div'); row.className='person-row';
+    row.innerHTML=`<div class="avatar" style="background:${AVATARS_BG[i%8]};color:${AVATARS_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div>
+      <div class="person-info"><div class="person-name">${m}</div><div class="person-sub">${i===0?'Primer pagador':'Miembro del grupo'}</div></div>`;
+    ml.appendChild(row);
+  });
+  // Prize table
+  const tbl=document.getElementById('prize-table');
+  const prizes={euromillones:[['5+2⭐','Bote millones'],['5+1⭐','~500k€'],['5','~100k€'],['4+2⭐','~3.000€'],['4+1⭐','~150€'],['3+2⭐','~80€'],['4','~40€'],['2+2⭐','~18€'],['3+1⭐','~14€'],['3','~10€'],['1+2⭐','~9€'],['2+1⭐','~6€']],primitiva:[['6+C','Bote'],['6','~500k€'],['5+C','~15k€'],['5','~2k€'],['4','~50€'],['3','~1€']],bonoloto:[['6+C','Bote'],['6','~300k€'],['5+C','~10k€'],['5','~1k€'],['4','~30€'],['3','~1€']]};
+  tbl.innerHTML='<tr><th>Aciertos</th><th class="amt">Premio</th></tr>';
+  (prizes[CFG.lottery]||prizes.euromillones).forEach(([a,p])=>{
+    tbl.innerHTML+=`<tr><td>${a}</td><td class="amt">${p}</td></tr>`;
+  });
+}
+
+// ── NOTIFICATIONS ──────────────────────────────────────────────────────────────
+function getMyIdx(){return parseInt(localStorage.getItem('pf_who_'+CFG.name)??'-1');}
+function getNotifMsg(myIdx){
+  const payerIdx=getCurrentPayerIdx(), payer=CFG.members[payerIdx];
+  const others=CFG.members.filter((_,i)=>i!==payerIdx);
+  if(myIdx===payerIdx) return{title:`🎰 ¡Te toca jugar en ${CFG.name}!`,body:`Recuerda comprar el boleto esta semana. El grupo te hará el Bizum de ${CFG.bizum}€.`};
+  return{title:`💸 Bizum de ${CFG.bizum}€ a ${payer}`,body:`Esta semana juega ${payer} en ${CFG.name}. Recuerda hacerle el Bizum de ${CFG.bizum}€.`};
+}
+function getNextMondays(n=5){
+  const dates=[],d=new Date();d.setHours(0,0,0,0);
+  while(dates.length<n){d.setDate(d.getDate()+1);if(d.getDay()===1)dates.push(new Date(d));}
+  return dates;
+}
+function updateNotifStatusUI(){
+  const box=document.getElementById('notif-status-box'),row=document.getElementById('notif-status-row'),dot=document.getElementById('notif-dot'),txt=document.getElementById('notif-status-text'),btn=document.getElementById('btn-notif');
+  box.style.display='block';
+  if(!('Notification' in window)){row.className='notif-status off';dot.className='dot red';txt.textContent='Tu navegador no soporta notificaciones.';btn.style.display='none';return;}
+  const p=Notification.permission;
+  if(p==='granted'){row.className='notif-status ok';dot.className='dot green';txt.textContent='✅ Notificaciones activadas. Cada lunes a las 10:00h.';btn.style.display='none';document.getElementById('notif-preview').style.display='block';}
+  else if(p==='denied'){row.className='notif-status off';dot.className='dot red';txt.textContent='❌ Notificaciones bloqueadas. Actívalas en los ajustes.';btn.style.display='none';}
+  else{row.className='notif-status warn';dot.className='dot gold';txt.textContent='⚠️ Notificaciones no activadas. Pulsa el botón.';btn.style.display='block';}
+}
+async function requestNotifPermission(){
+  const p=await Notification.requestPermission();
+  updateNotifStatusUI();
+  if(p==='granted'){showToast('✅ ¡Notificaciones activadas!');document.getElementById('notif-preview').style.display='block';scheduleNotif();}
+  else showToast('Notificaciones denegadas.');
+}
+function scheduleNotif(){
+  const myIdx=getMyIdx();
+  if(myIdx<0||Notification.permission!=='granted') return;
+  const next=getNextMondays(1)[0]; next.setHours(10,0,0,0);
+  const ms=next-new Date();
+  if(ms>0&&ms<8*24*3600*1000){setTimeout(()=>{const msg=getNotifMsg(myIdx);new Notification(msg.title,{body:msg.body});setTimeout(scheduleNotif,60000);},ms);}
+}
+function testNotif(){
+  const myIdx=getMyIdx();
+  if(myIdx<0){showToast('Selecciona tu nombre primero');return;}
+  if(Notification.permission!=='granted'){showToast('Activa las notificaciones primero');return;}
+  const msg=getNotifMsg(myIdx);
+  new Notification(msg.title,{body:msg.body});
+  showToast('📨 Notificación de prueba enviada');
+}
+function buildNotifPreview(myIdx){
+  const msg=getNotifMsg(myIdx);
+  document.getElementById('preview-msg').innerHTML=`<strong>${msg.title}</strong><br>${msg.body}`;
+  const list=document.getElementById('schedule-list'); list.innerHTML='';
+  const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  getNextMondays(5).forEach(d=>{
+    const item=document.createElement('div');item.className='schedule-item';
+    item.innerHTML=`<span>Lunes ${d.getDate()} ${months[d.getMonth()]}</span><strong>10:00h 🔔</strong>`;
+    list.appendChild(item);
+  });
+}
+function onPersonChange(){
+  const val=document.getElementById('who-select').value;
+  if(val===''){document.getElementById('notif-status-box').style.display='none';document.getElementById('notif-preview').style.display='none';return;}
+  const idx=parseInt(val);
+  localStorage.setItem('pf_who_'+CFG.name,idx);
+  updateNotifStatusUI();
+  buildNotifPreview(idx);
+  if(Notification.permission==='granted') scheduleNotif();
+}
+function restoreWho(){
+  const saved=localStorage.getItem('pf_who_'+CFG.name);
+  if(saved!==null){document.getElementById('who-select').value=saved;onPersonChange();}
+}
+
+// ── UI HELPERS ────────────────────────────────────────────────────────────────
+function switchTab(id,el){
+  document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
+  document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
+  el.classList.add('active'); document.getElementById('tab-'+id).classList.add('active');
+  if(id==='premios') renderHistory();
+}
+function showToast(msg){const t=document.getElementById('toast');t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);}
+function copyMsg(){navigator.clipboard.writeText(lastWAMsg).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
+function openWA(){window.open('https://wa.me/?text='+encodeURIComponent(lastWAMsg),'_blank');}
+function copyTurn(){navigator.clipboard.writeText(lastWATurn).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
+function openWATurn(){window.open('https://wa.me/?text='+encodeURIComponent(lastWATurn),'_blank');}
+
+// ── START ─────────────────────────────────────────────────────────────────────
+loadConfig();
+</script>
+</body>
+</html>

@@ -1,0 +1,538 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="theme-color" content="#1B4332">
+<title>PeñaFácil — Gestiona tu lotería en grupo</title>
+<style>
+:root{
+  --forest:#1B4332;--green:#2D6A4F;--lime:#52B788;--mint:#D8F3DC;
+  --gold:#F4A261;--gold-dark:#E76F51;
+  --ink:#111827;--ink2:#374151;--ink3:#6B7280;
+  --paper:#FAFAF8;--surface:#FFFFFF;--surface2:#F3F4F0;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.14);
+  --radius:16px;--radius-sm:10px;
+  --shadow:0 1px 3px rgba(0,0,0,0.08),0 4px 16px rgba(0,0,0,0.06);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html{scroll-behavior:smooth;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--paper);color:var(--ink);min-height:100vh;}
+
+/* ── HERO ── */
+.hero{background:var(--forest);color:#fff;padding:64px 24px 80px;text-align:center;position:relative;overflow:hidden;}
+.hero::before{content:'🎰';font-size:180px;position:absolute;top:-20px;right:-30px;opacity:.06;pointer-events:none;}
+.hero-badge{display:inline-flex;align-items:center;gap:6px;background:rgba(255,255,255,0.12);border:1px solid rgba(255,255,255,0.2);border-radius:99px;padding:5px 14px;font-size:12px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;margin-bottom:20px;color:rgba(255,255,255,0.9);}
+.hero h1{font-size:clamp(36px,8vw,60px);font-weight:800;letter-spacing:-1.5px;line-height:1.05;margin-bottom:16px;}
+.hero h1 span{color:var(--lime);}
+.hero p{font-size:18px;opacity:.75;max-width:480px;margin:0 auto 36px;line-height:1.6;}
+.hero-cta{display:inline-flex;align-items:center;gap:8px;background:var(--lime);color:var(--forest);padding:15px 28px;border-radius:99px;font-size:16px;font-weight:700;text-decoration:none;transition:transform .15s,box-shadow .15s;box-shadow:0 4px 20px rgba(82,183,136,.4);}
+.hero-cta:hover{transform:translateY(-2px);box-shadow:0 8px 28px rgba(82,183,136,.5);}
+.hero-stats{display:flex;justify-content:center;gap:40px;margin-top:48px;padding-top:36px;border-top:1px solid rgba(255,255,255,0.1);}
+.stat-num{font-size:28px;font-weight:800;color:var(--lime);}
+.stat-lbl{font-size:12px;opacity:.6;margin-top:2px;}
+
+/* ── HOW IT WORKS ── */
+.section{padding:64px 24px;max-width:680px;margin:0 auto;}
+.section-eyebrow{font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--lime);margin-bottom:10px;}
+.section h2{font-size:clamp(24px,5vw,36px);font-weight:800;letter-spacing:-.5px;color:var(--ink);margin-bottom:40px;}
+.steps{display:flex;flex-direction:column;gap:0;}
+.step{display:flex;gap:20px;padding:24px 0;border-bottom:1px solid var(--border);}
+.step:last-child{border-bottom:none;}
+.step-num{width:40px;height:40px;border-radius:50%;background:var(--mint);color:var(--forest);font-size:16px;font-weight:800;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:2px;}
+.step-title{font-size:17px;font-weight:700;color:var(--ink);margin-bottom:6px;}
+.step-desc{font-size:14px;color:var(--ink3);line-height:1.6;}
+
+/* ── FEATURES ── */
+.features{background:var(--surface2);padding:64px 24px;}
+.features-inner{max-width:680px;margin:0 auto;}
+.feature-grid{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:32px;}
+.feature-card{background:var(--surface);border-radius:var(--radius);padding:20px;border:0.5px solid var(--border);box-shadow:var(--shadow);}
+.feature-icon{font-size:28px;margin-bottom:10px;}
+.feature-title{font-size:14px;font-weight:700;color:var(--ink);margin-bottom:4px;}
+.feature-desc{font-size:12px;color:var(--ink3);line-height:1.5;}
+
+/* ── CONFIGURATOR ── */
+.configurator{padding:64px 24px;max-width:680px;margin:0 auto;}
+.config-card{background:var(--surface);border-radius:var(--radius);border:0.5px solid var(--border);box-shadow:var(--shadow);overflow:hidden;}
+.config-header{background:var(--forest);color:#fff;padding:24px 28px;}
+.config-header h3{font-size:20px;font-weight:700;margin-bottom:4px;}
+.config-header p{font-size:13px;opacity:.7;}
+.config-body{padding:28px;}
+.config-step{display:none;}
+.config-step.active{display:block;}
+.step-indicator{display:flex;align-items:center;gap:8px;margin-bottom:28px;}
+.step-dot{width:8px;height:8px;border-radius:50%;background:var(--border2);transition:all .3s;}
+.step-dot.active{background:var(--green);width:24px;border-radius:4px;}
+.step-dot.done{background:var(--lime);}
+.field{margin-bottom:20px;}
+.field label{display:block;font-size:12px;font-weight:600;color:var(--ink2);text-transform:uppercase;letter-spacing:.06em;margin-bottom:7px;}
+.field input,.field select{width:100%;padding:12px 14px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--ink);font-size:15px;outline:none;transition:border .15s;}
+.field input:focus,.field select:focus{border-color:var(--green);}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:12px;}
+.field-hint{font-size:11px;color:var(--ink3);margin-top:5px;}
+/* Lottery picker */
+.lottery-opts{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;}
+.lottery-opt{border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:12px 8px;text-align:center;cursor:pointer;transition:all .15s;}
+.lottery-opt.selected{border-color:var(--green);background:var(--mint);}
+.lottery-opt-emoji{font-size:22px;display:block;margin-bottom:4px;}
+.lottery-opt-name{font-size:12px;font-weight:600;color:var(--ink2);}
+.lottery-opt-days{font-size:10px;color:var(--ink3);margin-top:2px;}
+/* Number picker */
+.num-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.num-btn{width:36px;height:36px;border-radius:50%;border:1.5px solid var(--border2);background:var(--surface2);color:var(--ink2);font-size:13px;font-weight:600;cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center;}
+.num-btn.selected-main{background:var(--green);border-color:var(--green);color:#fff;}
+.num-btn.selected-star{background:var(--gold);border-color:var(--gold);color:#fff;}
+.num-btn:disabled{opacity:.3;cursor:not-allowed;}
+.num-legend{display:flex;gap:16px;margin-top:10px;font-size:11px;color:var(--ink3);}
+.num-legend span{display:flex;align-items:center;gap:4px;}
+.num-legend-dot{width:10px;height:10px;border-radius:50%;}
+/* Members */
+.member-list{display:flex;flex-direction:column;gap:8px;margin-bottom:12px;}
+.member-row{display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:var(--radius-sm);}
+.member-avatar{width:32px;height:32px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:12px;font-weight:700;flex-shrink:0;}
+.member-name{flex:1;font-size:14px;font-weight:600;color:var(--ink);}
+.member-del{background:none;border:none;color:var(--ink3);cursor:pointer;font-size:16px;padding:4px;}
+.add-member-row{display:flex;gap:8px;}
+.add-member-row input{flex:1;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--ink);font-size:14px;}
+.add-member-row button{padding:10px 16px;border-radius:var(--radius-sm);background:var(--green);color:#fff;border:none;font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;}
+/* Rotation */
+.rotation-opts{display:grid;grid-template-columns:1fr 1fr;gap:8px;}
+.rotation-opt{border:1.5px solid var(--border2);border-radius:var(--radius-sm);padding:14px;cursor:pointer;transition:all .15s;}
+.rotation-opt.selected{border-color:var(--green);background:var(--mint);}
+.rotation-opt-title{font-size:13px;font-weight:700;color:var(--ink);margin-bottom:3px;}
+.rotation-opt-desc{font-size:11px;color:var(--ink3);}
+/* Buttons */
+.btn-row{display:flex;gap:10px;margin-top:24px;}
+.btn-next{flex:1;padding:13px;background:var(--forest);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;transition:opacity .15s;}
+.btn-next:hover{opacity:.85;}
+.btn-back{padding:13px 18px;background:var(--surface2);color:var(--ink2);border:1px solid var(--border2);border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;}
+/* Result */
+.result-box{text-align:center;padding:20px 0;}
+.result-emoji{font-size:56px;margin-bottom:12px;}
+.result-title{font-size:22px;font-weight:800;color:var(--forest);margin-bottom:8px;}
+.result-desc{font-size:14px;color:var(--ink3);margin-bottom:24px;line-height:1.6;}
+.result-link-box{background:var(--mint);border-radius:var(--radius-sm);padding:14px 16px;margin-bottom:16px;word-break:break-all;font-size:13px;font-family:'Courier New',monospace;color:var(--forest);font-weight:600;border:1px solid var(--lime);}
+.btn-copy{width:100%;padding:13px;background:var(--green);color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;margin-bottom:8px;}
+.btn-wa-share{width:100%;padding:13px;background:#25D366;color:#fff;border:none;border-radius:var(--radius-sm);font-size:15px;font-weight:600;cursor:pointer;}
+
+/* ── FOOTER ── */
+footer{background:var(--forest);color:rgba(255,255,255,0.5);text-align:center;padding:32px 24px;font-size:13px;}
+footer strong{color:rgba(255,255,255,0.8);}
+
+/* ── TOAST ── */
+.toast{position:fixed;bottom:80px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+
+@media(max-width:480px){
+  .feature-grid{grid-template-columns:1fr;}
+  .field-row{grid-template-columns:1fr;}
+  .lottery-opts{grid-template-columns:1fr;}
+  .rotation-opts{grid-template-columns:1fr;}
+}
+</style>
+</head>
+<body>
+
+<!-- ── HERO ── -->
+<section class="hero">
+  <div class="hero-badge">🇪🇸 Hecho para España</div>
+  <h1>La lotería en grupo,<br><span>sin líos</span></h1>
+  <p>Configura tu peña en 2 minutos. Comparte el enlace con tu grupo. Que empiece la suerte.</p>
+  <a href="#configurar" class="hero-cta">Crear mi peña gratis →</a>
+  <div class="hero-stats">
+    <div><div class="stat-num">∞</div><div class="stat-lbl">Grupos</div></div>
+    <div><div class="stat-num">0€</div><div class="stat-lbl">Coste</div></div>
+    <div><div class="stat-num">2min</div><div class="stat-lbl">Configuración</div></div>
+  </div>
+</section>
+
+<!-- ── COMO FUNCIONA ── -->
+<section class="section">
+  <div class="section-eyebrow">Cómo funciona</div>
+  <h2>Tres pasos y a jugar</h2>
+  <div class="steps">
+    <div class="step">
+      <div class="step-num">1</div>
+      <div>
+        <div class="step-title">El administrador configura la peña</div>
+        <div class="step-desc">Nombre del grupo, lotería, números que jugáis, miembros, importes y rotación de quién paga. Todo en un formulario guiado de 2 minutos.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">2</div>
+      <div>
+        <div class="step-title">Comparte el enlace por WhatsApp</div>
+        <div class="step-desc">La app genera un enlace único para tu peña. Lo mandas al grupo y cada compañero lo añade a su pantalla de inicio. Sin descargas, sin registros.</div>
+      </div>
+    </div>
+    <div class="step">
+      <div class="step-num">3</div>
+      <div>
+        <div class="step-title">Cada sorteo, la app hace el trabajo</div>
+        <div class="step-desc">Comprueba los resultados automáticamente, avisa a quién le toca pagar y recuerda los Bizums. El grupo se entera de todo sin que nadie tenga que hacer nada.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ── FEATURES ── -->
+<section class="features">
+  <div class="features-inner">
+    <div class="section-eyebrow">Funcionalidades</div>
+    <h2>Todo lo que necesita tu peña</h2>
+    <div class="feature-grid">
+      <div class="feature-card"><div class="feature-icon">🔍</div><div class="feature-title">Resultados automáticos</div><div class="feature-desc">Consulta el último sorteo oficial y comprueba los aciertos con un toque.</div></div>
+      <div class="feature-card"><div class="feature-icon">🔄</div><div class="feature-title">Rotación de pagos</div><div class="feature-desc">El sistema sabe siempre quién paga esta ronda y quién tiene que hacer el Bizum.</div></div>
+      <div class="feature-card"><div class="feature-icon">🔔</div><div class="feature-title">Avisos al móvil</div><div class="feature-desc">Notificación cada lunes recordando si te toca jugar o hacer el Bizum.</div></div>
+      <div class="feature-card"><div class="feature-icon">💰</div><div class="feature-title">Historial de premios</div><div class="feature-desc">Lleva el control de todo lo que ha ganado el grupo desde el primer día.</div></div>
+      <div class="feature-card"><div class="feature-icon">📲</div><div class="feature-title">Mensaje para WhatsApp</div><div class="feature-desc">Genera el mensaje de resultados listo para pegar en el grupo con un toque.</div></div>
+      <div class="feature-card"><div class="feature-icon">🎯</div><div class="feature-title">Euromillones, Primitiva y Bonoloto</div><div class="feature-desc">Compatible con las tres loterías más jugadas en grupos de trabajo en España.</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- ── CONFIGURADOR ── -->
+<section class="configurator" id="configurar">
+  <div class="section-eyebrow">Crea tu peña</div>
+  <h2>Configura tu grupo ahora</h2>
+  <div class="config-card">
+    <div class="config-header">
+      <h3 id="config-step-title">Información del grupo</h3>
+      <p id="config-step-sub">Paso <span id="step-num">1</span> de 4</p>
+    </div>
+    <div class="config-body">
+      <div class="step-indicator" id="step-indicator"></div>
+
+      <!-- PASO 1: Grupo y lotería -->
+      <div class="config-step active" id="step-1">
+        <div class="field">
+          <label>Nombre del grupo</label>
+          <input type="text" id="f-group-name" placeholder="Ej: Peña SAICA, Los del trabajo..." maxlength="30">
+        </div>
+        <div class="field">
+          <label>Lotería que jugáis</label>
+          <div class="lottery-opts">
+            <div class="lottery-opt selected" data-lottery="euromillones" onclick="selectLottery(this)">
+              <span class="lottery-opt-emoji">🌟</span>
+              <div class="lottery-opt-name">Euromillones</div>
+              <div class="lottery-opt-days">Mar · Vie</div>
+            </div>
+            <div class="lottery-opt" data-lottery="primitiva" onclick="selectLottery(this)">
+              <span class="lottery-opt-emoji">🍀</span>
+              <div class="lottery-opt-name">Primitiva</div>
+              <div class="lottery-opt-days">Jue · Sáb</div>
+            </div>
+            <div class="lottery-opt" data-lottery="bonoloto" onclick="selectLottery(this)">
+              <span class="lottery-opt-emoji">🎱</span>
+              <div class="lottery-opt-name">Bonoloto</div>
+              <div class="lottery-opt-days">Lun–Vie</div>
+            </div>
+          </div>
+        </div>
+        <div class="btn-row"><button class="btn-next" onclick="goStep(2)">Siguiente →</button></div>
+      </div>
+
+      <!-- PASO 2: Números -->
+      <div class="config-step" id="step-2">
+        <div class="field">
+          <label id="main-nums-label">Números principales (elige 5)</label>
+          <div class="num-grid" id="main-num-grid"></div>
+        </div>
+        <div class="field" id="star-field">
+          <label id="star-nums-label">Estrellas (elige 2)</label>
+          <div class="num-grid" id="star-num-grid"></div>
+        </div>
+        <div class="num-legend">
+          <span><div class="num-legend-dot" style="background:var(--green)"></div> Números principales</span>
+          <span><div class="num-legend-dot" style="background:var(--gold)"></div> Estrellas / comp.</span>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(1)">← Atrás</button>
+          <button class="btn-next" onclick="goStep(3)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 3: Miembros -->
+      <div class="config-step" id="step-3">
+        <div class="field">
+          <label>Miembros del grupo</label>
+          <div class="member-list" id="member-list"></div>
+          <div class="add-member-row">
+            <input type="text" id="new-member-input" placeholder="Nombre del compañero..." maxlength="20" onkeydown="if(event.key==='Enter')addMember()">
+            <button onclick="addMember()">+ Añadir</button>
+          </div>
+          <div class="field-hint">Mínimo 2 personas. El primero en la lista será el primer pagador.</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(2)">← Atrás</button>
+          <button class="btn-next" onclick="goStep(4)">Siguiente →</button>
+        </div>
+      </div>
+
+      <!-- PASO 4: Importes y rotación -->
+      <div class="config-step" id="step-4">
+        <div class="field-row">
+          <div class="field">
+            <label>Coste del boleto (€)</label>
+            <input type="number" id="f-ticket-cost" value="20" min="1" max="500" step="0.5">
+            <div class="field-hint">Lo que cuesta el boleto completo</div>
+          </div>
+          <div class="field">
+            <label>Bizum por persona (€)</label>
+            <input type="number" id="f-bizum" value="4" min="0.5" max="100" step="0.5">
+            <div class="field-hint">Lo que paga cada miembro</div>
+          </div>
+        </div>
+        <div class="field">
+          <label>Rotación de pagos</label>
+          <div class="rotation-opts">
+            <div class="rotation-opt selected" data-rot="draws" onclick="selectRotation(this)">
+              <div class="rotation-opt-title">Cada X sorteos</div>
+              <div class="rotation-opt-desc">Un miembro paga durante varios sorteos seguidos</div>
+            </div>
+            <div class="rotation-opt" data-rot="week" onclick="selectRotation(this)">
+              <div class="rotation-opt-title">Cada semana</div>
+              <div class="rotation-opt-desc">El pagador cambia cada semana</div>
+            </div>
+          </div>
+        </div>
+        <div class="field" id="draws-per-turn-field">
+          <label>Sorteos por turno</label>
+          <input type="number" id="f-draws-per-turn" value="4" min="1" max="20">
+          <div class="field-hint">Cuántos sorteos seguidos paga cada persona</div>
+        </div>
+        <div class="btn-row">
+          <button class="btn-back" onclick="goStep(3)">← Atrás</button>
+          <button class="btn-next" onclick="createGroup()">🎰 Crear mi peña</button>
+        </div>
+      </div>
+
+      <!-- RESULTADO -->
+      <div class="config-step" id="step-result">
+        <div class="result-box">
+          <div class="result-emoji">🎉</div>
+          <div class="result-title" id="result-group-name">¡Tu peña está lista!</div>
+          <div class="result-desc">Comparte este enlace con tu grupo.<br>Cada miembro lo añade a su pantalla de inicio y listo.</div>
+          <div class="result-link-box" id="result-link">—</div>
+          <button class="btn-copy" onclick="copyGroupLink()">📋 Copiar enlace</button>
+          <button class="btn-wa-share" onclick="shareGroupWA()">📲 Compartir por WhatsApp</button>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<footer>
+  <strong>PeñaFácil</strong> · Gestiona tu lotería en grupo · Gratis, sin registro, sin comisiones
+</footer>
+
+<div class="toast" id="toast"></div>
+
+<script>
+// ── STATE ────────────────────────────────────────────────────────────────────
+const LOTTERIES = {
+  euromillones: { name:'Euromillones', emoji:'🌟', mainCount:5, mainMax:50, starCount:2, starMax:12, starLabel:'Estrellas', days:'Mar · Vie' },
+  primitiva:    { name:'Primitiva',    emoji:'🍀', mainCount:6, mainMax:49, starCount:1, starMax:9,  starLabel:'Complementario', days:'Jue · Sáb' },
+  bonoloto:     { name:'Bonoloto',     emoji:'🎱', mainCount:6, mainMax:49, starCount:1, starMax:9,  starLabel:'Complementario', days:'Lun–Vie' },
+};
+const AVATARS_BG = ['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];
+const AVATARS_FG = ['#0C447C','#3B6D11','#854F0B','#7A2443','#534AB7','#1B6B4E','#A0430A','#6B2E90'];
+
+let currentStep = 1;
+let selectedLottery = 'euromillones';
+let selectedMain = new Set();
+let selectedStars = new Set();
+let members = [];
+let selectedRotation = 'draws';
+
+function showToast(msg){
+  const t=document.getElementById('toast');
+  t.textContent=msg; t.classList.add('show');
+  setTimeout(()=>t.classList.remove('show'),2400);
+}
+
+// ── STEP NAVIGATION ───────────────────────────────────────────────────────────
+const STEP_TITLES = {
+  1: ['Información del grupo', '¿Qué lotería jugáis?'],
+  2: ['Vuestros números de la suerte', 'Selecciona la combinación que jugáis'],
+  3: ['Miembros de la peña', '¿Quiénes jugáis juntos?'],
+  4: ['Importes y rotación', '¿Cómo os organizáis?'],
+};
+
+function updateStepUI(step){
+  document.querySelectorAll('.config-step').forEach(s=>s.classList.remove('active'));
+  document.getElementById(step==='result'?'step-result':`step-${step}`).classList.add('active');
+  if(step==='result'){
+    document.getElementById('config-step-title').textContent='¡Peña creada!';
+    document.getElementById('config-step-sub').textContent='Comparte el enlace';
+    return;
+  }
+  const [title,sub]=STEP_TITLES[step];
+  document.getElementById('config-step-title').textContent=title;
+  document.getElementById('config-step-sub').textContent=`Paso ${step} de 4`;
+  document.getElementById('step-num').textContent=step;
+  // Dots
+  const ind=document.getElementById('step-indicator');
+  ind.innerHTML='';
+  for(let i=1;i<=4;i++){
+    const d=document.createElement('div');
+    d.className='step-dot'+(i===step?' active':i<step?' done':'');
+    ind.appendChild(d);
+  }
+}
+
+function goStep(step){
+  if(step===2){
+    const name=document.getElementById('f-group-name').value.trim();
+    if(!name){showToast('Escribe el nombre del grupo');return;}
+    buildNumGrids();
+  }
+  if(step===3){
+    const lot=LOTTERIES[selectedLottery];
+    if(selectedMain.size!==lot.mainCount){showToast(`Elige ${lot.mainCount} números principales`);return;}
+    if(selectedStars.size!==lot.starCount){showToast(`Elige ${lot.starCount} ${lot.starLabel.toLowerCase()}`);return;}
+    renderMembers();
+  }
+  if(step===4){
+    if(members.length<2){showToast('Añade al menos 2 miembros');return;}
+    // Auto-calculate bizum
+    const cost=parseFloat(document.getElementById('f-ticket-cost').value)||20;
+    document.getElementById('f-bizum').value=(cost/members.length).toFixed(2);
+  }
+  currentStep=step;
+  updateStepUI(step);
+}
+
+// ── LOTTERY SELECTOR ──────────────────────────────────────────────────────────
+function selectLottery(el){
+  document.querySelectorAll('.lottery-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedLottery=el.dataset.lottery;
+  selectedMain.clear(); selectedStars.clear();
+}
+
+// ── NUMBER GRIDS ──────────────────────────────────────────────────────────────
+function buildNumGrids(){
+  const lot=LOTTERIES[selectedLottery];
+  document.getElementById('main-nums-label').textContent=`Números principales (elige ${lot.mainCount})`;
+  document.getElementById('star-nums-label').textContent=`${lot.starLabel} (elige ${lot.starCount})`;
+  // Main grid
+  const mg=document.getElementById('main-num-grid'); mg.innerHTML='';
+  for(let i=1;i<=lot.mainMax;i++){
+    const b=document.createElement('button');
+    b.className='num-btn'+(selectedMain.has(i)?' selected-main':'');
+    b.textContent=i;
+    b.onclick=()=>toggleNum(i,'main',lot.mainCount,b);
+    mg.appendChild(b);
+  }
+  // Star grid
+  const sg=document.getElementById('star-num-grid'); sg.innerHTML='';
+  for(let i=1;i<=lot.starMax;i++){
+    const b=document.createElement('button');
+    b.className='num-btn'+(selectedStars.has(i)?' selected-star':'');
+    b.textContent=i;
+    b.onclick=()=>toggleNum(i,'star',lot.starCount,b);
+    sg.appendChild(b);
+  }
+}
+
+function toggleNum(n,type,max,el){
+  if(type==='main'){
+    if(selectedMain.has(n)){selectedMain.delete(n);el.className='num-btn';}
+    else if(selectedMain.size<max){selectedMain.add(n);el.className='num-btn selected-main';}
+    else{showToast(`Máximo ${max} números principales`);}
+  }else{
+    if(selectedStars.has(n)){selectedStars.delete(n);el.className='num-btn';}
+    else if(selectedStars.size<max){selectedStars.add(n);el.className='num-btn selected-star';}
+    else{showToast(`Máximo ${max} estrellas`);}
+  }
+}
+
+// ── MEMBERS ───────────────────────────────────────────────────────────────────
+function renderMembers(){
+  const list=document.getElementById('member-list'); list.innerHTML='';
+  members.forEach((m,i)=>{
+    const row=document.createElement('div'); row.className='member-row';
+    row.innerHTML=`
+      <div class="member-avatar" style="background:${AVATARS_BG[i%8]};color:${AVATARS_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div>
+      <div class="member-name">${m}${i===0?' <span style="font-size:11px;color:var(--green);font-weight:500;">(primer pagador)</span>':''}</div>
+      <button class="member-del" onclick="removeMember(${i})">✕</button>`;
+    list.appendChild(row);
+  });
+}
+
+function addMember(){
+  const inp=document.getElementById('new-member-input');
+  const name=inp.value.trim();
+  if(!name){showToast('Escribe un nombre');return;}
+  if(members.includes(name)){showToast('Ese nombre ya está en el grupo');return;}
+  if(members.length>=12){showToast('Máximo 12 miembros');return;}
+  members.push(name); inp.value=''; renderMembers();
+}
+
+function removeMember(i){
+  members.splice(i,1); renderMembers();
+}
+
+// ── ROTATION ─────────────────────────────────────────────────────────────────
+function selectRotation(el){
+  document.querySelectorAll('.rotation-opt').forEach(o=>o.classList.remove('selected'));
+  el.classList.add('selected');
+  selectedRotation=el.dataset.rot;
+  document.getElementById('draws-per-turn-field').style.display=selectedRotation==='draws'?'block':'none';
+}
+
+// ── CREATE GROUP ──────────────────────────────────────────────────────────────
+function createGroup(){
+  const ticketCost=parseFloat(document.getElementById('f-ticket-cost').value)||20;
+  const bizum=parseFloat(document.getElementById('f-bizum').value)||4;
+  const drawsPerTurn=parseInt(document.getElementById('f-draws-per-turn').value)||4;
+  if(members.length<2){showToast('Añade al menos 2 miembros');return;}
+
+  const config={
+    name: document.getElementById('f-group-name').value.trim(),
+    lottery: selectedLottery,
+    main: [...selectedMain].sort((a,b)=>a-b),
+    stars: [...selectedStars].sort((a,b)=>a-b),
+    members,
+    ticketCost,
+    bizum,
+    rotation: selectedRotation,
+    drawsPerTurn: selectedRotation==='draws'?drawsPerTurn:2,
+    created: new Date().toISOString(),
+    epoch: new Date().toISOString(),
+  };
+
+  // Encode config in URL hash (base64)
+  const encoded = btoa(unescape(encodeURIComponent(JSON.stringify(config))));
+  const baseUrl = window.location.origin + window.location.pathname.replace('index.html','').replace(/\/?$/,'/');
+  const appUrl = `${baseUrl}app.html#${encoded}`;
+
+  document.getElementById('result-group-name').textContent=`¡${config.name} está lista!`;
+  document.getElementById('result-link').textContent=appUrl;
+  window._groupLink=appUrl;
+  window._groupConfig=config;
+  updateStepUI('result');
+}
+
+function copyGroupLink(){
+  navigator.clipboard.writeText(window._groupLink)
+    .then(()=>showToast('✅ Enlace copiado'))
+    .catch(()=>showToast('Copia el enlace manualmente'));
+}
+
+function shareGroupWA(){
+  const cfg=window._groupConfig;
+  const lot=LOTTERIES[cfg.lottery];
+  const msg=`🎰 *${cfg.name}* — PeñaFácil\n\nYa tenemos nuestra app de lotería configurada.\nNúmeros: ${cfg.main.join(', ')} ⭐ ${cfg.stars.join(', ')}\nBizum: ${cfg.bizum}€ a quien toque\n\n👉 Ábrela aquí y añádela a tu pantalla de inicio:\n${window._groupLink}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+
+// ── INIT ─────────────────────────────────────────────────────────────────────
+updateStepUI(1);
+</script>
+</body>
+</html>
