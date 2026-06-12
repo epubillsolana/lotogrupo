@@ -764,7 +764,7 @@ async function fetchDraw(lotKey){
     if(!arr||!arr.length) throw new Error();
     arr.sort((a,b)=>b.fecha_sorteo.localeCompare(a.fecha_sorteo));
     const s=arr[0];
-    const f=s.fecha_sorteo.replace(/\s.*/,''); // remove time part
+    const f=s.fecha_sorteo.replace(/\s.*/,'').replace(/-/g,''); // remove time part and dashes
     const fecha=`${f.slice(6,8)}/${f.slice(4,6)}/${f.slice(0,4)}`;
     const comb=s.combinacion.match(/\d+/g).map(Number).filter(n=>n>0);
     const numeros=comb.slice(0,lot.mainCount).sort((a,b)=>a-b);
