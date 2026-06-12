@@ -1245,14 +1245,35 @@ function loadHistory(lotKey){try{return JSON.parse(localStorage.getItem(getPrize
 function saveHistory(h,lotKey){localStorage.setItem(getPrizeKey(lotKey),JSON.stringify(h));}
 async function loadHistory(lotKey){
   const slug=getSlug();
+  let results=[];
+  const seenIds=new Set();
+  
+  // Load from Supabase
   try{
     let url=`${SUPA_URL}/rest/v1/premios?grupo_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc`;
     if(lotKey) url+=`&lot_key=eq.${encodeURIComponent(lotKey)}`;
     const r=await fetch(url,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
     const data=await r.json();
-    if(Array.isArray(data)) return data.map(d=>({id:d.id,amount:d.amount,label:d.label,fecha:d.fecha,lotKey:d.lot_key}));
+    if(Array.isArray(data)) data.forEach(d=>{
+      seenIds.add(String(d.id));
+      results.push({id:d.id,amount:d.amount,label:d.label,fecha:d.fecha,lotKey:d.lot_key});
+    });
   }catch(e){}
-  try{return JSON.parse(localStorage.getItem(`lg_prizes_${CFG.name}_${lotKey||'all'}`)||'[]');}catch(e){return[];}
+  
+  // Also load from localStorage (old data)
+  try{
+    const keys=lotKey?[`lg_prizes_${CFG.name}_${lotKey}`]:[`lg_prizes_${CFG.name}_all`,...CFG.lotteries.map(l=>`lg_prizes_${CFG.name}_${l.lottery}`)];
+    keys.forEach(key=>{
+      const local=JSON.parse(localStorage.getItem(key)||'[]');
+      local.forEach(d=>{
+        if(!seenIds.has(String(d.id||d.fecha+d.amount))){
+          results.push({id:d.id||Date.now(),amount:d.amount,label:d.label,fecha:d.fecha,lotKey:lotKey||d.lotKey||CFG.lotteries[0].lottery});
+        }
+      });
+    });
+  }catch(e){}
+  
+  return results;
 }
 
 async function saveHistoryItem(item,lotKey){
@@ -1332,6 +1353,22 @@ async function renderHistory(){
   const total=history.reduce((s,e)=>s+parseFloat(e.amount||0),0);
   const totalEl=document.getElementById('total-amount');
   if(totalEl) totalEl.textContent=formatEur(total);
+
+  // Gasto total
+  let totalGastado=0;
+  CFG.lotteries.forEach(l=>{
+    const jugados=countSorteosJugados(l.lottery);
+    const costePorSorteo=(CFG.ticketCost||20)/(CFG.drawsPerTurn||4);
+    totalGastado+=jugados*costePorSorteo;
+  });
+  const balance=total-totalGastado;
+  const gastadoEl=document.getElementById('bal-gastado');
+  const balanceEl=document.getElementById('bal-balance');
+  if(gastadoEl) gastadoEl.textContent=formatEur(totalGastado);
+  if(balanceEl){
+    balanceEl.textContent=(balance>=0?'+':'')+formatEur(balance);
+    balanceEl.style.color=balance>=0?'#2E7D32':'#C62828';
+  }
 
   const subEl=document.getElementById('total-sub');
   if(subEl) subEl.textContent=history.length===0?'Sin premios registrados':`${history.length} premio${history.length!==1?'s':''}`;
@@ -1872,7 +1909,6 @@ async function renderBoletos(){
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
     });
     const data=await r.json();
-    if(list) list.innerHTML='<div style="font-size:10px;color:green;padding:4px;">Debug: slug='+slug+' status='+r.status+' rows='+(Array.isArray(data)?data.length:'err')+'</div>';
     if(r.ok&&Array.isArray(data)) data.forEach(b=>{
       seenIds.add(String(b.id));
       boletos.push({id:b.id,lot:b.lot_name,who:b.who,members:b.members?b.members.split(', '):[],fecha:b.fecha,hora:b.hora,imgUrl:b.img_url});
