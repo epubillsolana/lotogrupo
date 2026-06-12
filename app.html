@@ -1055,6 +1055,9 @@ function buildTurns(){
 }
 
 // ── BIZUM CONFIRM ─────────────────────────────────────────────────────────────
+function getSlug(){
+  return new URLSearchParams(window.location.search).get('g')||CFG.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
 function getBizumKey(){
   const idx=getCurrentPayerIdx();
   const ym=new Date().toISOString().slice(0,7);
