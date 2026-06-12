@@ -610,6 +610,8 @@ async function loadConfig(){
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 function initApp(){
+  if(window._appInited) return;
+  window._appInited=true;
   // Normalize lotteries format
   if(!CFG.lotteries){
     CFG.lotteries=[{lottery:CFG.lottery||'euromillones',main:CFG.main||[],stars:CFG.stars||[],apuesta:'sencilla'}];
@@ -1597,19 +1599,29 @@ function processImage(input){
   if(!file) return;
   const reader=new FileReader();
   reader.onload=e=>{
-    const img=document.getElementById('scanner-img');
-    img.src=e.target.result;
-    // Store image data for saving
-    window._scanImgData=e.target.result;
-    const {who,lotKey}=getSelectedScanner();
-    const lot=LOTTERIES[lotKey];
-    const members=getSavedMembers()||CFG.members;
-    const membersWithID=members.map(m=>getMemberID(m)).join(', ');
-    document.getElementById('scanner-who-confirm').innerHTML=
-      `<strong>${who}</strong> tiene el boleto · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
-       <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithID}</span>`;
-    document.getElementById('scanner-preview-box').style.display='block';
-    document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
+    const rawImg=new Image();
+    rawImg.onload=()=>{
+      // Compress to max 800px wide
+      const canvas=document.createElement('canvas');
+      const maxW=800;
+      const scale=Math.min(1,maxW/rawImg.width);
+      canvas.width=rawImg.width*scale;
+      canvas.height=rawImg.height*scale;
+      canvas.getContext('2d').drawImage(rawImg,0,0,canvas.width,canvas.height);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      window._scanImgData=compressed;
+      document.getElementById('scanner-img').src=compressed;
+      const {who,lotKey}=getSelectedScanner();
+      const lot=LOTTERIES[lotKey];
+      const members=getSavedMembers()||CFG.members;
+      const membersWithID=members.map(m=>getMemberID(m)).join(', ');
+      document.getElementById('scanner-who-confirm').innerHTML=
+        `<strong>${who}</strong> tiene el boleto · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
+         <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithID}</span>`;
+      document.getElementById('scanner-preview-box').style.display='block';
+      document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
+    };
+    rawImg.src=e.target.result;
   };
   reader.readAsDataURL(file);
   input.value='';
