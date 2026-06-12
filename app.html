@@ -1822,13 +1822,13 @@ function saveBoleto(){
 
   // Try to upload to Supabase Storage
   showToast('📤 Guardando boleto...');
-  uploadBoletoImg(imgData,slug,id).then(url=>{
+  showToast('📤 Subiendo foto...');
+  uploadBoletoImg(imgData,slug,id).then(async url=>{
     boleto.imgUrl=url;
-    storeBoleto(boleto);
-  }).catch(()=>{
-    // Fallback: store base64 locally (may fail for large images)
-    boleto.imgUrl=imgData;
-    storeBoleto(boleto);
+    await storeBoleto(boleto);
+  }).catch(async ()=>{
+    boleto.imgUrl=null;
+    await storeBoleto(boleto);
   });
 }
 
@@ -1851,33 +1851,41 @@ async function uploadBoletoImg(base64,slug,id){
   return `${SUPA_URL}/storage/v1/object/public/boletos/${filename}`;
 }
 
-function storeBoleto(boleto){
+async function storeBoleto(boleto){
   const slug=getSlug();
-  // Save to Supabase
-  fetch(`${SUPA_URL}/rest/v1/boletos`,{
-    method:'POST',
-    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
-    body:JSON.stringify({
-      id:boleto.id,
-      grupo_slug:slug,
-      lot_name:boleto.lot,
-      who:boleto.who,
-      members:boleto.members?boleto.members.join(', '):'',
-      fecha:boleto.fecha,
-      hora:boleto.hora||'',
-      img_url:boleto.imgUrl||null
-    })
-  }).catch(()=>{});
-  // Also save locally as backup
-  const key=`lg_boletos_${CFG.name}`;
+  // Save to Supabase and WAIT for confirmation
   try{
-    const saved=JSON.parse(localStorage.getItem(key)||'[]');
-    saved.push(boleto);
-    localStorage.setItem(key,JSON.stringify(saved));
-  }catch(e){}
+    const r=await fetch(`${SUPA_URL}/rest/v1/boletos`,{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({
+        id:boleto.id,
+        grupo_slug:slug,
+        lot_name:boleto.lot,
+        who:boleto.who,
+        members:boleto.members?boleto.members.join(', '):'',
+        fecha:boleto.fecha,
+        hora:boleto.hora||'',
+        img_url:boleto.imgUrl||null
+      })
+    });
+    if(!r.ok){
+      const err=await r.text();
+      console.error('Boleto save error:',err);
+    }
+  }catch(e){
+    console.error('Boleto save failed:',e);
+    // Fallback localStorage only
+    const key=`lg_boletos_${CFG.name}`;
+    try{
+      const saved=JSON.parse(localStorage.getItem(key)||'[]');
+      saved.push(boleto);
+      localStorage.setItem(key,JSON.stringify(saved));
+    }catch(e2){}
+  }
   document.getElementById('scanner-preview-box').style.display='none';
   window._scanImgData=null;
-  renderBoletos();
+  await renderBoletos();
   showToast('✅ Boleto registrado');
 }
 
