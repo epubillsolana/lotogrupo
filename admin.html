@@ -5,122 +5,201 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
 <title>LotoGrupo — Admin</title>
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
-body{font-family:'Inter',sans-serif;background:#0A1F0F;color:#fff;min-height:100vh;padding:24px;}
-.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:24px;}
+body{font-family:'Inter',sans-serif;background:#0A1F0F;color:#fff;min-height:100vh;}
+
+/* LOGIN */
+.login{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:24px;gap:16px;}
+.login-logo{font-family:'Bebas Neue',sans-serif;font-size:40px;letter-spacing:2px;}
+.login-logo span{color:#FF8C00;}
+.login-sub{font-size:13px;color:rgba(255,255,255,0.4);}
+.login-card{background:rgba(255,255,255,0.06);border-radius:16px;padding:28px 24px;width:100%;max-width:340px;display:flex;flex-direction:column;gap:12px;}
+.login-card input{padding:12px 16px;border-radius:10px;border:1.5px solid rgba(255,255,255,0.12);background:rgba(255,255,255,0.07);color:#fff;font-size:15px;font-family:inherit;outline:none;width:100%;}
+.login-card input:focus{border-color:#FF8C00;}
+.login-card input::placeholder{color:rgba(255,255,255,0.3);}
+.btn-login{background:#FF8C00;color:#0A1F0F;border:none;border-radius:10px;padding:13px;font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:1px;cursor:pointer;width:100%;}
+.btn-login:disabled{opacity:.5;cursor:not-allowed;}
+.login-error{color:#EF9A9A;font-size:13px;text-align:center;display:none;}
+
+/* ADMIN */
+.admin{display:none;padding:24px;max-width:800px;margin:0 auto;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:4px;}
 .logo span{color:#FF8C00;}
-.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.top-bar{display:flex;justify-content:space-between;align-items:center;margin-bottom:20px;}
+.btn-logout{background:rgba(255,255,255,0.08);color:rgba(255,255,255,0.6);border:none;border-radius:99px;padding:6px 16px;font-size:12px;font-weight:600;cursor:pointer;}
+.btn-logout:hover{background:rgba(255,255,255,0.15);}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(140px,1fr));gap:12px;margin-bottom:20px;}
 .stat-card{background:rgba(255,255,255,0.07);border-radius:14px;padding:18px;text-align:center;}
 .stat-val{font-family:'Bebas Neue',sans-serif;font-size:42px;color:#FF8C00;}
-.stat-lbl{font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
 .card{background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:12px;}
-.card-title{font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;}
-.group-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid rgba(255,255,255,0.08);font-size:13px;}
+.card-title{font-size:12px;font-weight:700;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;}
+.group-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid rgba(255,255,255,0.07);}
 .group-row:last-child{border-bottom:none;}
-.group-name{font-weight:600;}
-.group-meta{color:rgba(255,255,255,0.4);font-size:11px;}
-.badge{background:rgba(255,140,0,0.2);color:#FF8C00;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;}
-.event-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid rgba(255,255,255,0.06);font-size:12px;}
+.group-name{font-weight:600;font-size:14px;}
+.group-meta{color:rgba(255,255,255,0.35);font-size:11px;margin-top:2px;}
+.badge{background:rgba(255,140,0,0.15);color:#FF8C00;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;}
+.btn-del{background:rgba(198,40,40,0.2);color:#EF9A9A;border:1px solid rgba(198,40,40,0.3);border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;}
+.btn-del:hover{background:rgba(198,40,40,0.4);}
+.event-row{display:flex;justify-content:space-between;align-items:center;padding:7px 0;border-bottom:.5px solid rgba(255,255,255,0.05);font-size:12px;}
 .event-row:last-child{border-bottom:none;}
 .event-tipo{color:#FF8C00;font-weight:600;}
-.loader{text-align:center;padding:40px;color:rgba(255,255,255,0.4);}
-.refresh{background:#FF8C00;color:#0A1F0F;border:none;border-radius:99px;padding:8px 20px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;margin-bottom:20px;}
+.event-slug{color:rgba(255,255,255,0.5);}
+.event-date{color:rgba(255,255,255,0.25);}
+.btn-refresh{background:#FF8C00;color:#0A1F0F;border:none;border-radius:99px;padding:7px 18px;font-family:'Bebas Neue',sans-serif;font-size:15px;letter-spacing:1px;cursor:pointer;}
+.loader{text-align:center;padding:32px;color:rgba(255,255,255,0.3);font-size:13px;}
 </style>
 </head>
 <body>
-<div class="logo">Loto<span>Grupo</span> — Admin</div>
-<div style="background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.3);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:16px;">
-  ⚠️ Para que eliminar funcione, ejecuta en Supabase SQL Editor:<br>
-  <code style="color:#FF8C00;">CREATE POLICY "Public delete" ON grupos FOR DELETE USING (true);<br>
-  CREATE POLICY "Public delete eventos" ON eventos FOR DELETE USING (true);</code>
-</div>
-<button class="refresh" onclick="loadData()">↻ Actualizar</button>
 
-<div class="grid">
-  <div class="stat-card"><div class="stat-val" id="stat-grupos">—</div><div class="stat-lbl">Grupos creados</div></div>
-  <div class="stat-card"><div class="stat-val" id="stat-aperturas">—</div><div class="stat-lbl">Aperturas totales</div></div>
-  <div class="stat-card"><div class="stat-val" id="stat-comprobaciones">—</div><div class="stat-lbl">Comprobaciones</div></div>
-  <div class="stat-card"><div class="stat-val" id="stat-bizums">—</div><div class="stat-lbl">Bizums confirmados</div></div>
+<!-- LOGIN -->
+<div class="login" id="login-screen">
+  <div class="login-logo">Loto<span>Grupo</span></div>
+  <div class="login-sub">Panel de administración</div>
+  <div class="login-card">
+    <input type="email" id="inp-email" placeholder="Email" value="e.pubill@gmail.com">
+    <input type="password" id="inp-pwd" placeholder="Contraseña" onkeydown="if(event.key==='Enter')doLogin()">
+    <button class="btn-login" id="btn-login" onclick="doLogin()">ENTRAR</button>
+    <div class="login-error" id="login-error">Email o contraseña incorrectos</div>
+  </div>
 </div>
 
-<div class="card">
-  <div class="card-title">Grupos registrados</div>
-  <div id="grupos-list"><div class="loader">Cargando...</div></div>
-</div>
+<!-- ADMIN -->
+<div class="admin" id="admin-screen">
+  <div class="top-bar">
+    <div class="logo">Loto<span>Grupo</span> <span style="font-size:14px;font-family:'Inter';font-weight:400;color:rgba(255,255,255,0.4);">Admin</span></div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn-refresh" onclick="loadData()">↻ Actualizar</button>
+      <button class="btn-logout" onclick="doLogout()">Cerrar sesión</button>
+    </div>
+  </div>
 
-<div class="card">
-  <div class="card-title">Últimos 20 eventos</div>
-  <div id="eventos-list"><div class="loader">Cargando...</div></div>
+  <div class="grid">
+    <div class="stat-card"><div class="stat-val" id="stat-grupos">—</div><div class="stat-lbl">Grupos</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-aperturas">—</div><div class="stat-lbl">Aperturas</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-checks">—</div><div class="stat-lbl">Comprobaciones</div></div>
+    <div class="stat-card"><div class="stat-val" id="stat-bizums">—</div><div class="stat-lbl">Bizums</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Grupos registrados</div>
+    <div id="grupos-list"><div class="loader">Cargando...</div></div>
+  </div>
+
+  <div class="card">
+    <div class="card-title">Últimos 30 eventos</div>
+    <div id="eventos-list"><div class="loader">Cargando...</div></div>
+  </div>
 </div>
 
 <script>
 const SUPA_URL='https://yvlgnjfjpevusokegjbm.supabase.co';
 const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bGduamZqcGV2dXNva2VnamJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMjQxMjIsImV4cCI6MjA5NjgwMDEyMn0.MUqSaOJU69gT4r8AegtUtRXwZd7eDBY2IWeoMMddXVA';
 
-async function get(path){
-  const r=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+const { createClient } = supabase;
+const db = createClient(SUPA_URL, SUPA_KEY);
+
+// ── AUTH ──────────────────────────────────────────────────────────────────────
+async function doLogin(){
+  const email=document.getElementById('inp-email').value.trim();
+  const pwd=document.getElementById('inp-pwd').value;
+  const btn=document.getElementById('btn-login');
+  const err=document.getElementById('login-error');
+  btn.disabled=true;btn.textContent='Entrando...';err.style.display='none';
+  const {error}=await db.auth.signInWithPassword({email,password:pwd});
+  if(error){
+    err.style.display='block';
+    btn.disabled=false;btn.textContent='ENTRAR';
+  }else{
+    showAdmin();
+  }
+}
+
+async function doLogout(){
+  await db.auth.signOut();
+  document.getElementById('admin-screen').style.display='none';
+  document.getElementById('login-screen').style.display='flex';
+}
+
+function showAdmin(){
+  document.getElementById('login-screen').style.display='none';
+  document.getElementById('admin-screen').style.display='block';
+  loadData();
+}
+
+// Check if already logged in
+db.auth.getSession().then(({data:{session}})=>{
+  if(session) showAdmin();
+});
+
+// ── DATA ──────────────────────────────────────────────────────────────────────
+async function api(path){
+  const {data:{session}}=await db.auth.getSession();
+  const token=session?.access_token||SUPA_KEY;
+  const r=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token}});
   return r.json();
+}
+
+async function apiDel(path){
+  const {data:{session}}=await db.auth.getSession();
+  const token=session?.access_token||SUPA_KEY;
+  return fetch(SUPA_URL+path,{method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+token}});
 }
 
 async function loadData(){
   // Grupos
-  const grupos=await get('/rest/v1/grupos?select=slug,config,created_at&order=created_at.desc');
-  document.getElementById('stat-grupos').textContent=grupos.length;
-  document.getElementById('grupos-list').innerHTML=grupos.length===0
+  const grupos=await api('/rest/v1/grupos?select=slug,config,created_at&order=created_at.desc');
+  document.getElementById('stat-grupos').textContent=Array.isArray(grupos)?grupos.length:'—';
+  document.getElementById('grupos-list').innerHTML=!Array.isArray(grupos)||grupos.length===0
     ?'<div class="loader">Sin grupos todavía</div>'
     :grupos.map(g=>{
-      const cfg=g.config;
+      const cfg=g.config||{};
       const date=new Date(g.created_at).toLocaleDateString('es-ES');
       const lots=cfg.lotteries?.map(l=>l.lottery).join(', ')||cfg.lottery||'—';
       return `<div class="group-row">
-        <div><div class="group-name">${cfg.name}</div><div class="group-meta">${lots} · ${cfg.members?.length||0} miembros · ${date}</div></div>
+        <div>
+          <div class="group-name">${cfg.name||g.slug}</div>
+          <div class="group-meta">${lots} · ${cfg.members?.length||0} miembros · ${date}</div>
+        </div>
         <div style="display:flex;align-items:center;gap:8px;">
           <span class="badge">${g.slug}</span>
-          <button onclick="deleteGroup('${g.slug}')" style="background:#C62828;color:#fff;border:none;border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;">✕ Eliminar</button>
+          <button class="btn-del" onclick="deleteGroup('${g.slug}','${cfg.name||g.slug}')">✕ Eliminar</button>
         </div>
       </div>`;
     }).join('');
 
   // Eventos
-  const eventos=await get('/rest/v1/eventos?select=*&order=created_at.desc&limit=100');
-  document.getElementById('stat-aperturas').textContent=eventos.filter(e=>e.tipo==='apertura').length;
-  document.getElementById('stat-comprobaciones').textContent=eventos.filter(e=>e.tipo==='comprobar_premio').length;
-  document.getElementById('stat-bizums').textContent=eventos.filter(e=>e.tipo==='bizum_confirmado').length;
-  
-  const ultimos=eventos.slice(0,20);
-  document.getElementById('eventos-list').innerHTML=ultimos.length===0
-    ?'<div class="loader">Sin eventos todavía</div>'
-    :ultimos.map(e=>{
-      const date=new Date(e.created_at).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
-      return `<div class="event-row">
-        <span class="event-tipo">${e.tipo}</span>
-        <span style="color:rgba(255,255,255,0.6)">${e.grupo_slug}</span>
-        <span style="color:rgba(255,255,255,0.3)">${date}</span>
-      </div>`;
-    }).join('');
+  const eventos=await api('/rest/v1/eventos?select=*&order=created_at.desc&limit=100');
+  if(Array.isArray(eventos)){
+    document.getElementById('stat-aperturas').textContent=eventos.filter(e=>e.tipo==='apertura').length;
+    document.getElementById('stat-checks').textContent=eventos.filter(e=>e.tipo==='comprobar_premio').length;
+    document.getElementById('stat-bizums').textContent=eventos.filter(e=>e.tipo==='bizum_confirmado').length;
+    const ultimos=eventos.slice(0,30);
+    document.getElementById('eventos-list').innerHTML=ultimos.length===0
+      ?'<div class="loader">Sin eventos todavía</div>'
+      :ultimos.map(e=>{
+        const date=new Date(e.created_at).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+        return `<div class="event-row">
+          <span class="event-tipo">${e.tipo}</span>
+          <span class="event-slug">${e.grupo_slug||'—'}</span>
+          <span class="event-date">${date}</span>
+        </div>`;
+      }).join('');
+  }
 }
 
-async function deleteGroup(slug){
-  if(!confirm(`¿Eliminar el grupo "${slug}"? Esta acción no se puede deshacer.`)) return;
+async function deleteGroup(slug, name){
+  if(!confirm(`¿Eliminar el grupo "${name}"?\nEsta acción no se puede deshacer.`)) return;
   try{
-    await fetch(SUPA_URL+`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}`,{
-      method:'DELETE',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-    });
-    // Also delete events
-    await fetch(SUPA_URL+`/rest/v1/eventos?grupo_slug=eq.${encodeURIComponent(slug)}`,{
-      method:'DELETE',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-    });
-    alert(`Grupo "${slug}" eliminado.`);
+    await apiDel(`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}`);
+    await apiDel(`/rest/v1/eventos?grupo_slug=eq.${encodeURIComponent(slug)}`);
     loadData();
   }catch(e){
     alert('Error al eliminar. Inténtalo de nuevo.');
   }
 }
-
-loadData();
 </script>
 </body>
 </html>
