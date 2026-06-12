@@ -221,7 +221,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 </head>
 <body>
 
-<div id="setup-screen" style="display:flex;" class="setup">
+<div id="setup-screen" style="display:none;" class="setup">
   <div class="setup-emoji">🎰</div>
   <div class="setup-title">LotoGrupo</div>
   <div class="setup-sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
@@ -601,20 +601,6 @@ function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
 async function loadConfig(){
-  // DEBUG: force load from Supabase and show result
-  const _slug=new URLSearchParams(window.location.search).get('g');
-  if(_slug){
-    try{
-      const _r=await fetch(SUPA_URL+'/rest/v1/grupos?slug=eq.'+encodeURIComponent(_slug)+'&select=config',{
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-      });
-      const _d=await _r.json();
-      document.getElementById('setup-screen').querySelector('.setup-sub').textContent=
-        'Debug: status='+_r.status+' data='+JSON.stringify(_d).slice(0,100);
-    }catch(e){
-      document.getElementById('setup-screen').querySelector('.setup-sub').textContent='Debug error: '+e.message;
-    }
-  }
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('g');
   const hash=window.location.hash.slice(1);
