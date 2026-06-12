@@ -256,6 +256,22 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       <input type="number" id="f-draws" value="4" min="1" max="20">
     </div>
     <div class="field">
+      <label>¿Ya habéis jugado algún sorteo juntos?</label>
+      <p style="font-size:12px;color:#888;margin-bottom:8px;">Si el grupo ya lleva sorteos, indica la fecha del primer sorteo que jugasteis. Así el sistema sabrá quién paga ahora y cuánto lleváis gastado.</p>
+      <div style="display:flex;gap:10px;align-items:center;">
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;cursor:pointer;">
+          <input type="radio" name="epoch-type" value="now" checked onchange="toggleEpochField(this)"> Empezamos ahora
+        </label>
+        <label style="display:flex;align-items:center;gap:6px;font-size:14px;font-weight:500;cursor:pointer;">
+          <input type="radio" name="epoch-type" value="past" onchange="toggleEpochField(this)"> Ya hemos jugado
+        </label>
+      </div>
+      <div id="epoch-field" style="display:none;margin-top:10px;">
+        <label style="font-size:13px;color:#666;margin-bottom:4px;display:block;">Fecha del primer sorteo jugado</label>
+        <input type="date" id="f-epoch" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #ddd;font-size:15px;font-family:inherit;">
+      </div>
+    </div>
+    <div class="field">
       <label>Loterías configuradas</label>
       <div class="loterias-added" id="loterias-added"></div>
       <button class="btn-add-lot" id="btn-add-lot" onclick="addOtraLoteria()" style="display:none;">+ Añadir otra lotería</button>
@@ -310,6 +326,16 @@ async function supaFetch2(path,method,body){
   try{
     await fetch(SUPA_URL+path,{method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
   }catch(e){}
+}
+
+function toggleEpochField(radio){
+  const field=document.getElementById('epoch-field');
+  field.style.display=radio.value==='past'?'block':'none';
+  if(radio.value==='past'){
+    // Default to today
+    const today=new Date().toISOString().slice(0,10);
+    document.getElementById('f-epoch').value=today;
+  }
 }
 
 function toSlug(name){
@@ -460,7 +486,7 @@ function goBack(){if(typeof step==='number'&&step>1)step--;updateUI();window.scr
 
 async function createGroup(){
   const name=document.getElementById('f-name').value.trim();
-  const cfg={name,color:groupColor,lotteries:lotConfigs,members,ticketCost:parseFloat(document.getElementById('f-cost').value)||20,bizum:parseFloat(document.getElementById('f-bizum').value)||4,rotation:rotType,drawsPerTurn:rotType==='draws'?parseInt(document.getElementById('f-draws').value)||4:2,epoch:new Date().toISOString()};
+  const cfg={name,color:groupColor,lotteries:lotConfigs,members,ticketCost:parseFloat(document.getElementById('f-cost').value)||20,bizum:parseFloat(document.getElementById('f-bizum').value)||4,rotation:rotType,drawsPerTurn:rotType==='draws'?parseInt(document.getElementById('f-draws').value)||4:2,epoch:document.querySelector('input[name="epoch-type"]:checked')?.value==='past'?new Date(document.getElementById('f-epoch').value+'T00:00:00').toISOString():new Date().toISOString()};
   
   const btn=document.getElementById('btn-next');
   btn.textContent='Creando...';btn.disabled=true;
