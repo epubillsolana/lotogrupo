@@ -1834,9 +1834,12 @@ async function renderBoletos(){
   const list=document.getElementById('scanner-saved-list');
   const empty=document.getElementById('scanner-empty');
   if(list) list.innerHTML='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Cargando...</div>';
+
   const slug=getSlug();
   let boletos=[];
   const seenIds=new Set();
+
+  // Load from Supabase
   try{
     const r=await fetch(`${SUPA_URL}/rest/v1/boletos?grupo_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc`,{
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
@@ -1844,18 +1847,31 @@ async function renderBoletos(){
     if(r.ok){
       const data=await r.json();
       if(Array.isArray(data)) data.forEach(b=>{
-        seenIds.add(b.id);
+        seenIds.add(String(b.id));
         boletos.push({id:b.id,lot:b.lot_name,who:b.who,members:b.members?b.members.split(', '):[],fecha:b.fecha,hora:b.hora,imgUrl:b.img_url});
       });
     }
   }catch(e){}
+
+  // Merge localStorage
   try{
     const local=JSON.parse(localStorage.getItem(`lg_boletos_${CFG.name}`)||'[]');
-    local.forEach(b=>{if(!seenIds.has(b.id)){seenIds.add(b.id);boletos.push(b);}});
+    local.forEach(b=>{
+      if(!seenIds.has(String(b.id))){
+        seenIds.add(String(b.id));
+        boletos.push(b);
+      }
+    });
   }catch(e){}
-  boletos.sort((a,b)=>b.id-a.id);
+
+  boletos.sort((a,b)=>Number(b.id)-Number(a.id));
+
   if(!list) return;
-  if(!boletos.length){list.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(!boletos.length){
+    list.innerHTML='';
+    if(empty) empty.style.display='block';
+    return;
+  }
   if(empty) empty.style.display='none';
   list.innerHTML='';
   boletos.forEach(b=>{
@@ -1878,9 +1894,16 @@ async function renderBoletos(){
 
 
 function deleteBoleto(id){
+  if(!confirm('¿Eliminar este boleto?')) return;
+  fetch(`${SUPA_URL}/rest/v1/boletos?id=eq.${id}`,{
+    method:'DELETE',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+  }).catch(()=>{});
   const key=`lg_boletos_${CFG.name}`;
-  const saved=JSON.parse(localStorage.getItem(key)||'[]').filter(b=>b.id!==id);
-  localStorage.setItem(key,JSON.stringify(saved));
+  try{
+    const saved=JSON.parse(localStorage.getItem(key)||'[]').filter(b=>String(b.id)!==String(id));
+    localStorage.setItem(key,JSON.stringify(saved));
+  }catch(e){}
   renderBoletos();
   showToast('Boleto eliminado');
 }
