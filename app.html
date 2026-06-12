@@ -221,6 +221,22 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 </head>
 <body>
 
+<div id="onboarding-screen" style="display:none;min-height:100vh;background:#0A1F0F;color:#fff;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;position:fixed;inset:0;z-index:200;">
+  <div style="font-size:64px;margin-bottom:20px;">🎰</div>
+  <div style="font-size:28px;font-weight:900;margin-bottom:8px;" id="ob-group-name">Tu Peña</div>
+  <div style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:32px;line-height:1.6;">Te han invitado a unirte al grupo.<br>Gestiona turnos, Bizums y premios<br>desde un solo enlace.</div>
+  <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:20px;width:100%;max-width:320px;margin-bottom:24px;text-align:left;">
+    <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Qué encontrarás</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">🔍</span><span style="font-size:14px;">Comprobar el sorteo automáticamente</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">💸</span><span style="font-size:14px;">Confirmar tu Bizum al pagador</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">🏆</span><span style="font-size:14px;">Historial de premios del grupo</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">📷</span><span style="font-size:14px;">Foto del boleto como prueba</span></div>
+    </div>
+  </div>
+  <button onclick="finishOnboarding()" style="width:100%;max-width:320px;padding:16px;border-radius:99px;background:#FF8C00;color:#0A1F0F;border:none;font-size:17px;font-weight:800;cursor:pointer;margin-bottom:14px;">¡Entrar a la peña! →</button>
+</div>
+
 <div id="setup-screen" style="display:flex;" class="setup">
   <div class="setup-emoji">🎰</div>
   <div class="setup-title">LotoGrupo</div>
@@ -561,6 +577,46 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
+function finishOnboarding(){
+  localStorage.setItem(`lg_ob_${CFG.name}`,'1');
+  document.getElementById('onboarding-screen').style.display='none';
+  showTutorial();
+}
+
+function showTutorial(){
+  const steps=[
+    {emoji:'🔍',color:'#1565C0',bg:'#E3F2FD',tab:'Comprobar',title:'Comprueba el sorteo',desc:'Entra después de cada sorteo para ver si ha tocado premio.'},
+    {emoji:'👥',color:'#2E7D32',bg:'#E8F5E9',tab:'Turnos & Bizum',title:'Gestiona los pagos',desc:'El sistema sabe quién paga. Confirma tu Bizum con un toque.'},
+    {emoji:'🏆',color:'#F57F17',bg:'#FFF9C4',tab:'Premios',title:'Historial de premios',desc:'Veis cuánto habéis gastado y ganado en todo momento.'},
+    {emoji:'📷',color:'#6A1B9A',bg:'#F3E5F5',tab:'Scanner',title:'Fotografía el boleto',desc:'Foto del boleto como prueba. Queda registrado quién lo tiene.'},
+    {emoji:'📱',color:'#0A1F0F',bg:'#F1F3F4',tab:'',title:'Añádela a tu inicio',desc:'iPhone: Safari → Compartir → Añadir a pantalla de inicio\nAndroid: Chrome → ⋮ → Añadir a pantalla de inicio'},
+    {emoji:'🍀',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:'¡Disfruta y suerte!',desc:'Que os toque el gordo... y si no, al menos sin líos 😄'},
+  ];
+  let step=0;
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;';
+  function render(){
+    const s=steps[step];const isLast=step===steps.length-1;
+    const dots=steps.map((_,i)=>`<div style="width:${i===step?22:7}px;height:7px;border-radius:4px;background:${i===step?s.color:'#E5E7EB'};transition:all .3s;"></div>`).join('');
+    overlay.innerHTML=`<div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;width:100%;max-width:480px;">
+      <div style="display:flex;justify-content:center;gap:5px;margin-bottom:28px;">${dots}</div>
+      <div style="width:80px;height:80px;border-radius:24px;background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">${s.emoji}</div>
+      ${s.tab?`<div style="text-align:center;margin-bottom:8px;"><span style="background:${s.bg};color:${s.color};border-radius:99px;padding:4px 14px;font-size:12px;font-weight:700;">${s.tab}</span></div>`:''}
+      <div style="text-align:center;font-size:22px;font-weight:900;color:#1A1A18;margin-bottom:10px;">${s.title}</div>
+      <div style="text-align:center;font-size:15px;color:#6B7280;line-height:1.6;margin-bottom:32px;white-space:pre-line;">${s.desc}</div>
+      <button onclick="window._tNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
+      ${step===0?'<button onclick="window._tSkip()" style="width:100%;padding:10px;background:none;border:none;color:#9CA3AF;font-size:14px;cursor:pointer;">Saltar</button>':''}
+    </div>`;
+  }
+  window._tNext=()=>{if(step<steps.length-1){step++;render();}else window._tSkip();};
+  window._tSkip=()=>{overlay.remove();};
+  render();
+  document.body.appendChild(overlay);
+  let sx=0;
+  overlay.addEventListener('touchstart',e=>sx=e.touches[0].clientX,{passive:true});
+  overlay.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-sx;if(dx<-50&&step<steps.length-1){step++;render();}else if(dx>50&&step>0){step--;render();}},{passive:true});
+}
+
 async function loadConfig(){
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('g');
@@ -601,6 +657,11 @@ async function loadConfig(){
     initApp();
     document.getElementById('setup-screen').style.display='none';
     document.getElementById('main-app').style.display='block';
+    const obKey=`lg_ob_${CFG.name}`;
+    if(!localStorage.getItem(obKey)){
+      document.getElementById('ob-group-name').textContent=CFG.name;
+      document.getElementById('onboarding-screen').style.display='flex';
+    }
   }catch(e){
     document.querySelector('.setup-sub').textContent='Error: '+e.message;
   }
@@ -798,7 +859,6 @@ function toggleNumEditor(lotKey){
   if(open){cancelNumEdit(lotKey);return;}
   editor.style.display='block';
   btn.textContent='✕ Cerrar';
-  // Build grids
   const lot=LOTTERIES[lotKey];
   const nums=getSavedNums(lotKey);
   const selMain=new Set(nums.main);
@@ -806,8 +866,10 @@ function toggleNumEditor(lotKey){
   // Main grid
   const mg=document.getElementById(`grid-main-${lotKey}`);mg.innerHTML='';
   for(let i=1;i<=lot.mainMax;i++){
+    const isSel=selMain.has(i);
     const b=document.createElement('button');
-    b.style.cssText=`width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border2);background:${selMain.has(i)?'linear-gradient(135deg,#1976D2,#42A5F5)':'var(--surface2)'};color:${selMain.has(i)?'#fff':'var(--text2)'};font-size:11px;font-weight:700;cursor:pointer;`;
+    b.dataset.sel=isSel?'1':'0';
+    b.style.cssText=`width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border2);background:${isSel?'linear-gradient(135deg,#1976D2,#42A5F5)':'var(--surface2)'};color:${isSel?'#fff':'var(--text2)'};font-size:11px;font-weight:700;cursor:pointer;`;
     b.textContent=i;
     b.onclick=()=>toggleNumBtn(b,i,lotKey,'main',lot.mainCount);
     mg.appendChild(b);
@@ -815,8 +877,10 @@ function toggleNumEditor(lotKey){
   // Star grid
   const sg=document.getElementById(`grid-star-${lotKey}`);sg.innerHTML='';
   for(let i=1;i<=lot.starMax;i++){
+    const isSel=selStar.has(i);
     const b=document.createElement('button');
-    b.style.cssText=`width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border2);background:${selStar.has(i)?'linear-gradient(135deg,#F57F17,#FFD54F)':'var(--surface2)'};color:${selStar.has(i)?'#fff':'var(--text2)'};font-size:11px;font-weight:700;cursor:pointer;`;
+    b.dataset.sel=isSel?'1':'0';
+    b.style.cssText=`width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border2);background:${isSel?'linear-gradient(135deg,#F57F17,#FFD54F)':'var(--surface2)'};color:${isSel?'#fff':'var(--text2)'};font-size:11px;font-weight:700;cursor:pointer;`;
     b.textContent=i;
     b.onclick=()=>toggleNumBtn(b,i,lotKey,'star',lot.starCount);
     sg.appendChild(b);
@@ -981,22 +1045,20 @@ function checkAllPrizes(){
   track('comprobar_premio',{resultado:totalCat});
 }
 
-function addPrizeFromResult(){
+async function addPrizeFromResult(){
   if(!lastPrizeResult) return;
   const amount=parseFloat(document.getElementById('real-amount').value);
-  if(!amount||amount<=0){showToast('Introduce el importe real');return;}
-  const best=lastPrizeResult.allResults.find(r=>r.prize.cat!=='none');
+  if(!amount||amount<=0){showToast('Introduce el importe real cobrado');return;}
+  const best=lastPrizeResult.allResults?.find(r=>r.prize.cat!=='none');
   const label=best?best.lot.name+' — '+best.prize.label:'Premio';
   const fecha=best?best.draw.fecha:new Date().toLocaleDateString('es-ES');
-  if(addPrize(amount,label,fecha)){
+  if(await addPrize(amount,label,fecha)){
     document.getElementById('real-amount').value='';
     document.getElementById('add-prize-box').style.display='none';
-    // Mark as added
     if(lastPrizeResult.prizeKey) localStorage.setItem(lastPrizeResult.prizeKey,'1');
   }
 }
 
-// ── PLAYED ────────────────────────────────────────────────────────────────────
 function getPlayedKey(lotKey,fecha){return `lg_played_${CFG.name}_${lotKey}_${fecha}`;}
 function getPlayedState(lotKey,fecha){return localStorage.getItem(getPlayedKey(lotKey,fecha));}
 
@@ -1054,6 +1116,40 @@ function buildTurns(){
 function getSlug(){
   return new URLSearchParams(window.location.search).get('g')||CFG.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
+async function loadBizumState(){
+  const slug=getSlug();
+  const turno=getCurrentPayerIdx();
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/bizums?grupo_slug=eq.${encodeURIComponent(slug)}&turno_idx=eq.${turno}&select=member_name,confirmado`,{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    const data=await r.json();
+    if(Array.isArray(data)&&data.length>0){
+      const state={};
+      data.forEach(row=>{state[row.member_name]=row.confirmado;});
+      return state;
+    }
+  }catch(e){}
+  try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}
+}
+
+async function saveBizumState(name,confirmado){
+  const slug=getSlug();
+  const turno=getCurrentPayerIdx();
+  try{
+    await fetch(`${SUPA_URL}/rest/v1/bizums`,{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({grupo_slug:slug,turno_idx:turno,member_name:name,confirmado,updated_at:new Date().toISOString()})
+    });
+  }catch(e){}
+  try{
+    const state=JSON.parse(localStorage.getItem(getBizumKey())||'{}');
+    state[name]=confirmado;
+    localStorage.setItem(getBizumKey(),JSON.stringify(state));
+  }catch(e){}
+}
+
 function getBizumKey(){
   const idx=getCurrentPayerIdx();
   const ym=new Date().toISOString().slice(0,7);
@@ -1062,12 +1158,14 @@ function getBizumKey(){
 function getBizumState(){try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}}
 function saveBizumState(s){localStorage.setItem(getBizumKey(),JSON.stringify(s));}
 
-function buildBizumConfirm(){
-  const _mbrs=getSavedMembers();
-  const idx=getCurrentPayerIdx()%_mbrs.length,payer=_mbrs[idx];
-  const others=_mbrs.filter((_,i)=>i!==idx);
-  const state=getBizumState();
+async function buildBizumConfirm(){
+  const members=getSavedMembers()||CFG.members;
+  const payerIdx=getCurrentPayerIdx()%members.length;
+  const payer=members[payerIdx];
+  const others=members.filter((_,i)=>i!==payerIdx);
   const list=document.getElementById('bizum-confirm-list');if(!list)return;
+  list.innerHTML='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Cargando...</div>';
+  const state=await loadBizumState();
   list.innerHTML='';
   const payerRow=document.createElement('div');payerRow.className='bizum-row';
   payerRow.innerHTML=`<span style="font-size:14px;font-weight:700;">💳 ${payer}</span><span style="font-size:11px;color:var(--text3);">Paga el boleto</span>`;
@@ -1079,17 +1177,22 @@ function buildBizumConfirm(){
       <button class="bizum-btn ${done?'done':'pending'}" onclick="toggleBizum('${m}',this)">${done?'✅ Bizum hecho':'⏳ Pendiente'}</button>`;
     list.appendChild(row);
   });
+  buildWABizum(state,payer,others);
 }
 
-function toggleBizum(name,btn){
-  const state=getBizumState();
-  state[name]=!state[name];
-  saveBizumState(state);
-  btn.className='bizum-btn '+(state[name]?'done':'pending');
-  btn.textContent=state[name]?'✅ Bizum hecho':'⏳ Pendiente';
-  showToast(state[name]?`✅ ${name} — confirmado`:`⏳ ${name} — pendiente`);
-  buildWABizum();
-  if(state[name]) track('bizum_confirmado');
+async function toggleBizum(name,btn){
+  const current=btn.classList.contains('done');
+  const newState=!current;
+  btn.className='bizum-btn '+(newState?'done':'pending');
+  btn.textContent=newState?'✅ Bizum hecho':'⏳ Pendiente';
+  btn.disabled=true;
+  await saveBizumState(name,newState);
+  btn.disabled=false;
+  showToast(newState?`✅ ${name} confirmado`:`⏳ ${name} pendiente`);
+  const state=await loadBizumState();
+  const members=getSavedMembers()||CFG.members;
+  const payerIdx=getCurrentPayerIdx()%members.length;
+  buildWABizum(state,members[payerIdx],members.filter((_,i)=>i!==payerIdx));
 }
 
 function buildWABizum(){
@@ -1114,6 +1217,70 @@ function buildWABizum(){
 function getPrizeKey(lotKey){return `lg_prizes_${CFG.name}_${lotKey||'all'}`;}
 function loadHistory(lotKey){try{return JSON.parse(localStorage.getItem(getPrizeKey(lotKey))||'[]');}catch(e){return[];}}
 function saveHistory(h,lotKey){localStorage.setItem(getPrizeKey(lotKey),JSON.stringify(h));}
+async function loadHistory(lotKey){
+  const slug=getSlug();
+  try{
+    let url=`${SUPA_URL}/rest/v1/premios?grupo_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc`;
+    if(lotKey) url+=`&lot_key=eq.${encodeURIComponent(lotKey)}`;
+    const r=await fetch(url,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+    const data=await r.json();
+    if(Array.isArray(data)) return data.map(d=>({id:d.id,amount:d.amount,label:d.label,fecha:d.fecha,lotKey:d.lot_key}));
+  }catch(e){}
+  try{return JSON.parse(localStorage.getItem(`lg_prizes_${CFG.name}_${lotKey||'all'}`)||'[]');}catch(e){return[];}
+}
+
+async function saveHistoryItem(item,lotKey){
+  const slug=getSlug();
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/premios`,{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
+      body:JSON.stringify({grupo_slug:slug,lot_key:lotKey||CFG.lotteries[0].lottery,label:item.label,amount:item.amount,fecha:item.fecha})
+    });
+    const data=await r.json();
+    return Array.isArray(data)?data[0]:data;
+  }catch(e){
+    const h=JSON.parse(localStorage.getItem(`lg_prizes_${CFG.name}_${lotKey||'all'}`)||'[]');
+    h.push(item);localStorage.setItem(`lg_prizes_${CFG.name}_${lotKey||'all'}`,JSON.stringify(h));
+    return item;
+  }
+}
+
+async function deleteHistoryItem(id,lotKey){
+  try{
+    await fetch(`${SUPA_URL}/rest/v1/premios?id=eq.${id}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+  }catch(e){}
+}
+
+async function editPrize(id,lotKey){
+  const h=await loadHistory(lotKey);
+  const entry=h.find(e=>String(e.id)===String(id));
+  if(!entry) return;
+  const newAmt=prompt(`Importe actual: ${formatEur(entry.amount)}\nIntroduce el nuevo importe:`,entry.amount);
+  if(newAmt===null) return;
+  const amt=parseFloat(newAmt);
+  if(!amt||amt<=0){showToast('Importe no válido');return;}
+  try{
+    await fetch(`${SUPA_URL}/rest/v1/premios?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({amount:amt})
+    });
+  }catch(e){}
+  renderHistory();
+  showToast('✅ Premio actualizado');
+}
+
+async function deleteSinglePrize(id,lotKey){
+  if(!confirm('¿Eliminar este premio?')) return;
+  await deleteHistoryItem(id,lotKey);
+  renderHistory();
+  showToast('Premio eliminado');
+}
+
 function formatEur(n){return n.toLocaleString('es-ES',{minimumFractionDigits:2,maximumFractionDigits:2})+' €';}
 
 let _currentPremiosLot='all';
@@ -1124,78 +1291,51 @@ function selectPremiosLot(lot,btn){
   renderHistory();
 }
 
-function renderHistory(){
-  // Get all history combined or per lottery
-  let history=[];
-  if(_currentPremiosLot==='all'){
-    CFG.lotteries.forEach(l=>{history=[...history,...loadHistory(l.lottery).map(e=>({...e,lotKey:l.lottery}))];});
-    history.sort((a,b)=>new Date(b.fechaRaw||0)-new Date(a.fechaRaw||0));
-  }else{
-    history=loadHistory(_currentPremiosLot);
-  }
-  const total=history.reduce((s,e)=>s+e.amount,0);
-  document.getElementById('total-amount').textContent=formatEur(total);
-  // Gastos totales
-  let totalGastado=0;
-  CFG.lotteries.forEach(l=>{
-    const jugados=countSorteosJugados(l.lottery);
-    const costePorSorteo=(CFG.ticketCost||20)/(CFG.drawsPerTurn*2||8);
-    totalGastado+=Math.floor(jugados/(CFG.drawsPerTurn*2||8))*(CFG.ticketCost||20)+(jugados%(CFG.drawsPerTurn*2||8))*costePorSorteo;
-  });
-  const balance=total-totalGastado;
-  const gastadoEl=document.getElementById('bal-gastado');
-  const balanceEl=document.getElementById('bal-balance');
-  if(gastadoEl) gastadoEl.textContent=formatEur(totalGastado);
-  if(balanceEl){
-    balanceEl.textContent=(balance>=0?'+':'')+formatEur(balance);
-    balanceEl.style.color=balance>=0?'#2E7D32':'#C62828';
-  }
-  document.getElementById('total-sub').textContent=history.length===0?'Sin premios registrados':`${history.length} premio${history.length!==1?'s':''}`;
-  // Stats
-  const numPremiados=history.filter(e=>e.label!=='Premio anterior').length;
-  const sorteosTotal=CFG.lotteries.reduce((s,l)=>s+countSorteosJugados(l.lottery),0);
-  document.getElementById('stat-premiados').textContent=numPremiados;
-  const pctEl=document.getElementById('stat-premiados-pct');
-  if(pctEl) pctEl.textContent=sorteosTotal>0?(Math.round(numPremiados/sorteosTotal*100)+'% de '+sorteosTotal+' jugados'):'';
-  const statMejor=document.getElementById('stat-mejor');
-  if(statMejor){statMejor.textContent=history.length===0?'—':formatEur(Math.max(...history.map(e=>e.amount)));statMejor.style.fontSize=history.length===0?'22px':'14px';}
-  // Rachas (simplified)
-  document.getElementById('stat-peor-racha').textContent='—';
-  document.getElementById('stat-mejor-racha').textContent='—';
-  // Historial
+async function renderHistory(){
   const list=document.getElementById('history-list');
-  if(history.length===0){
-    list.innerHTML='<div class="empty-state">Todavía no hay premios 🍀<br><span style="font-size:12px;">Cuando toque algo, aparecerá aquí</span></div>';
-    document.getElementById('reset-box').style.display='none';return;
+  if(list) list.innerHTML='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Cargando...</div>';
+
+  // Load from Supabase
+  let history=[];
+  for(const l of CFG.lotteries){
+    const h=await loadHistory(l.lottery);
+    history=[...history,...h.map(e=>({...e,lotKey:l.lottery}))];
   }
-  document.getElementById('reset-box').style.display='block';
+  history.sort((a,b)=>(b.id||0)-(a.id||0));
+
+  const total=history.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+  const totalEl=document.getElementById('total-amount');
+  if(totalEl) totalEl.textContent=formatEur(total);
+
+  const subEl=document.getElementById('total-sub');
+  if(subEl) subEl.textContent=history.length===0?'Sin premios registrados':`${history.length} premio${history.length!==1?'s':''}`;
+
+  const statMejor=document.getElementById('stat-mejor');
+  if(statMejor) statMejor.textContent=history.length>0?formatEur(Math.max(...history.map(e=>parseFloat(e.amount||0)))):'—';
+
+  if(!list) return;
+  if(history.length===0){
+    list.innerHTML='<div class="empty-state">Sin premios todavía 🍀</div>';
+    return;
+  }
   list.innerHTML='';
-  [...history].reverse().forEach((e,ri)=>{
-    const realIdx=history.length-1-ri;
+  history.forEach(e=>{
     const lotKey=e.lotKey||CFG.lotteries[0].lottery;
     const row=document.createElement('div');row.className='history-item';
-    row.innerHTML=`<div><div class="history-label">${e.label}</div><div class="history-date">${e.fecha}</div></div>
+    row.innerHTML=`
+      <div>
+        <div class="history-label">${e.label||'Premio'}</div>
+        <div class="history-date">${e.fecha||''}</div>
+      </div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span class="history-amount" id="hist-amt-${realIdx}">+${formatEur(e.amount)}</span>
-        <button onclick="editPrize(${realIdx},'${lotKey}')" style="padding:3px 8px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;cursor:pointer;">✏️</button>
-        <button onclick="deleteSinglePrize(${realIdx},'${lotKey}')" style="padding:3px 8px;border-radius:99px;background:#FFEBEE;border:1px solid #FFCDD2;font-size:11px;cursor:pointer;color:#C62828;">✕</button>
+        <span class="history-amount">+${formatEur(parseFloat(e.amount||0))}</span>
+        <button onclick="editPrize('${e.id}','${lotKey}')" style="padding:3px 8px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;cursor:pointer;">✏️</button>
+        <button onclick="deleteSinglePrize('${e.id}','${lotKey}')" style="padding:3px 8px;border-radius:99px;background:#FFEBEE;border:1px solid #FFCDD2;font-size:11px;cursor:pointer;color:#C62828;">✕</button>
       </div>`;
     list.appendChild(row);
   });
 }
 
-function addPrize(amount,label,fecha){
-  if(!amount||amount<=0){showToast('Introduce un importe válido');return false;}
-  // Detect which lottery from label
-  const lotKey=CFG.lotteries.find(l=>label.includes(LOTTERIES[l.lottery]?.name||''))?.lottery||CFG.lotteries[0].lottery;
-  const h=loadHistory(lotKey);
-  h.push({amount,label,fecha,fechaRaw:new Date().toISOString()});
-  saveHistory(h,lotKey);
-  renderHistory();
-  showToast(`✅ +${formatEur(amount)} añadido`);
-  track('premio_registrado',{amount});
-  return true;
-}
 
 function addManualPrize(){
   const input=document.getElementById('manual-amount');
@@ -1639,12 +1779,20 @@ async function saveBoleto(){
   const whoName=who||(members[getCurrentPayerIdx()%members.length]);
   const membersStr=members.map(m=>getMemberID(m)).join(', ');
 
-  showToast('💾 Guardando boleto...');
+  showToast('📤 Subiendo foto...');
   document.getElementById('scanner-preview-box').style.display='none';
   window._scanImgData=null;
 
-  // Save to Supabase
-  const payload={id,grupo_slug:slug,lot_name:lot.name,who:whoName,members:membersStr,fecha,hora,img_url:null};
+  // STEP 1: Upload photo first
+  let imgUrl=null;
+  try{
+    imgUrl=await uploadBoletoImg(imgData,slug,id);
+  }catch(e){
+    console.warn('Photo upload failed:',e);
+  }
+
+  // STEP 2: Save to Supabase with photo URL
+  const payload={id,grupo_slug:slug,lot_name:lot.name,who:whoName,members:membersStr,fecha,hora,img_url:imgUrl};
   let savedOk=false;
   try{
     const r=await fetch(`${SUPA_URL}/rest/v1/boletos`,{
@@ -1655,32 +1803,18 @@ async function saveBoleto(){
     savedOk=r.ok||r.status===201||r.status===200;
   }catch(e){}
 
-  // Save to localStorage as backup
+  // STEP 3: Save to localStorage as backup
   try{
     const key=`lg_boletos_${CFG.name}`;
     const saved=JSON.parse(localStorage.getItem(key)||'[]');
-    saved.unshift({id,lotKey,lot:lot.name,who:whoName,members:members.map(m=>getMemberID(m)),fecha,hora,imgUrl:null});
+    saved.unshift({id,lotKey,lot:lot.name,who:whoName,members:members.map(m=>getMemberID(m)),fecha,hora,imgUrl});
     localStorage.setItem(key,JSON.stringify(saved.slice(0,50)));
   }catch(e){}
 
   await renderBoletos();
-  showToast(savedOk?'✅ Boleto guardado':'✅ Guardado localmente');
-
-  // Upload photo in background
-  try{
-    const url=await uploadBoletoImg(imgData,slug,id);
-    await fetch(`${SUPA_URL}/rest/v1/boletos?id=eq.${id}`,{
-      method:'PATCH',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
-      body:JSON.stringify({img_url:url})
-    });
-    const key=`lg_boletos_${CFG.name}`;
-    const saved=JSON.parse(localStorage.getItem(key)||'[]');
-    const b=saved.find(x=>x.id===id);
-    if(b){b.imgUrl=url;localStorage.setItem(key,JSON.stringify(saved));}
-    await renderBoletos();
-  }catch(e){}
+  showToast(savedOk?'✅ Boleto registrado':'✅ Guardado localmente');
 }
+
 
 async function uploadBoletoImg(base64,slug,id){
   const res=await fetch(base64);
@@ -1772,4 +1906,13 @@ function openWABizum(){window.open('https://wa.me/?text='+encodeURIComponent(las
 loadConfig();
 </script>
 </body>
-</html>
+</html>async function addPrize(amount,label,fecha){
+  if(!amount||amount<=0){showToast('Introduce un importe válido');return false;}
+  const lotKey=CFG.lotteries.find(l=>label.includes(LOTTERIES[l.lottery]?.name||''))?.lottery||CFG.lotteries[0].lottery;
+  await saveHistoryItem({amount,label,fecha},lotKey);
+  await renderHistory();
+  showToast(`✅ +${formatEur(amount)} añadido`);
+  return true;
+}
+
+
