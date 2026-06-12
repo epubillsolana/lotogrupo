@@ -787,23 +787,11 @@ async function initAllDraws(){
   });
   buildComprobar();
   document.getElementById('btn-check').disabled=false;
-  // Always fetch fresh from API
+  // Always fetch fresh from API - no cache
   for(const l of CFG.lotteries){
     try{
-      // Clear cache older than 1 hour
-      const cached=localStorage.getItem('lg_draw_'+l.lottery);
-      if(cached){
-        const ts=localStorage.getItem('lg_draw_ts_'+l.lottery);
-        if(ts&&Date.now()-parseInt(ts)<3600000){
-          drawDataMap[l.lottery]=JSON.parse(cached);
-          continue;
-        }
-      }
       const fresh=await fetchDraw(l.lottery);
-      if(fresh){
-        drawDataMap[l.lottery]=fresh;
-        localStorage.setItem('lg_draw_ts_'+l.lottery,Date.now().toString());
-      }
+      if(fresh) drawDataMap[l.lottery]=fresh;
     }catch(e){}
   }
   buildComprobar();
