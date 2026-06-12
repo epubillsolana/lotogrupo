@@ -383,6 +383,20 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <!-- GRUPO -->
   <div class="section" id="tab-grupo">
     <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-label" style="margin-bottom:0;">Nombre del grupo</div>
+        <button onclick="toggleEditName()" id="edit-name-btn" style="padding:4px 12px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);">✏️ Editar</button>
+      </div>
+      <div id="name-view" style="font-size:18px;font-weight:700;color:var(--text);padding:4px 0;"></div>
+      <div id="name-editor" style="display:none;margin-top:8px;">
+        <input type="text" id="name-input" maxlength="30" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:16px;font-family:inherit;outline:none;" placeholder="Nombre del grupo...">
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button onclick="cancelEditName()" style="flex:1;padding:10px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);font-size:13px;font-weight:700;cursor:pointer;">Cancelar</button>
+          <button onclick="saveName()" style="flex:1;padding:10px;border-radius:10px;background:#2E7D32;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;">Guardar ✅</button>
+        </div>
+      </div>
+    </div>
+    <div class="card">
       <div class="card-label">Miembros del grupo</div>
       <div id="members-list"></div>
     </div>
@@ -512,6 +526,7 @@ function initApp(){
   buildWABizum();
   buildMembers();
   renderHistory();
+  renderGroupName();
   restoreWho();
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()=>{});
 }
@@ -1040,6 +1055,48 @@ function saveNotifConfig(myIdx){
   localStorage.setItem(`lg_notif_${CFG.name}`,JSON.stringify({myIdx,payerIdx:getCurrentPayerIdx()}));
 }
 
+// ── EDIT NAME ─────────────────────────────────────────────────────────────────
+function getGroupName(){return localStorage.getItem(`lg_name_${CFG.name._orig||CFG.name}`)||CFG.name;}
+
+function renderGroupName(){
+  const name=getGroupName();
+  const el=document.getElementById('name-view');
+  if(el) el.textContent=name;
+  // Update header
+  const h1=document.getElementById('header-title');
+  if(h1) h1.textContent=name;
+  const badge=document.getElementById('header-name');
+  if(badge) badge.textContent=name;
+}
+
+function toggleEditName(){
+  const editor=document.getElementById('name-editor');
+  const view=document.getElementById('name-view');
+  const btn=document.getElementById('edit-name-btn');
+  const isOpen=editor.style.display!=='none';
+  editor.style.display=isOpen?'none':'block';
+  view.style.display=isOpen?'block':'none';
+  btn.textContent=isOpen?'✏️ Editar':'✕ Cerrar';
+  if(!isOpen) document.getElementById('name-input').value=getGroupName();
+}
+
+function cancelEditName(){
+  document.getElementById('name-editor').style.display='none';
+  document.getElementById('name-view').style.display='block';
+  document.getElementById('edit-name-btn').textContent='✏️ Editar';
+}
+
+function saveName(){
+  const val=document.getElementById('name-input').value.trim();
+  if(!val){showToast('Escribe un nombre');return;}
+  localStorage.setItem(`lg_name_${CFG.name._orig||CFG.name}`,val);
+  cancelEditName();
+  renderGroupName();
+  buildTurns();
+  buildWABizum();
+  showToast('✅ Nombre actualizado');
+}
+
 // ── UI ────────────────────────────────────────────────────────────────────────
 function switchTab(id,el){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
@@ -1048,7 +1105,7 @@ function switchTab(id,el){
   if(id==='premios') renderHistory();
   if(id==='turnos') buildTurns();
   if(id==='bizum'){buildBizumConfirm();buildWABizum();}
-  if(id==='grupo') buildMembers();
+  if(id==='grupo'){buildMembers();renderGroupName();}
 }
 function copyMsg(){navigator.clipboard.writeText(lastWAMsg).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
 function openWA(){window.open('https://wa.me/?text='+encodeURIComponent(lastWAMsg),'_blank');}
