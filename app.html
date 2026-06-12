@@ -1292,7 +1292,7 @@ function buildMembers(){
           <span style="font-size:11px;color:var(--text3);">DNI (últimos 4):</span>
           <input type="text" maxlength="4" placeholder="----" value="${dni}"
             style="width:48px;padding:2px 6px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);font-size:12px;font-family:inherit;text-align:center;outline:none;"
-            onchange="saveDNI('${m}',this.value)" oninput="this.value=this.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase()">
+            oninput="this.value=this.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase();saveDNI('${m}',this.value)">
         </div>
       </div>
       <div style="display:flex;gap:6px;">
