@@ -287,7 +287,11 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       <div class="result-sub">Comparte con tu grupo por WhatsApp.<br>Cada miembro lo añade a la pantalla de inicio.</div>
       <button class="btn-wa-big" onclick="shareWA()">📲 COMPARTIR POR WHATSAPP</button>
       <button class="btn-copy-big" onclick="copyLink()">📋 COPIAR ENLACE</button>
-      <div style="margin-top:12px;font-size:11px;color:#9CA3AF;text-align:center;">El enlace contiene toda la configuración de tu peña</div>
+      <div style="margin-top:16px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:12px 14px;text-align:left;">
+        <div style="font-size:11px;font-weight:700;color:#15803D;text-transform:uppercase;letter-spacing:.05em;margin-bottom:6px;">Tu enlace directo:</div>
+        <div id="res-link" style="font-size:13px;color:#166534;word-break:break-all;font-weight:600;"></div>
+        <a id="res-link-a" href="#" target="_blank" style="display:inline-block;margin-top:8px;font-size:12px;color:#15803D;text-decoration:underline;">Abrir ahora →</a>
+      </div>
     </div>
   </div>
 
@@ -525,6 +529,7 @@ async function createGroup(){
   const rb=document.getElementById('res-badges');
   rb.innerHTML=lotConfigs.map(c=>`<span style="background:#EAF3DE;color:#3B6D11;border-radius:99px;padding:5px 14px;font-size:13px;font-weight:700;">${LOTS[c.lottery].emoji} ${LOTS[c.lottery].name}</span>`).join('');
   document.getElementById('res-link').textContent=_link;
+  document.getElementById('res-link-a').href=_link;
   step='result';updateUI();window.scrollTo(0,0);
 }
 
