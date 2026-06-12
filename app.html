@@ -1867,16 +1867,16 @@ async function renderBoletos(){
 
   // Load from Supabase
   try{
-    const r=await fetch(`${SUPA_URL}/rest/v1/boletos?grupo_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc`,{
+    const url=`${SUPA_URL}/rest/v1/boletos?grupo_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc`;
+    const r=await fetch(url,{
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
     });
-    if(r.ok){
-      const data=await r.json();
-      if(Array.isArray(data)) data.forEach(b=>{
-        seenIds.add(String(b.id));
-        boletos.push({id:b.id,lot:b.lot_name,who:b.who,members:b.members?b.members.split(', '):[],fecha:b.fecha,hora:b.hora,imgUrl:b.img_url});
-      });
-    }
+    const data=await r.json();
+    if(list) list.innerHTML='<div style="font-size:10px;color:green;padding:4px;">Debug: slug='+slug+' status='+r.status+' rows='+(Array.isArray(data)?data.length:'err')+'</div>';
+    if(r.ok&&Array.isArray(data)) data.forEach(b=>{
+      seenIds.add(String(b.id));
+      boletos.push({id:b.id,lot:b.lot_name,who:b.who,members:b.members?b.members.split(', '):[],fecha:b.fecha,hora:b.hora,imgUrl:b.img_url});
+    });
   }catch(e){}
 
   // Merge localStorage
