@@ -1596,20 +1596,33 @@ function openGallery(){
 function processImage(input){
   const file=input.files[0];
   if(!file) return;
+  // Compress image before storing (max 800px wide, quality 0.7)
   const reader=new FileReader();
   reader.onload=e=>{
-    const img=document.getElementById('scanner-img');
+    const img=new Image();
+    img.onload=()=>{
+      const canvas=document.createElement('canvas');
+      const maxW=800;
+      const scale=Math.min(1,maxW/img.width);
+      canvas.width=img.width*scale;
+      canvas.height=img.height*scale;
+      const ctx=canvas.getContext('2d');
+      ctx.drawImage(img,0,0,canvas.width,canvas.height);
+      const compressed=canvas.toDataURL('image/jpeg',0.7);
+      window._scanImgData=compressed;
+      // Show preview
+      document.getElementById('scanner-img').src=compressed;
+      const {who,lotKey}=getSelectedScanner();
+      const lot=LOTTERIES[lotKey];
+      const members=getSavedMembers()||CFG.members;
+      const membersWithDNI=members.map(m=>getMemberID(m)).join(', ');
+      document.getElementById('scanner-who-confirm').innerHTML=
+        `<strong>${who}</strong> tiene el boleto · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
+         <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithDNI}</span>`;
+      document.getElementById('scanner-preview-box').style.display='block';
+      document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
+    };
     img.src=e.target.result;
-    window._scanImgData=e.target.result;
-    const {who,lotKey}=getSelectedScanner();
-    const lot=LOTTERIES[lotKey];
-    const members=getSavedMembers()||CFG.members;
-    const membersWithDNI=members.map(m=>getMemberID(m)).join(', ');
-    document.getElementById('scanner-who-confirm').innerHTML=
-      `<strong>${who}</strong> tiene el boleto · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
-       <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithDNI}</span>`;
-    document.getElementById('scanner-preview-box').style.display='block';
-    document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
   };
   reader.readAsDataURL(file);
   input.value='';
@@ -1632,13 +1645,26 @@ function saveBoleto(){
     id:Date.now()
   };
   const key=`lg_boletos_${CFG.name}`;
-  const saved=JSON.parse(localStorage.getItem(key)||'[]');
-  saved.push(boleto);
-  localStorage.setItem(key,JSON.stringify(saved));
-  document.getElementById('scanner-preview-box').style.display='none';
-  window._scanImgData=null;
-  renderBoletos();
-  showToast('✅ Boleto registrado con foto');
+  try{
+    const saved=JSON.parse(localStorage.getItem(key)||'[]');
+    saved.push(boleto);
+    localStorage.setItem(key,JSON.stringify(saved));
+    document.getElementById('scanner-preview-box').style.display='none';
+    window._scanImgData=null;
+    renderBoletos();
+    showToast('✅ Boleto registrado con foto');
+  }catch(e){
+    // Storage full - try without image
+    boleto.img=null;
+    boleto.imgError='Foto no guardada (almacenamiento lleno)';
+    const saved=JSON.parse(localStorage.getItem(key)||'[]');
+    saved.push(boleto);
+    localStorage.setItem(key,JSON.stringify(saved));
+    document.getElementById('scanner-preview-box').style.display='none';
+    window._scanImgData=null;
+    renderBoletos();
+    showToast('⚠️ Boleto guardado sin foto (almacenamiento lleno)');
+  }
 }
 
 function renderBoletos(){
