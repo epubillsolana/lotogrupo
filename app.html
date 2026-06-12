@@ -1601,10 +1601,13 @@ function processImage(input){
     img.src=e.target.result;
     // Store image data for saving
     window._scanImgData=e.target.result;
-    const {who}=getSelectedScanner();
-    const lot=LOTTERIES[getSelectedScanner().lotKey];
+    const {who,lotKey}=getSelectedScanner();
+    const lot=LOTTERIES[lotKey];
+    const members=getSavedMembers()||CFG.members;
+    const membersWithID=members.map(m=>getMemberID(m)).join(', ');
     document.getElementById('scanner-who-confirm').innerHTML=
-      `<strong>${who}</strong> · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}`;
+      `<strong>${who}</strong> tiene el boleto · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
+       <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithID}</span>`;
     document.getElementById('scanner-preview-box').style.display='block';
     document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
   };
