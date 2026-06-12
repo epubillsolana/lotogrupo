@@ -249,10 +249,11 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
       <div id="hits-detail"></div>
       <div id="add-prize-box" class="card" style="display:none;">
-        <div class="card-label">¿Añadir al historial?</div>
+        <div class="card-label">💰 Añadir premio al historial</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="add-prize-hint">Introduce el importe real cobrado.</p>
         <div class="add-prize-row">
-          <input type="number" id="real-amount" placeholder="€ importe real" min="0" step="0.01">
-          <button id="add-prize-btn" onclick="addPrizeFromResult()" style="background:var(--green);">Añadir</button>
+          <input type="number" id="real-amount" placeholder="€ importe real cobrado" min="0" step="0.01">
+          <button id="add-prize-btn" onclick="addPrizeFromResult()" style="background:var(--green);">+ Añadir</button>
         </div>
       </div>
       <div class="card">
@@ -671,26 +672,62 @@ async function initAllDraws(){
 }
 
 // ── COMPROBAR ─────────────────────────────────────────────────────────────────
+function getSavedNums(lotKey){
+  const saved=localStorage.getItem(`lg_nums_${CFG.name}_${lotKey}`);
+  if(saved){try{return JSON.parse(saved);}catch(e){}}
+  const l=CFG.lotteries.find(x=>x.lottery===lotKey);
+  return{main:l?.main||[],stars:l?.stars||[]};
+}
+function saveNums(lotKey,main,stars){
+  localStorage.setItem(`lg_nums_${CFG.name}_${lotKey}`,JSON.stringify({main,stars}));
+}
+
 function buildComprobar(){
   const container=document.getElementById('loterias-comprobar');
   container.innerHTML='';
-  CFG.lotteries.forEach(l=>{
+  CFG.lotteries.forEach((l,li)=>{
     const lot=LOTTERIES[l.lottery];
     const draw=drawDataMap[l.lottery]||lot.fallback;
+    const nums=getSavedNums(l.lottery);
     const div=document.createElement('div');div.className='card';
-    // Played button key
     const playedState=getPlayedState(l.lottery,draw.fecha);
     const playedClass=playedState==='yes'?'yes':playedState==='no'?'no':'unknown';
     const playedText=playedState==='yes'?'✅ Jugado':playedState==='no'?'❌ No jugado':'Sin marcar';
     div.innerHTML=`
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:8px;">
           <span style="font-size:18px;">${lot.emoji}</span>
           <span style="font-size:14px;font-weight:700;">${lot.name}</span>
         </div>
         <span style="font-size:11px;color:var(--text3);">📅 ${draw.fecha}</span>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-bottom:8px;text-align:center;">Nuestros números: <strong>${l.main.join(' · ')}</strong> ⭐ <strong>${l.stars.join(' · ')}</strong></div>
+
+      <!-- Nuestros números (grandes) -->
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Nuestros números</div>
+        <button onclick="toggleNumEditor('${l.lottery}')" id="edit-btn-${l.lottery}"
+          style="padding:3px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);">✏️ Editar</button>
+      </div>
+      <div class="ball-row" id="our-balls-${l.lottery}" style="margin-bottom:14px;">
+        ${nums.main.map(n=>`<div class="ball our-main">${n}</div>`).join('')}
+        <span class="star-sep">⭐</span>
+        ${nums.stars.map(n=>`<div class="ball our-star">${n}</div>`).join('')}
+      </div>
+
+      <!-- Editor números -->
+      <div id="num-editor-${l.lottery}" style="display:none;margin-bottom:14px;padding:12px;background:var(--surface2);border-radius:12px;">
+        <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">Números <span id="cnt-main-${l.lottery}" style="color:var(--blue);">0/${lot.mainCount}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;" id="grid-main-${l.lottery}"></div>
+        <div style="font-size:11px;font-weight:700;color:var(--text3);margin-bottom:8px;">${lot.starLabel} <span id="cnt-star-${l.lottery}" style="color:var(--gold);">0/${lot.starCount}</span></div>
+        <div style="display:flex;flex-wrap:wrap;gap:5px;margin-bottom:10px;" id="grid-star-${l.lottery}"></div>
+        <div style="display:flex;gap:8px;">
+          <button onclick="cancelNumEdit('${l.lottery}')" style="flex:1;padding:9px;border-radius:9px;background:var(--surface);border:1px solid var(--border2);font-size:13px;font-weight:700;cursor:pointer;">Cancelar</button>
+          <button onclick="saveNumEdit('${l.lottery}',${lot.mainCount},${lot.starCount},${lot.mainMax},${lot.starMax})" style="flex:1;padding:9px;border-radius:9px;background:#2E7D32;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;">Guardar ✅</button>
+        </div>
+      </div>
+
+      <!-- Sorteo oficial -->
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Último sorteo oficial</div>
       <div class="ball-row">
         ${draw.numeros.map(n=>`<div class="ball draw-main" id="dn-${l.lottery}-${n}">${n}</div>`).join('')}
         <span class="star-sep">⭐</span>
@@ -702,6 +739,91 @@ function buildComprobar(){
       </div>`;
     container.appendChild(div);
   });
+}
+
+function toggleNumEditor(lotKey){
+  const editor=document.getElementById(`num-editor-${lotKey}`);
+  const btn=document.getElementById(`edit-btn-${lotKey}`);
+  const open=editor.style.display!=='none';
+  if(open){cancelNumEdit(lotKey);return;}
+  editor.style.display='block';
+  btn.textContent='✕ Cerrar';
+  // Build grids
+  const lot=LOTTERIES[lotKey];
+  const nums=getSavedNums(lotKey);
+  const selMain=new Set(nums.main);
+  const selStar=new Set(nums.stars);
+  // Main grid
+  const mg=document.getElementById(`grid-main-${lotKey}`);mg.innerHTML='';
+  for(let i=1;i<=lot.mainMax;i++){
+    const b=document.createElement('button');
+    b.style.cssText=`width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border2);background:${selMain.has(i)?'linear-gradient(135deg,#1976D2,#42A5F5)':'var(--surface2)'};color:${selMain.has(i)?'#fff':'var(--text2)'};font-size:11px;font-weight:700;cursor:pointer;`;
+    b.textContent=i;
+    b.onclick=()=>toggleNumBtn(b,i,lotKey,'main',lot.mainCount);
+    mg.appendChild(b);
+  }
+  // Star grid
+  const sg=document.getElementById(`grid-star-${lotKey}`);sg.innerHTML='';
+  for(let i=1;i<=lot.starMax;i++){
+    const b=document.createElement('button');
+    b.style.cssText=`width:34px;height:34px;border-radius:50%;border:1.5px solid var(--border2);background:${selStar.has(i)?'linear-gradient(135deg,#F57F17,#FFD54F)':'var(--surface2)'};color:${selStar.has(i)?'#fff':'var(--text2)'};font-size:11px;font-weight:700;cursor:pointer;`;
+    b.textContent=i;
+    b.onclick=()=>toggleNumBtn(b,i,lotKey,'star',lot.starCount);
+    sg.appendChild(b);
+  }
+  updateNumCounts(lotKey,lot);
+}
+
+function toggleNumBtn(btn,n,lotKey,type,max){
+  const gridId=type==='main'?`grid-main-${lotKey}`:`grid-star-${lotKey}`;
+  const grid=document.getElementById(gridId);
+  const selected=grid.querySelectorAll('button[data-sel="1"]');
+  const isSel=btn.dataset.sel==='1';
+  if(!isSel&&selected.length>=max){showToast(`Máximo ${max}`);return;}
+  btn.dataset.sel=isSel?'0':'1';
+  const isMain=type==='main';
+  btn.style.background=(!isSel)?(isMain?'linear-gradient(135deg,#1976D2,#42A5F5)':'linear-gradient(135deg,#F57F17,#FFD54F)'):'var(--surface2)';
+  btn.style.color=(!isSel)?'#fff':'var(--text2)';
+  const lot=LOTTERIES[lotKey];
+  updateNumCounts(lotKey,lot);
+}
+
+function updateNumCounts(lotKey,lot){
+  const mg=document.getElementById(`grid-main-${lotKey}`);
+  const sg=document.getElementById(`grid-star-${lotKey}`);
+  // Init data-sel from background
+  mg.querySelectorAll('button').forEach(b=>{
+    if(b.dataset.sel===undefined) b.dataset.sel=b.style.background.includes('1976D2')?'1':'0';
+  });
+  sg.querySelectorAll('button').forEach(b=>{
+    if(b.dataset.sel===undefined) b.dataset.sel=b.style.background.includes('F57F17')?'1':'0';
+  });
+  const mc=mg.querySelectorAll('button[data-sel="1"]').length;
+  const sc=sg.querySelectorAll('button[data-sel="1"]').length;
+  document.getElementById(`cnt-main-${lotKey}`).textContent=`${mc}/${lot.mainCount}`;
+  document.getElementById(`cnt-star-${lotKey}`).textContent=`${sc}/${lot.starCount}`;
+}
+
+function cancelNumEdit(lotKey){
+  const editor=document.getElementById(`num-editor-${lotKey}`);
+  const btn=document.getElementById(`edit-btn-${lotKey}`);
+  editor.style.display='none';
+  btn.textContent='✏️ Editar';
+}
+
+function saveNumEdit(lotKey,mainCount,starCount,mainMax,starMax){
+  const mg=document.getElementById(`grid-main-${lotKey}`);
+  const sg=document.getElementById(`grid-star-${lotKey}`);
+  const main=[...mg.querySelectorAll('button[data-sel="1"]')].map(b=>parseInt(b.textContent)).sort((a,b)=>a-b);
+  const stars=[...sg.querySelectorAll('button[data-sel="1"]')].map(b=>parseInt(b.textContent)).sort((a,b)=>a-b);
+  if(main.length!==mainCount){showToast(`Elige exactamente ${mainCount} números`);return;}
+  if(stars.length!==starCount){showToast(`Elige exactamente ${starCount} ${LOTTERIES[lotKey].starLabel.toLowerCase()}`);return;}
+  saveNums(lotKey,main,stars);
+  cancelNumEdit(lotKey);
+  // Update displayed balls
+  const row=document.getElementById(`our-balls-${lotKey}`);
+  if(row) row.innerHTML=main.map(n=>`<div class="ball our-main">${n}</div>`).join('')+'<span class="star-sep">⭐</span>'+stars.map(n=>`<div class="ball our-star">${n}</div>`).join('');
+  showToast('✅ Números guardados');
 }
 
 function getPrize(nm,ns,lotKey){
@@ -720,8 +842,9 @@ function checkAllPrizes(){
   CFG.lotteries.forEach(l=>{
     const lot=LOTTERIES[l.lottery];
     const draw=drawDataMap[l.lottery]||lot.fallback;
-    const hitM=l.main.filter(n=>draw.numeros.includes(n));
-    const hitS=l.stars.filter(n=>draw.estrellas.includes(n));
+    const _nums=getSavedNums(l.lottery);
+    const hitM=_nums.main.filter(n=>draw.numeros.includes(n));
+    const hitS=_nums.stars.filter(n=>draw.estrellas.includes(n));
     const prize=getPrize(hitM.length,hitS.length,l.lottery);
     if(prize.cat!=='none') totalCat=prize.cat==='big'?'big':totalCat==='big'?'big':prize.cat==='medium'?'medium':'small';
     // Highlight
@@ -734,7 +857,7 @@ function checkAllPrizes(){
     const numLine=draw.numeros.sort((a,b)=>a-b).map(n=>hitM.includes(n)?`🔵 *${n}*`:`⚪ ${n}`).join(' ');
     const starLine=draw.estrellas.sort((a,b)=>a-b).map(n=>hitS.includes(n)?`🟡 *${n}*`:`⚪ ${n}`).join(' ');
     const resultLine=prize.cat==='none'?'😅 *Sin premio*':'🏆 *'+prize.label+'* — '+prize.approx;
-    waLines.push(`${lot.name}\n${lineSep}\n${resultLine}\n\n🎱 *Nuestros números*\n${l.main.join(' · ')}  ⭐ ${l.stars.join(' · ')}\n\n🔢 *Sorteo premiado*\n${numLine}  ⭐ ${starLine}\n✅ Aciertos: *${hitM.length>0?hitM.join(', '):'ninguno'}*${hitS.length>0?'  ·  ⭐ *'+hitS.join(', ')+'*':''}`);
+    waLines.push(`${lot.name}\n${lineSep}\n${resultLine}\n\n🎱 *Nuestros números*\n${_nums.main.join(' · ')}  ⭐ ${_nums.stars.join(' · ')}\n\n🔢 *Sorteo premiado*\n${numLine}  ⭐ ${starLine}\n✅ Aciertos: *${hitM.length>0?hitM.join(', '):'ninguno'}*${hitS.length>0?'  ·  ⭐ *'+hitS.join(', ')+'*':''}`);
   });
 
   // Banner
@@ -758,12 +881,22 @@ function checkAllPrizes(){
     document.getElementById('rb-amount').style.color=colors[totalCat];
     document.getElementById('rb-amount').textContent=best?.approx||'';
     document.getElementById('rb-sub').textContent='¡Enhorabuena! 🎊';
-    document.getElementById('add-prize-box').style.display='block';
-    if(best?.approx){
-      const num=parseFloat(best.approx.replace(/[~€\s.]/g,'').replace(',','.'));
-      if(!isNaN(num)) document.getElementById('real-amount').value=num;
+    // Update hint for jackpot
+    const hint=document.getElementById('add-prize-hint');
+    if(hint){
+      if(totalCat==='big') hint.textContent='¡PREMIO GORDO! Introduce el importe real que habéis cobrado.';
+      else hint.textContent='Introduce el importe real cobrado por el grupo.';
     }
-    lastPrizeResult={totalCat,allResults};
+    // Show add prize box only if not already added for this draw
+    const prizeKey=`lg_autoprize_${allResults[0]?.draw?.fecha}_${CFG.name}`;
+    if(!localStorage.getItem(prizeKey)){
+      document.getElementById('add-prize-box').style.display='block';
+      if(best?.approx){
+        const num=parseFloat(best.approx.replace(/[~€\s.]/g,'').replace(',','.'));
+        if(!isNaN(num)&&num>0) document.getElementById('real-amount').value=num;
+      }
+    }
+    lastPrizeResult={totalCat,allResults,prizeKey};
   }
 
   // Hits detail
@@ -801,12 +934,15 @@ function checkAllPrizes(){
 function addPrizeFromResult(){
   if(!lastPrizeResult) return;
   const amount=parseFloat(document.getElementById('real-amount').value);
+  if(!amount||amount<=0){showToast('Introduce el importe real');return;}
   const best=lastPrizeResult.allResults.find(r=>r.prize.cat!=='none');
   const label=best?best.lot.name+' — '+best.prize.label:'Premio';
   const fecha=best?best.draw.fecha:new Date().toLocaleDateString('es-ES');
   if(addPrize(amount,label,fecha)){
     document.getElementById('real-amount').value='';
     document.getElementById('add-prize-box').style.display='none';
+    // Mark as added
+    if(lastPrizeResult.prizeKey) localStorage.setItem(lastPrizeResult.prizeKey,'1');
   }
 }
 
@@ -982,10 +1118,14 @@ function renderHistory(){
   document.getElementById('reset-box').style.display='block';
   list.innerHTML='';
   [...history].reverse().forEach((e,ri)=>{
+    const realIdx=history.length-1-ri;
+    const lotKey=e.lotKey||CFG.lotteries[0].lottery;
     const row=document.createElement('div');row.className='history-item';
     row.innerHTML=`<div><div class="history-label">${e.label}</div><div class="history-date">${e.fecha}</div></div>
       <div style="display:flex;align-items:center;gap:8px;">
-        <span class="history-amount">+${formatEur(e.amount)}</span>
+        <span class="history-amount" id="hist-amt-${realIdx}">+${formatEur(e.amount)}</span>
+        <button onclick="editPrize(${realIdx},'${lotKey}')" style="padding:3px 8px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;cursor:pointer;">✏️</button>
+        <button onclick="deleteSinglePrize(${realIdx},'${lotKey}')" style="padding:3px 8px;border-radius:99px;background:#FFEBEE;border:1px solid #FFCDD2;font-size:11px;cursor:pointer;color:#C62828;">✕</button>
       </div>`;
     list.appendChild(row);
   });
@@ -1017,9 +1157,32 @@ function addManualPrize(){
 }
 
 function resetPrizes(){
-  if(!confirm('¿Borrar todo el historial?')) return;
+  if(!confirm('¿Borrar TODO el historial de premios?')) return;
   CFG.lotteries.forEach(l=>saveHistory([],l.lottery));
   renderHistory();showToast('Historial borrado');
+}
+
+function deleteSinglePrize(idx,lotKey){
+  if(!confirm('¿Eliminar este premio?')) return;
+  const h=loadHistory(lotKey);
+  h.splice(idx,1);
+  saveHistory(h,lotKey);
+  renderHistory();
+  showToast('Premio eliminado');
+}
+
+function editPrize(idx,lotKey){
+  const h=loadHistory(lotKey);
+  const entry=h[idx];
+  if(!entry) return;
+  const newAmt=prompt(`Importe actual: ${formatEur(entry.amount)}\nIntroduce el nuevo importe:`,entry.amount);
+  if(newAmt===null) return;
+  const amt=parseFloat(newAmt);
+  if(!amt||amt<=0){showToast('Importe no válido');return;}
+  h[idx].amount=amt;
+  saveHistory(h,lotKey);
+  renderHistory();
+  showToast('✅ Premio actualizado');
 }
 
 // ── AVATARES ──────────────────────────────────────────────────────────────────

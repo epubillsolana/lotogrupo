@@ -203,7 +203,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       </div>
     </div>
     <div class="num-section">
-      <div class="num-label"><span id="lbl-main">Números principales</span><span class="num-count" id="cnt-main">0/5</span></div>
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:8px;">
+        <div class="num-label" style="margin-bottom:0;"><span id="lbl-main">Números principales</span><span class="num-count" id="cnt-main">0/5</span></div>
+        <button onclick="pickRandom()" style="padding:5px 14px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;">🎲 Aleatorio</button>
+      </div>
       <div class="num-grid" id="grid-main"></div>
     </div>
     <div class="num-section" id="star-section">
@@ -340,6 +343,37 @@ function toggleEpochField(radio){
     const today=new Date().toISOString().slice(0,10);
     document.getElementById('f-epoch').value=today;
   }
+}
+
+function pickRandom(){
+  const lot=LOTS[selLotteries[currentLotIdx]||selLotteries[0]];
+  if(!lot) return;
+  // Clear current selection
+  document.querySelectorAll('#grid-main button.sel').forEach(b=>{b.classList.remove('sel');b.removeAttribute('data-sel');});
+  document.querySelectorAll('#grid-star button.sel').forEach(b=>{b.classList.remove('sel');b.removeAttribute('data-sel');});
+  // Pick random main numbers
+  const mainNums=[];
+  while(mainNums.length<lot.mainCount){
+    const n=Math.floor(Math.random()*lot.mainMax)+1;
+    if(!mainNums.includes(n)) mainNums.push(n);
+  }
+  // Pick random stars
+  const starNums=[];
+  while(starNums.length<lot.starCount){
+    const n=Math.floor(Math.random()*lot.starMax)+1;
+    if(!starNums.includes(n)) starNums.push(n);
+  }
+  // Apply to grid
+  mainNums.forEach(n=>{
+    const btn=document.querySelector(`#grid-main button[data-n="${n}"]`);
+    if(btn){btn.classList.add('sel');btn.dataset.sel='1';}
+  });
+  starNums.forEach(n=>{
+    const btn=document.querySelector(`#grid-star button[data-n="${n}"]`);
+    if(btn){btn.classList.add('sel');btn.dataset.sel='1';}
+  });
+  updateCounts();
+  showToast('🎲 Números aleatorios seleccionados');
 }
 
 function toSlug(name){
