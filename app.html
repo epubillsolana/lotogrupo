@@ -664,12 +664,11 @@ async function loadConfig(){
   try{
     initApp();
     document.getElementById('setup-screen').style.display='none';
+    document.getElementById('main-app').style.display='block';
     const obKey=`lg_ob_${CFG.name}`;
     if(!localStorage.getItem(obKey)){
       document.getElementById('ob-group-name').textContent=CFG.name;
       document.getElementById('onboarding-screen').style.display='flex';
-    }else{
-      document.getElementById('main-app').style.display='block';
     }
   }catch(e){
     document.querySelector('.setup-sub').textContent='Error: '+e.message;
