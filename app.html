@@ -236,7 +236,8 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div class="header-loterias" id="header-loterias"></div>
   </div>
 
-  <div class="tabbar">
+  <div style="position:relative;">
+  <div class="tabbar" id="tabbar">
     <button class="tab-btn active" onclick="switchTab('comprobar',this)"><i class="ti ti-search"></i>Comprobar</button>
     <button class="tab-btn" onclick="switchTab('turnos',this)"><i class="ti ti-users"></i>Turnos</button>
     <button class="tab-btn" onclick="switchTab('bizum',this)"><i class="ti ti-cash"></i>Bizum</button>
@@ -245,6 +246,8 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <button class="tab-btn" onclick="switchTab('grupo',this)"><i class="ti ti-users"></i>Grupo</button>
     <button class="tab-btn" onclick="switchTab('scanner',this)"><i class="ti ti-scan"></i>Scanner</button>
   </div>
+  <div id="tabbar-fade" style="position:absolute;right:0;top:0;bottom:0;width:32px;background:linear-gradient(to right,transparent,#fff);pointer-events:none;"></div>
+</div>
 
   <!-- COMPROBAR -->
   <div class="section active" id="tab-comprobar">
@@ -400,8 +403,10 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Lotería</div>
       <div id="scanner-loteria-selector" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
 
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién ha comprado el boleto?</div>
-      <div id="scan-who-list" style="margin-bottom:14px;"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién tiene el boleto físicamente?</div>
+      <input type="text" id="scan-holder" placeholder="Nombre de quien lo tiene..."
+        style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;margin-bottom:8px;">
+      <div id="scan-who-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
 
       <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;">📷 Hacer foto al boleto</button>
       <button onclick="openGallery()" class="btn btn-gray">🖼️ Elegir foto de galería</button>
@@ -648,6 +653,7 @@ function initApp(){
   }
   // Init all draws
   initAllDraws();
+  initTabbarFade();
   buildTurns();
   buildBizumConfirm();
   buildWABizum();
@@ -1523,34 +1529,31 @@ function saveName(){
 // ── SCANNER ───────────────────────────────────────────────────────────────────
 function buildScannerWhoSelect(){
   const container=document.getElementById('scan-who-list');
+  const input=document.getElementById('scan-holder');
   if(!container) return;
   const members=getSavedMembers()||CFG.members;
   const payerIdx=getCurrentPayerIdx()%members.length;
   container.innerHTML='';
-  container._selected=members[payerIdx];
+  // Set default holder to current payer
+  if(input) input.value=members[payerIdx];
+  // Pills as quick-select shortcuts
   members.forEach((m,i)=>{
     const btn=document.createElement('button');
-    const isDefault=i===payerIdx;
-    btn.style.cssText=`padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid ${isDefault?'var(--primary)':'var(--border2)'};background:${isDefault?'var(--primary)':'var(--surface2)'};color:${isDefault?'#fff':'var(--text2)'};margin-right:6px;margin-bottom:6px;`;
+    btn.style.cssText='padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);';
     const avatar=getAvatar(m)||'😀';
     btn.textContent=avatar+' '+m;
-    btn.onclick=()=>{
-      container.querySelectorAll('button').forEach(b=>{
-        b.style.background='var(--surface2)';b.style.color='var(--text2)';b.style.borderColor='var(--border2)';
-      });
-      btn.style.background='var(--primary)';btn.style.color='#fff';btn.style.borderColor='var(--primary)';
-      container._selected=m;
-    };
+    btn.onclick=()=>{if(input) input.value=m;};
     container.appendChild(btn);
   });
 }
 
 function getSelectedScanner(){
   const lotEl=document.getElementById('scanner-loteria-selector');
-  const whoEl=document.getElementById('scan-who-list');
+  const holderInput=document.getElementById('scan-holder');
+  const members=getSavedMembers()||CFG.members;
   return{
     lotKey:lotEl?._selected||CFG?.lotteries[0]?.lottery,
-    who:whoEl?._selected||(getSavedMembers()||CFG.members)[0]
+    who:holderInput?.value.trim()||members[getCurrentPayerIdx()%members.length]
   };
 }
 
@@ -1597,12 +1600,14 @@ function processImage(input){
   reader.onload=e=>{
     const img=document.getElementById('scanner-img');
     img.src=e.target.result;
-    // Store image data for saving
     window._scanImgData=e.target.result;
-    const who=document.getElementById('scan-who').value;
-    const lot=LOTTERIES[getSelectedScanner().lotKey];
+    const {who,lotKey}=getSelectedScanner();
+    const lot=LOTTERIES[lotKey];
+    const members=getSavedMembers()||CFG.members;
+    const membersWithDNI=members.map(m=>getMemberID(m)).join(', ');
     document.getElementById('scanner-who-confirm').innerHTML=
-      `<strong>${who}</strong> · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}`;
+      `<strong>${who}</strong> tiene el boleto · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
+       <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithDNI}</span>`;
     document.getElementById('scanner-preview-box').style.display='block';
     document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
   };
@@ -1614,13 +1619,16 @@ function saveBoleto(){
   const {lotKey,who}=getSelectedScanner();
   const lot=LOTTERIES[lotKey];
   const imgData=window._scanImgData||null;
+  if(!imgData){showToast('Primero haz una foto al boleto');return;}
   const members=getSavedMembers()||CFG.members;
   const boleto={
-    lotKey,lot:lot.name,who,
-    members:members.map(m=>getMemberID(m)), // snapshot con DNI si disponible
+    lotKey,
+    lot:lot.name,
+    who:who||(members[getCurrentPayerIdx()%members.length]),
+    members:members.map(m=>getMemberID(m)),
     fecha:new Date().toLocaleDateString('es-ES'),
     hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
-    img:imgData, // foto del boleto
+    img:imgData,
     id:Date.now()
   };
   const key=`lg_boletos_${CFG.name}`;
@@ -1630,7 +1638,7 @@ function saveBoleto(){
   document.getElementById('scanner-preview-box').style.display='none';
   window._scanImgData=null;
   renderBoletos();
-  showToast('✅ Boleto registrado');
+  showToast('✅ Boleto registrado con foto');
 }
 
 function renderBoletos(){
@@ -1668,10 +1676,21 @@ function deleteBoleto(id){
 }
 
 // ── UI ────────────────────────────────────────────────────────────────────────
+function initTabbarFade(){
+  const bar=document.getElementById('tabbar');
+  const fade=document.getElementById('tabbar-fade');
+  if(!bar||!fade) return;
+  bar.addEventListener('scroll',()=>{
+    const atEnd=bar.scrollLeft+bar.clientWidth>=bar.scrollWidth-4;
+    fade.style.opacity=atEnd?'0':'1';
+  });
+}
+
 function switchTab(id,el){
   document.querySelectorAll('.tab-btn').forEach(b=>b.classList.remove('active'));
   document.querySelectorAll('.section').forEach(s=>s.classList.remove('active'));
   el.classList.add('active');document.getElementById('tab-'+id).classList.add('active');
+  el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
   if(id==='premios') renderHistory();
   if(id==='turnos') buildTurns();
   if(id==='bizum'){buildBizumConfirm();buildWABizum();}
