@@ -263,6 +263,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
   <!-- COMPROBAR -->
   <div class="section active" id="tab-comprobar">
+    <div id="debug-box" style="background:#fff3cd;border:1px solid #ffc107;border-radius:8px;padding:10px;margin-bottom:10px;font-size:11px;font-family:monospace;word-break:break-all;display:block;"></div>
     <div id="loterias-comprobar"></div>
     <button class="btn btn-primary" id="btn-check" onclick="checkAllPrizes()" disabled style="margin-bottom:12px;">Comprobar premio</button>
     <div id="result-area" style="display:none;">
@@ -749,6 +750,7 @@ function getCurrentPayerIdx(){
 // ── DRAWS ─────────────────────────────────────────────────────────────────────
 async function fetchDraw(lotKey){
   const lot=LOTTERIES[lotKey];
+  const dbg=msg=>{const el=document.getElementById('debug-box');if(el)el.innerHTML+=msg+'<br>';};
   try{
     const now=new Date();
     const pad=n=>String(n).padStart(2,'0');
@@ -758,23 +760,30 @@ async function fetchDraw(lotKey){
     const gameIds={euromillones:'EMIL',primitiva:'LAPR',bonoloto:'BONO',gordo:'ELGR',loteria_nacional:'LNAC'};
     const gameId=gameIds[lotKey]||'EMIL';
     const url=`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=${gameId}&celebrados=true&num=3&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
+    dbg('URL ok | from='+dateFrom+' to='+dateStr);
     const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
-    if(!r.ok) throw new Error();
+    dbg('HTTP: '+r.status);
+    if(!r.ok) throw new Error('HTTP '+r.status);
     const arr=await r.json();
-    if(!arr||!arr.length) throw new Error();
+    dbg('Resultados: '+(arr?arr.length:0)+' | 1o: '+(arr[0]?arr[0].fecha_sorteo:'none'));
+    if(!arr||!arr.length) throw new Error('arr vacio');
     arr.sort((a,b)=>b.fecha_sorteo.localeCompare(a.fecha_sorteo));
     const s=arr[0];
-    const f=s.fecha_sorteo.replace(/\s.*/,'').replace(/-/g,''); // remove time part and dashes
+    const f=s.fecha_sorteo.replace(/\s.*/,'').replace(/-/g,'');
     const fecha=`${f.slice(6,8)}/${f.slice(4,6)}/${f.slice(0,4)}`;
     const comb=s.combinacion.match(/\d+/g).map(Number).filter(n=>n>0);
+    dbg('f='+f+' fecha='+fecha+' comb='+comb.length);
     const numeros=comb.slice(0,lot.mainCount).sort((a,b)=>a-b);
     const estrellas=comb.slice(lot.mainCount,lot.mainCount+lot.starCount).sort((a,b)=>a-b);
+    dbg('nums='+numeros.length+'/'+lot.mainCount+' stars='+estrellas.length+'/'+lot.starCount);
     if(numeros.length===lot.mainCount&&estrellas.length===lot.starCount){
       const result={fecha,numeros,estrellas,bote:s.bote_ganado||'—'};
       localStorage.setItem('lg_draw_'+lotKey,JSON.stringify(result));
+      dbg('OK: '+fecha);
       return result;
     }
-  }catch(e){}
+    dbg('FALLO validacion');
+  }catch(e){dbg('ERROR: '+e.message);}
   return null;
 }
 
