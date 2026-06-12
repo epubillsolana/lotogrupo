@@ -522,26 +522,36 @@ async function loadConfig(){
   const hash=window.location.hash.slice(1);
 
   if(slug){
-    // Load from Supabase
+    // Try Supabase with timeout
     try{
-      const r=await supaFetch(`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}&select=config`);
+      const controller=new AbortController();
+      setTimeout(()=>controller.abort(),5000);
+      const r=await fetch(SUPA_URL+`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}&select=config`,{
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY},
+        signal:controller.signal
+      });
       const data=await r.json();
       if(data&&data.length>0){
         CFG=data[0].config;
         localStorage.setItem('lg_config_'+slug,JSON.stringify(CFG));
       }
-    }catch(e){}
-    // Fallback to localStorage
-    if(!CFG){const s=localStorage.getItem('lg_config_'+slug);if(s)try{CFG=JSON.parse(s);}catch(e){}}
+    }catch(e){console.warn('Supabase error:',e);}
+    // Fallback localStorage
+    if(!CFG){
+      const s=localStorage.getItem('lg_config_'+slug);
+      if(s)try{CFG=JSON.parse(s);}catch(e){}
+    }
   }else if(hash){
-    // Legacy hash format
     try{CFG=JSON.parse(decodeURIComponent(escape(atob(hash))));localStorage.setItem('lg_config',JSON.stringify(CFG));}
     catch(e){const s=localStorage.getItem('lg_config');if(s)try{CFG=JSON.parse(s);}catch(e2){}}
   }else{
     const s=localStorage.getItem('lg_config');if(s)try{CFG=JSON.parse(s);}catch(e){}
   }
 
-  if(!CFG||!CFG.members){document.getElementById('setup-screen').style.display='flex';return;}
+  if(!CFG||!CFG.members){
+    document.getElementById('setup-screen').style.display='flex';
+    return;
+  }
   document.getElementById('main-app').style.display='block';
   initApp();
 }
@@ -600,7 +610,7 @@ function initApp(){
   renderGroupName();
   renderImportes();
   restoreWho();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()={});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()=>{});
   track('apertura',{members:CFG.members.length,lotteries:CFG.lotteries.map(l=>l.lottery)});
 }
 
