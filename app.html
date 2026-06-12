@@ -228,6 +228,25 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <a href="https://lotogrupo.es/crear.html" class="setup-btn">Crear una peña nueva →</a>
 </div>
 
+
+<!-- ONBOARDING -->
+<div id="onboarding-screen" style="display:none;min-height:100vh;background:#0A1F0F;color:#fff;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;">
+  <div style="font-size:64px;margin-bottom:20px;">🎰</div>
+  <div style="font-size:28px;font-weight:900;margin-bottom:8px;" id="ob-group-name">Tu Peña</div>
+  <div style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:32px;line-height:1.6;">Te han invitado a unirte al grupo.<br>Gestiona turnos, Bizums y premios<br>desde un solo enlace.</div>
+  <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:20px;width:100%;max-width:320px;margin-bottom:24px;text-align:left;">
+    <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Qué encontrarás</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">🔍</span><span style="font-size:14px;">Comprobar el sorteo automáticamente</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">💸</span><span style="font-size:14px;">Confirmar tu Bizum al pagador</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">🏆</span><span style="font-size:14px;">Historial de premios del grupo</span></div>
+      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">📷</span><span style="font-size:14px;">Foto del boleto como prueba</span></div>
+    </div>
+  </div>
+  <button onclick="finishOnboarding()" style="width:100%;max-width:320px;padding:16px;border-radius:99px;background:#FF8C00;color:#0A1F0F;border:none;font-size:17px;font-weight:800;cursor:pointer;margin-bottom:14px;">¡Entrar a la peña! →</button>
+  <div style="font-size:12px;color:rgba(255,255,255,0.35);">Guarda este enlace para volver siempre</div>
+</div>
+
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
     <div class="header-badge"><span id="header-name">LotoGrupo</span></div>
@@ -400,8 +419,9 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Lotería</div>
       <div id="scanner-loteria-selector" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
 
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién ha comprado el boleto?</div>
-      <div id="scan-who-list" style="margin-bottom:14px;"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién tiene el boleto físicamente?</div>
+      <input type="text" id="scan-holder" placeholder="Nombre de quien lo tiene..." style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;margin-bottom:8px;">
+      <div id="scan-who-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
 
       <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;">📷 Hacer foto al boleto</button>
       <button onclick="openGallery()" class="btn btn-gray">🖼️ Elegir foto de galería</button>
@@ -562,6 +582,49 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
+// ── ONBOARDING & TUTORIAL ────────────────────────────────────────────────────
+function finishOnboarding(){
+  localStorage.setItem(`lg_ob_${CFG.name}`,'1');
+  document.getElementById('onboarding-screen').style.display='none';
+  showTutorial();
+}
+
+function showTutorial(){
+  const steps=[
+    {emoji:'🔍',color:'#1565C0',bg:'#E3F2FD',tab:'Comprobar',title:'Comprueba el sorteo',desc:'Entra después de cada sorteo para ver si ha tocado premio. La app lo compara con vuestros números automáticamente.'},
+    {emoji:'👥',color:'#2E7D32',bg:'#E8F5E9',tab:'Turnos & Bizum',title:'Gestiona los pagos',desc:'El sistema sabe quién paga esta ronda. Confirma tu Bizum con un toque para que el pagador lo vea al momento.'},
+    {emoji:'🏆',color:'#F57F17',bg:'#FFF9C4',tab:'Premios',title:'Historial de premios',desc:'Cuando toque algo, se añade al balance del grupo. Veis cuánto habéis gastado y ganado.'},
+    {emoji:'📷',color:'#6A1B9A',bg:'#F3E5F5',tab:'Scanner',title:'Fotografía el boleto',desc:'Haz una foto al boleto como prueba de compra. Queda registrado quién lo tiene y quiénes jugáis.'},
+    {emoji:'📱',color:'#0A1F0F',bg:'#F1F3F4',tab:'',title:'Añádela a tu inicio',desc:'Para entrar siempre con un toque.\n\niPhone: Safari → Compartir → Añadir a pantalla de inicio\n\nAndroid: Chrome → Menú → Añadir a pantalla de inicio'},
+    {emoji:'🍀',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:'¡Disfruta y suerte!',desc:'Ya estáis listos. Que os toque el gordo... y si no, al menos lo gestionáis sin líos 😄'},
+  ];
+  let step=0;
+  const overlay=document.createElement('div');
+  overlay.id='tutorial-overlay';
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;';
+  function render(){
+    const s=steps[step];
+    const isLast=step===steps.length-1;
+    const dots=steps.map((_,i)=>`<div style="width:${i===step?22:7}px;height:7px;border-radius:4px;background:${i===step?s.color:'#E5E7EB'};transition:all .3s;"></div>`).join('');
+    overlay.innerHTML=`<div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;width:100%;max-width:480px;">
+      <div style="display:flex;justify-content:center;gap:5px;margin-bottom:28px;">${dots}</div>
+      <div style="width:80px;height:80px;border-radius:24px;background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">${s.emoji}</div>
+      ${s.tab?`<div style="text-align:center;margin-bottom:8px;"><span style="background:${s.bg};color:${s.color};border-radius:99px;padding:4px 14px;font-size:12px;font-weight:700;">${s.tab}</span></div>`:''}
+      <div style="text-align:center;font-size:22px;font-weight:900;color:#1A1A18;margin-bottom:10px;">${s.title}</div>
+      <div style="text-align:center;font-size:15px;color:#6B7280;line-height:1.6;margin-bottom:32px;white-space:pre-line;">${s.desc}</div>
+      <button onclick="window._tutNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
+      ${step===0?`<button onclick="window._tutSkip()" style="width:100%;padding:10px;background:none;border:none;color:#9CA3AF;font-size:14px;cursor:pointer;">Saltar</button>`:''}
+    </div>`;
+  }
+  window._tutNext=function(){if(step<steps.length-1){step++;render();}else window._tutSkip();};
+  window._tutSkip=function(){document.getElementById('tutorial-overlay')?.remove();document.getElementById('main-app').style.display='block';};
+  render();
+  document.body.appendChild(overlay);
+  let startX=0;
+  overlay.addEventListener('touchstart',e=>startX=e.touches[0].clientX,{passive:true});
+  overlay.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(dx<-50&&step<steps.length-1){step++;render();}else if(dx>50&&step>0){step--;render();}},{passive:true});
+}
+
 async function loadConfig(){
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('g');
@@ -601,7 +664,13 @@ async function loadConfig(){
   try{
     initApp();
     document.getElementById('setup-screen').style.display='none';
-    document.getElementById('main-app').style.display='block';
+    const obKey=`lg_ob_${CFG.name}`;
+    if(!localStorage.getItem(obKey)){
+      document.getElementById('ob-group-name').textContent=CFG.name;
+      document.getElementById('onboarding-screen').style.display='flex';
+    }else{
+      document.getElementById('main-app').style.display='block';
+    }
   }catch(e){
     document.querySelector('.setup-sub').textContent='Error: '+e.message;
   }
@@ -1054,15 +1123,54 @@ function getBizumKey(){
   const ym=new Date().toISOString().slice(0,7);
   return `lg_bizum_${CFG.name}_${idx}_${ym}`;
 }
-function getBizumState(){try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}}
-function saveBizumState(s){localStorage.setItem(getBizumKey(),JSON.stringify(s));}
 
-function buildBizumConfirm(){
-  const _mbrs=getSavedMembers();
-  const idx=getCurrentPayerIdx()%_mbrs.length,payer=_mbrs[idx];
-  const others=_mbrs.filter((_,i)=>i!==idx);
-  const state=getBizumState();
+function getSlug(){
+  return new URLSearchParams(window.location.search).get('g')||CFG.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
+}
+
+async function loadBizumState(){
+  const slug=getSlug();
+  const turno=getCurrentPayerIdx();
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/bizums?grupo_slug=eq.${encodeURIComponent(slug)}&turno_idx=eq.${turno}&select=member_name,confirmado`,{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    const data=await r.json();
+    if(Array.isArray(data)&&data.length>0){
+      const state={};
+      data.forEach(row=>{state[row.member_name]=row.confirmado;});
+      return state;
+    }
+  }catch(e){}
+  try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}
+}
+
+async function saveBizumState(name,confirmado){
+  const slug=getSlug();
+  const turno=getCurrentPayerIdx();
+  try{
+    await fetch(`${SUPA_URL}/rest/v1/bizums`,{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
+      body:JSON.stringify({grupo_slug:slug,turno_idx:turno,member_name:name,confirmado,updated_at:new Date().toISOString()})
+    });
+  }catch(e){}
+  try{
+    const state=JSON.parse(localStorage.getItem(getBizumKey())||'{}');
+    state[name]=confirmado;
+    localStorage.setItem(getBizumKey(),JSON.stringify(state));
+  }catch(e){}
+}
+
+
+async function buildBizumConfirm(){
+  const members=getSavedMembers()||CFG.members;
+  const payerIdx=getCurrentPayerIdx()%members.length;
+  const payer=members[payerIdx];
+  const others=members.filter((_,i)=>i!==payerIdx);
   const list=document.getElementById('bizum-confirm-list');if(!list)return;
+  list.innerHTML='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Cargando...</div>';
+  const state=await loadBizumState();
   list.innerHTML='';
   const payerRow=document.createElement('div');payerRow.className='bizum-row';
   payerRow.innerHTML=`<span style="font-size:14px;font-weight:700;">💳 ${payer}</span><span style="font-size:11px;color:var(--text3);">Paga el boleto</span>`;
@@ -1074,18 +1182,25 @@ function buildBizumConfirm(){
       <button class="bizum-btn ${done?'done':'pending'}" onclick="toggleBizum('${m}',this)">${done?'✅ Bizum hecho':'⏳ Pendiente'}</button>`;
     list.appendChild(row);
   });
+  buildWABizum(state,payer,others);
 }
 
-function toggleBizum(name,btn){
-  const state=getBizumState();
-  state[name]=!state[name];
-  saveBizumState(state);
-  btn.className='bizum-btn '+(state[name]?'done':'pending');
-  btn.textContent=state[name]?'✅ Bizum hecho':'⏳ Pendiente';
-  showToast(state[name]?`✅ ${name} — confirmado`:`⏳ ${name} — pendiente`);
-  buildWABizum();
-  if(state[name]) track('bizum_confirmado');
+
+async function toggleBizum(name,btn){
+  const current=btn.classList.contains('done');
+  const newState=!current;
+  btn.className='bizum-btn '+(newState?'done':'pending');
+  btn.textContent=newState?'✅ Bizum hecho':'⏳ Pendiente';
+  btn.disabled=true;
+  await saveBizumState(name,newState);
+  btn.disabled=false;
+  showToast(newState?`✅ ${name} confirmado`:`⏳ ${name} pendiente`);
+  const state=await loadBizumState();
+  const members=getSavedMembers()||CFG.members;
+  const payerIdx=getCurrentPayerIdx()%members.length;
+  buildWABizum(state,members[payerIdx],members.filter((_,i)=>i!==payerIdx));
 }
+
 
 function buildWABizum(){
   const _mbrs=getSavedMembers();
@@ -1527,34 +1642,28 @@ function saveName(){
 // ── SCANNER ───────────────────────────────────────────────────────────────────
 function buildScannerWhoSelect(){
   const container=document.getElementById('scan-who-list');
+  const input=document.getElementById('scan-holder');
   if(!container) return;
   const members=getSavedMembers()||CFG.members;
   const payerIdx=getCurrentPayerIdx()%members.length;
   container.innerHTML='';
-  container._selected=members[payerIdx];
-  members.forEach((m,i)=>{
+  if(input) input.value=members[payerIdx];
+  members.forEach(m=>{
     const btn=document.createElement('button');
-    const isDefault=i===payerIdx;
-    btn.style.cssText=`padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid ${isDefault?'var(--primary)':'var(--border2)'};background:${isDefault?'var(--primary)':'var(--surface2)'};color:${isDefault?'#fff':'var(--text2)'};margin-right:6px;margin-bottom:6px;`;
-    const avatar=getAvatar(m)||'😀';
-    btn.textContent=avatar+' '+m;
-    btn.onclick=()=>{
-      container.querySelectorAll('button').forEach(b=>{
-        b.style.background='var(--surface2)';b.style.color='var(--text2)';b.style.borderColor='var(--border2)';
-      });
-      btn.style.background='var(--primary)';btn.style.color='#fff';btn.style.borderColor='var(--primary)';
-      container._selected=m;
-    };
+    btn.style.cssText='padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);';
+    btn.textContent=(getAvatar(m)||'😀')+' '+m;
+    btn.onclick=()=>{if(input) input.value=m;};
     container.appendChild(btn);
   });
 }
 
 function getSelectedScanner(){
   const lotEl=document.getElementById('scanner-loteria-selector');
-  const whoEl=document.getElementById('scan-who-list');
+  const holderInput=document.getElementById('scan-holder');
+  const members=getSavedMembers()||CFG.members;
   return{
     lotKey:lotEl?._selected||CFG?.lotteries[0]?.lottery,
-    who:whoEl?._selected||(getSavedMembers()||CFG.members)[0]
+    who:holderInput?.value.trim()||members[getCurrentPayerIdx()%members.length]
   };
 }
 
