@@ -606,6 +606,9 @@ async function loadConfig(){
   const hash=window.location.hash.slice(1);
 
   if(slug){
+    // Try localStorage first (instant)
+    try{const s=localStorage.getItem('lg_config_'+slug);if(s)CFG=JSON.parse(s);}catch(e){}
+    // Then try Supabase
     try{
       const r=await fetch(SUPA_URL+'/rest/v1/grupos?slug=eq.'+encodeURIComponent(slug)+'&select=config',{
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
@@ -616,9 +619,6 @@ async function loadConfig(){
         localStorage.setItem('lg_config_'+slug,JSON.stringify(CFG));
       }
     }catch(e){}
-    if(!CFG){
-      try{const s=localStorage.getItem('lg_config_'+slug);if(s)CFG=JSON.parse(s);}catch(e){}
-    }
   }else if(hash){
     try{CFG=JSON.parse(decodeURIComponent(escape(atob(hash))));}catch(e){}
     if(!CFG){try{const s=localStorage.getItem('lg_config');if(s)CFG=JSON.parse(s);}catch(e){}}

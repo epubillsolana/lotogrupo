@@ -740,6 +740,8 @@ async function createGroup(){
     clearTimeout(tid);
     if(!save.ok) throw new Error('save failed');
     _link=`https://lotogrupo.es/app.html?g=${slug}`;
+    // Save to localStorage so app loads instantly
+    localStorage.setItem('lg_config_'+slug, JSON.stringify(cfg));
     // Track silently
     fetch(SUPA_URL+'/rest/v1/eventos',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({grupo_slug:slug,tipo:'grupo_creado',metadata:{members:members.length}})}).catch(()=>{});
   }catch(e){
