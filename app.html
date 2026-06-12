@@ -774,20 +774,17 @@ async function fetchDraw(lotKey){
       return result;
     }
   }catch(e){}
-  // Fallback localStorage
-  try{const s=localStorage.getItem('lg_draw_'+lotKey);if(s)return JSON.parse(s);}catch(e){}
-  return lot.fallback;
+  return null;
 }
 
 async function initAllDraws(){
-  // Show cached draw immediately if available
+  // Always start with hardcoded fallback - never use localStorage cache
   CFG.lotteries.forEach(l=>{
-    const cached=localStorage.getItem('lg_draw_'+l.lottery);
-    drawDataMap[l.lottery]=cached?JSON.parse(cached):LOTTERIES[l.lottery].fallback;
+    drawDataMap[l.lottery]=LOTTERIES[l.lottery].fallback;
   });
   buildComprobar();
   document.getElementById('btn-check').disabled=false;
-  // Always fetch fresh from API - no cache
+  // Fetch fresh from API directly
   for(const l of CFG.lotteries){
     try{
       const fresh=await fetchDraw(l.lottery);
