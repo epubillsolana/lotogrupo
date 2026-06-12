@@ -1853,40 +1853,54 @@ async function uploadBoletoImg(base64,slug,id){
 
 async function storeBoleto(boleto){
   const slug=getSlug();
-  // Save to Supabase and WAIT for confirmation
+  let savedToSupabase=false;
+  
   try{
+    const payload={
+      id:boleto.id,
+      grupo_slug:slug,
+      lot_name:boleto.lot||'',
+      who:boleto.who||'',
+      members:Array.isArray(boleto.members)?boleto.members.join(', '):'',
+      fecha:boleto.fecha||'',
+      hora:boleto.hora||'',
+      img_url:boleto.imgUrl||null
+    };
     const r=await fetch(`${SUPA_URL}/rest/v1/boletos`,{
       method:'POST',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=representation'},
-      body:JSON.stringify({
-        id:boleto.id,
-        grupo_slug:slug,
-        lot_name:boleto.lot,
-        who:boleto.who,
-        members:boleto.members?boleto.members.join(', '):'',
-        fecha:boleto.fecha,
-        hora:boleto.hora||'',
-        img_url:boleto.imgUrl||null
-      })
+      headers:{
+        'apikey':SUPA_KEY,
+        'Authorization':'Bearer '+SUPA_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify(payload)
     });
-    if(!r.ok){
-      const err=await r.text();
-      console.error('Boleto save error:',err);
+    if(r.ok||r.status===201){
+      savedToSupabase=true;
+    }else{
+      const errText=await r.text();
+      console.error('Boleto Supabase error:',r.status,errText);
     }
   }catch(e){
-    console.error('Boleto save failed:',e);
-    // Fallback localStorage only
-    const key=`lg_boletos_${CFG.name}`;
-    try{
-      const saved=JSON.parse(localStorage.getItem(key)||'[]');
+    console.error('Boleto fetch error:',e);
+  }
+
+  // Always save to localStorage as backup
+  const key=`lg_boletos_${CFG.name}`;
+  try{
+    const saved=JSON.parse(localStorage.getItem(key)||'[]');
+    // Avoid duplicates
+    if(!saved.find(b=>b.id===boleto.id)){
       saved.push(boleto);
       localStorage.setItem(key,JSON.stringify(saved));
-    }catch(e2){}
-  }
+    }
+  }catch(e){}
+
   document.getElementById('scanner-preview-box').style.display='none';
   window._scanImgData=null;
   await renderBoletos();
-  showToast('✅ Boleto registrado');
+  showToast(savedToSupabase?'✅ Boleto registrado':'✅ Boleto guardado localmente');
 }
 
 
@@ -1897,26 +1911,42 @@ async function renderBoletos(){
 
   const slug=getSlug();
   let boletos=[];
+  const seenIds=new Set();
 
+  // Load from Supabase
   try{
     const r=await fetch(`${SUPA_URL}/rest/v1/boletos?grupo_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc`,{
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
     });
-    const data=await r.json();
-    if(Array.isArray(data)&&data.length>0){
-      boletos=data.map(b=>({
-        id:b.id,lot:b.lot_name,who:b.who,
-        members:b.members?b.members.split(', '):[],
-        fecha:b.fecha,hora:b.hora,imgUrl:b.img_url
-      }));
+    if(r.ok){
+      const data=await r.json();
+      if(Array.isArray(data)){
+        data.forEach(b=>{
+          seenIds.add(b.id);
+          boletos.push({
+            id:b.id,lot:b.lot_name,who:b.who,
+            members:b.members?b.members.split(', '):[],
+            fecha:b.fecha,hora:b.hora,imgUrl:b.img_url
+          });
+        });
+      }
     }
   }catch(e){}
 
-  // Fallback localStorage
-  if(!boletos.length){
-    const key=`lg_boletos_${CFG.name}`;
-    try{boletos=JSON.parse(localStorage.getItem(key)||'[]');}catch(e){}
-  }
+  // Also load from localStorage and merge (avoid duplicates)
+  const key=`lg_boletos_${CFG.name}`;
+  try{
+    const local=JSON.parse(localStorage.getItem(key)||'[]');
+    local.forEach(b=>{
+      if(!seenIds.has(b.id)){
+        seenIds.add(b.id);
+        boletos.push(b);
+      }
+    });
+  }catch(e){}
+
+  // Sort by id descending (newest first)
+  boletos.sort((a,b)=>b.id-a.id);
 
   if(!list) return;
   if(!boletos.length){
@@ -1939,8 +1969,9 @@ async function renderBoletos(){
         </div>
         <button class="boleto-del" onclick="deleteBoleto(${b.id})">✕</button>
       </div>
-      ${imgSrc?`<img src="${imgSrc}" style="width:100%;border-radius:8px;margin-top:8px;max-height:200px;object-fit:contain;cursor:pointer;" onclick="this.style.maxHeight=this.style.maxHeight==='none'?'200px':'none'">`:
-        '<div style="font-size:11px;color:var(--text3);margin-top:4px;">Sin foto adjunta</div>'}`;
+      ${imgSrc
+        ?`<img src="${imgSrc}" style="width:100%;border-radius:8px;margin-top:8px;max-height:200px;object-fit:contain;cursor:pointer;" onclick="this.style.maxHeight=this.style.maxHeight==='none'?'200px':'none'">`
+        :'<div style="font-size:11px;color:var(--text3);margin-top:4px;">Sin foto adjunta</div>'}`;
     list.appendChild(div);
   });
 }
