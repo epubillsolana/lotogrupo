@@ -491,28 +491,36 @@ async function createGroup(){
   const btn=document.getElementById('btn-next');
   btn.textContent='Creando...';btn.disabled=true;
   const slug=toSlug(name);
-  
+
   try{
-    // Check if slug exists
-    const check=await supaFetch(`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}&select=slug`);
+    const controller=new AbortController();
+    const tid=setTimeout(()=>controller.abort(),7000);
+
+    // Check slug exists
+    const check=await fetch(SUPA_URL+`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}&select=slug`,
+      {headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY},signal:controller.signal});
     const existing=await check.json();
     if(existing&&existing.length>0){
+      clearTimeout(tid);
       toast(`Ya existe un grupo llamado "${name}". Elige otro nombre.`);
       btn.textContent='🎰 CREAR MI PEÑA';btn.disabled=false;
       return;
     }
-    // Save to Supabase
-    const save=await supaFetch('/rest/v1/grupos','POST',{slug,config:cfg});
-    if(!save.ok) throw new Error();
+    // Save
+    const save=await fetch(SUPA_URL+'/rest/v1/grupos',
+      {method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+       body:JSON.stringify({slug,config:cfg}),signal:controller.signal});
+    clearTimeout(tid);
+    if(!save.ok) throw new Error('save failed');
     _link=`https://lotogrupo.es/app.html?g=${slug}`;
-    // Track creation
-    await supaFetch2('/rest/v1/eventos','POST',{grupo_slug:slug,tipo:'grupo_creado',metadata:{members:members.length,lotteries:lotConfigs.map(l=>l.lottery)}});
+    // Track silently
+    fetch(SUPA_URL+'/rest/v1/eventos',{method:'POST',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify({grupo_slug:slug,tipo:'grupo_creado',metadata:{members:members.length}})}).catch(()=>{});
   }catch(e){
-    // Fallback to hash
+    // Fallback hash si falla Supabase
     const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
     _link=`https://lotogrupo.es/app.html#${encoded}`;
   }
-  
+  btn.textContent='🎰 CREAR MI PEÑA';btn.disabled=false;
   document.getElementById('res-title').textContent=`¡${name} lista!`;
   const rb=document.getElementById('res-badges');
   rb.innerHTML=lotConfigs.map(c=>`<span style="background:#EAF3DE;color:#3B6D11;border-radius:99px;padding:5px 14px;font-size:13px;font-weight:700;">${LOTS[c.lottery].emoji} ${LOTS[c.lottery].name}</span>`).join('');

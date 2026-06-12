@@ -30,6 +30,11 @@ body{font-family:'Inter',sans-serif;background:#0A1F0F;color:#fff;min-height:100
 </head>
 <body>
 <div class="logo">Loto<span>Grupo</span> — Admin</div>
+<div style="background:rgba(255,140,0,0.1);border:1px solid rgba(255,140,0,0.3);border-radius:10px;padding:10px 14px;font-size:12px;color:rgba(255,255,255,0.6);margin-bottom:16px;">
+  ⚠️ Para que eliminar funcione, ejecuta en Supabase SQL Editor:<br>
+  <code style="color:#FF8C00;">CREATE POLICY "Public delete" ON grupos FOR DELETE USING (true);<br>
+  CREATE POLICY "Public delete eventos" ON eventos FOR DELETE USING (true);</code>
+</div>
 <button class="refresh" onclick="loadData()">↻ Actualizar</button>
 
 <div class="grid">
@@ -70,7 +75,10 @@ async function loadData(){
       const lots=cfg.lotteries?.map(l=>l.lottery).join(', ')||cfg.lottery||'—';
       return `<div class="group-row">
         <div><div class="group-name">${cfg.name}</div><div class="group-meta">${lots} · ${cfg.members?.length||0} miembros · ${date}</div></div>
-        <span class="badge">${g.slug}</span>
+        <div style="display:flex;align-items:center;gap:8px;">
+          <span class="badge">${g.slug}</span>
+          <button onclick="deleteGroup('${g.slug}')" style="background:#C62828;color:#fff;border:none;border-radius:99px;padding:4px 12px;font-size:11px;font-weight:700;cursor:pointer;">✕ Eliminar</button>
+        </div>
       </div>`;
     }).join('');
 
@@ -91,6 +99,25 @@ async function loadData(){
         <span style="color:rgba(255,255,255,0.3)">${date}</span>
       </div>`;
     }).join('');
+}
+
+async function deleteGroup(slug){
+  if(!confirm(`¿Eliminar el grupo "${slug}"? Esta acción no se puede deshacer.`)) return;
+  try{
+    await fetch(SUPA_URL+`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    // Also delete events
+    await fetch(SUPA_URL+`/rest/v1/eventos?grupo_slug=eq.${encodeURIComponent(slug)}`,{
+      method:'DELETE',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    alert(`Grupo "${slug}" eliminado.`);
+    loadData();
+  }catch(e){
+    alert('Error al eliminar. Inténtalo de nuevo.');
+  }
 }
 
 loadData();
