@@ -230,9 +230,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
-    <div class="header-badge"><span id="header-name">LotoGrupo</span></div>
-    <div class="header-divider"></div>
-    <h1 id="header-title">Mi Peña</h1>
+    <h1 id="header-title" style="font-size:20px;font-weight:900;letter-spacing:.5px;">Mi Peña</h1>
     <div class="header-loterias" id="header-loterias"></div>
   </div>
 
@@ -628,8 +626,6 @@ function initApp(){
   style.textContent=`.tab-btn.active{color:${color}!important;border-bottom-color:${color}!important;}.btn-primary{background:${color}!important;}`;
   document.head.appendChild(style);
   // Header
-  document.getElementById('header-name').textContent=CFG.name;
-  document.getElementById('header-name').style.color=color;
   document.getElementById('header-title').textContent=CFG.name;
   const lotBadges=document.getElementById('header-loterias');
   lotBadges.innerHTML='';
