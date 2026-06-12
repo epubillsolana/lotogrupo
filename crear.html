@@ -491,9 +491,32 @@ function renderLoteriasAdded(){
   document.getElementById('btn-add-lot').style.display=pending.length>0?'block':'none';
 }
 function addOtraLoteria(){
-  const nextIdx=selLotteries.findIndex((_,i)=>!lotConfigs[i]);
-  if(nextIdx===-1){toast('Todas las loterías configuradas');return;}
-  lotIdx=nextIdx;selMain=new Set();selStars=new Set();apuestaType='sencilla';
+  // If only one lottery, add another combination of same type
+  if(selLotteries.length===1){
+    lotIdx=0;selMain=new Set();selStars=new Set();apuestaType='sencilla';
+    document.querySelectorAll('.apuesta-card').forEach(c=>c.classList.remove('selected'));
+    document.querySelector('.apuesta-card').classList.add('selected');
+    buildGrids();step=2;updateUI();window.scrollTo(0,0);
+    return;
+  }
+  // Multiple lotteries - show picker
+  const opts=selLotteries.map((key,i)=>`<button onclick="selectLotForAdd(${i})"
+    style="display:block;width:100%;text-align:left;padding:12px 14px;border-radius:10px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;font-size:15px;font-weight:600;cursor:pointer;">
+    ${LOTS[key].emoji} ${LOTS[key].name}</button>`).join('');
+  const picker=document.createElement('div');
+  picker.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;';
+  picker.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;">
+    <div style="font-size:14px;font-weight:700;margin-bottom:14px;color:#1A1A18;">¿Para qué lotería añades combinación?</div>
+    ${opts}
+    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:12px;border-radius:10px;background:#F1F3F4;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;">Cancelar</button>
+  </div>`;
+  document.body.appendChild(picker);
+  window._lotPicker=picker;
+}
+
+function selectLotForAdd(idx){
+  if(window._lotPicker) window._lotPicker.remove();
+  lotIdx=idx;selMain=new Set();selStars=new Set();apuestaType='sencilla';
   document.querySelectorAll('.apuesta-card').forEach(c=>c.classList.remove('selected'));
   document.querySelector('.apuesta-card').classList.add('selected');
   buildGrids();step=2;updateUI();window.scrollTo(0,0);
