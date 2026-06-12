@@ -1667,37 +1667,66 @@ function saveBoleto(){
   const imgData=window._scanImgData||null;
   if(!imgData){showToast('Primero haz una foto al boleto');return;}
   const members=getSavedMembers()||CFG.members;
+  const params=new URLSearchParams(window.location.search);
+  const slug=params.get('g')||CFG.name;
+  const id=Date.now();
+
   const boleto={
-    lotKey,
-    lot:lot.name,
+    lotKey,lot:lot.name,
     who:who||(members[getCurrentPayerIdx()%members.length]),
     members:members.map(m=>getMemberID(m)),
     fecha:new Date().toLocaleDateString('es-ES'),
     hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
-    img:imgData,
-    id:Date.now()
+    id,imgUrl:null
   };
+
+  // Try to upload to Supabase Storage
+  showToast('📤 Guardando boleto...');
+  uploadBoletoImg(imgData,slug,id).then(url=>{
+    boleto.imgUrl=url;
+    storeBoleto(boleto);
+  }).catch(()=>{
+    // Fallback: store base64 locally (may fail for large images)
+    boleto.imgUrl=imgData;
+    storeBoleto(boleto);
+  });
+}
+
+async function uploadBoletoImg(base64,slug,id){
+  // Convert base64 to blob
+  const res=await fetch(base64);
+  const blob=await res.blob();
+  const filename=`${slug}/${id}.jpg`;
+  const r=await fetch(`${SUPA_URL}/storage/v1/object/boletos/${filename}`,{
+    method:'POST',
+    headers:{
+      'apikey':SUPA_KEY,
+      'Authorization':'Bearer '+SUPA_KEY,
+      'Content-Type':'image/jpeg',
+      'x-upsert':'true'
+    },
+    body:blob
+  });
+  if(!r.ok) throw new Error('Upload failed');
+  return `${SUPA_URL}/storage/v1/object/public/boletos/${filename}`;
+}
+
+function storeBoleto(boleto){
   const key=`lg_boletos_${CFG.name}`;
   try{
     const saved=JSON.parse(localStorage.getItem(key)||'[]');
     saved.push(boleto);
     localStorage.setItem(key,JSON.stringify(saved));
-    document.getElementById('scanner-preview-box').style.display='none';
-    window._scanImgData=null;
-    renderBoletos();
-    showToast('✅ Boleto registrado con foto');
   }catch(e){
-    // Storage full - try without image
-    boleto.img=null;
-    boleto.imgError='Foto no guardada (almacenamiento lleno)';
-    const saved=JSON.parse(localStorage.getItem(key)||'[]');
-    saved.push(boleto);
+    // If localStorage full, store without img
+    boleto.imgUrl=null;
+    const saved=[];saved.push(boleto);
     localStorage.setItem(key,JSON.stringify(saved));
-    document.getElementById('scanner-preview-box').style.display='none';
-    window._scanImgData=null;
-    renderBoletos();
-    showToast('⚠️ Boleto guardado sin foto (almacenamiento lleno)');
   }
+  document.getElementById('scanner-preview-box').style.display='none';
+  window._scanImgData=null;
+  renderBoletos();
+  showToast('✅ Boleto registrado');
 }
 
 function renderBoletos(){
@@ -1720,7 +1749,7 @@ function renderBoletos(){
         </div>
         <button class="boleto-del" onclick="deleteBoleto(${b.id})">✕</button>
       </div>
-      ${b.img?`<img src="${b.img}" style="width:100%;border-radius:8px;margin-top:8px;max-height:200px;object-fit:contain;cursor:pointer;" onclick="this.style.maxHeight=this.style.maxHeight==='none'?'200px':'none'">`:
+      ${(b.imgUrl)?`<img src="${b.imgUrl}" style="width:100%;border-radius:8px;margin-top:8px;max-height:200px;object-fit:contain;cursor:pointer;" onclick="this.style.maxHeight=this.style.maxHeight==='none'?'200px':'none'">`:
         '<div style="font-size:11px;color:var(--text3);margin-top:4px;">Sin foto adjunta</div>'}`;
     list.appendChild(div);
   });
