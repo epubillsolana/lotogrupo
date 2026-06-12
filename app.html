@@ -221,7 +221,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 </head>
 <body>
 
-<div id="setup-screen" style="display:none;" class="setup">
+<div id="setup-screen" style="display:flex;" class="setup">
   <div class="setup-emoji">🎰</div>
   <div class="setup-title">LotoGrupo</div>
   <div class="setup-sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
@@ -601,6 +601,10 @@ function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
 async function loadConfig(){
+  window.onerror=function(msg,src,line){
+    document.querySelector('.setup-sub').innerHTML='<span style="color:red;font-size:11px;">'+msg+' (line '+line+')</span>';
+    return true;
+  };
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('g');
   const hash=window.location.hash.slice(1);
@@ -632,13 +636,13 @@ async function loadConfig(){
     return;
   }
 
-  document.getElementById('setup-screen').style.display='none';
-  document.getElementById('main-app').style.display='block';
   try{
     initApp();
+    document.getElementById('setup-screen').style.display='none';
+    document.getElementById('main-app').style.display='block';
   }catch(err){
     document.getElementById('setup-screen').style.display='flex';
-    document.getElementById('setup-screen').innerHTML+='<div style="color:red;padding:16px;font-size:12px;">Error: '+err.message+'</div>';
+    document.querySelector('.setup-sub').innerHTML='<span style="color:red;font-size:13px;">'+err.message+'<br>'+err.stack?.split('\n')[1]+'</span>';
   }
 
   const obKey='lg_ob_'+(CFG.name||'');
