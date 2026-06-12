@@ -400,8 +400,9 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Lotería</div>
       <div id="scanner-loteria-selector" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
 
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién ha comprado el boleto?</div>
-      <div id="scan-who-list" style="margin-bottom:14px;"></div>
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién tiene el boleto físicamente?</div>
+      <input type="text" id="scan-holder" placeholder="Nombre de quien lo tiene..." style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;margin-bottom:8px;">
+      <div id="scan-who-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
 
       <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;">📷 Hacer foto al boleto</button>
       <button onclick="openGallery()" class="btn btn-gray">🖼️ Elegir foto de galería</button>
@@ -629,6 +630,7 @@ function initApp(){
   document.getElementById('header-name').style.color=color;
   document.getElementById('header-title').textContent=CFG.name;
   const lotBadges=document.getElementById('header-loterias');
+  lotBadges.innerHTML='';
   CFG.lotteries.forEach(l=>{
     const lot=LOTTERIES[l.lottery];
     const b=document.createElement('div');b.className='header-lot-badge';
@@ -637,6 +639,7 @@ function initApp(){
   });
   // Who selector
   const sel=document.getElementById('who-select');
+  sel.innerHTML='<option value="">— Selecciona tu nombre —</option>';
   CFG.members.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;sel.appendChild(o);});
   // Total box color
   document.getElementById('total-box').style.background=`linear-gradient(135deg,${adjustColor(color,-30)},${color})`;
@@ -1528,34 +1531,28 @@ function saveName(){
 // ── SCANNER ───────────────────────────────────────────────────────────────────
 function buildScannerWhoSelect(){
   const container=document.getElementById('scan-who-list');
+  const input=document.getElementById('scan-holder');
   if(!container) return;
   const members=getSavedMembers()||CFG.members;
   const payerIdx=getCurrentPayerIdx()%members.length;
   container.innerHTML='';
-  container._selected=members[payerIdx];
-  members.forEach((m,i)=>{
+  if(input) input.value=members[payerIdx];
+  members.forEach(m=>{
     const btn=document.createElement('button');
-    const isDefault=i===payerIdx;
-    btn.style.cssText=`padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid ${isDefault?'var(--primary)':'var(--border2)'};background:${isDefault?'var(--primary)':'var(--surface2)'};color:${isDefault?'#fff':'var(--text2)'};margin-right:6px;margin-bottom:6px;`;
-    const avatar=getAvatar(m)||'😀';
-    btn.textContent=avatar+' '+m;
-    btn.onclick=()=>{
-      container.querySelectorAll('button').forEach(b=>{
-        b.style.background='var(--surface2)';b.style.color='var(--text2)';b.style.borderColor='var(--border2)';
-      });
-      btn.style.background='var(--primary)';btn.style.color='#fff';btn.style.borderColor='var(--primary)';
-      container._selected=m;
-    };
+    btn.style.cssText='padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);';
+    btn.textContent=(getAvatar(m)||'😀')+' '+m;
+    btn.onclick=()=>{if(input) input.value=m;};
     container.appendChild(btn);
   });
 }
 
 function getSelectedScanner(){
   const lotEl=document.getElementById('scanner-loteria-selector');
-  const whoEl=document.getElementById('scan-who-list');
+  const holderInput=document.getElementById('scan-holder');
+  const members=getSavedMembers()||CFG.members;
   return{
     lotKey:lotEl?._selected||CFG?.lotteries[0]?.lottery,
-    who:whoEl?._selected||(getSavedMembers()||CFG.members)[0]
+    who:holderInput?.value.trim()||members[getCurrentPayerIdx()%members.length]
   };
 }
 
@@ -1604,7 +1601,7 @@ function processImage(input){
     img.src=e.target.result;
     // Store image data for saving
     window._scanImgData=e.target.result;
-    const who=document.getElementById('scan-who').value;
+    const {who}=getSelectedScanner();
     const lot=LOTTERIES[getSelectedScanner().lotKey];
     document.getElementById('scanner-who-confirm').innerHTML=
       `<strong>${who}</strong> · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}`;
@@ -1615,54 +1612,122 @@ function processImage(input){
   input.value='';
 }
 
-function saveBoleto(){
+async function saveBoleto(){
   const {lotKey,who}=getSelectedScanner();
   const lot=LOTTERIES[lotKey];
   const imgData=window._scanImgData||null;
+  if(!imgData){showToast('Primero haz una foto al boleto');return;}
   const members=getSavedMembers()||CFG.members;
-  const boleto={
-    lotKey,lot:lot.name,who,
-    members:members.map(m=>getMemberID(m)), // snapshot con DNI si disponible
-    fecha:new Date().toLocaleDateString('es-ES'),
-    hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
-    img:imgData, // foto del boleto
-    id:Date.now()
-  };
-  const key=`lg_boletos_${CFG.name}`;
-  const saved=JSON.parse(localStorage.getItem(key)||'[]');
-  saved.push(boleto);
-  localStorage.setItem(key,JSON.stringify(saved));
+  const slug=getSlug();
+  const id=Date.now();
+  const fecha=new Date().toLocaleDateString('es-ES');
+  const hora=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  const whoName=who||(members[getCurrentPayerIdx()%members.length]);
+  const membersStr=members.map(m=>getMemberID(m)).join(', ');
+
+  showToast('💾 Guardando boleto...');
   document.getElementById('scanner-preview-box').style.display='none';
   window._scanImgData=null;
-  renderBoletos();
-  showToast('✅ Boleto registrado');
+
+  // Save to Supabase
+  const payload={id,grupo_slug:slug,lot_name:lot.name,who:whoName,members:membersStr,fecha,hora,img_url:null};
+  let savedOk=false;
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/boletos`,{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'return=minimal'},
+      body:JSON.stringify(payload)
+    });
+    savedOk=r.ok||r.status===201||r.status===200;
+  }catch(e){}
+
+  // Save to localStorage as backup
+  try{
+    const key=`lg_boletos_${CFG.name}`;
+    const saved=JSON.parse(localStorage.getItem(key)||'[]');
+    saved.unshift({id,lotKey,lot:lot.name,who:whoName,members:members.map(m=>getMemberID(m)),fecha,hora,imgUrl:null});
+    localStorage.setItem(key,JSON.stringify(saved.slice(0,50)));
+  }catch(e){}
+
+  await renderBoletos();
+  showToast(savedOk?'✅ Boleto guardado':'✅ Guardado localmente');
+
+  // Upload photo in background
+  try{
+    const url=await uploadBoletoImg(imgData,slug,id);
+    await fetch(`${SUPA_URL}/rest/v1/boletos?id=eq.${id}`,{
+      method:'PATCH',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({img_url:url})
+    });
+    const key=`lg_boletos_${CFG.name}`;
+    const saved=JSON.parse(localStorage.getItem(key)||'[]');
+    const b=saved.find(x=>x.id===id);
+    if(b){b.imgUrl=url;localStorage.setItem(key,JSON.stringify(saved));}
+    await renderBoletos();
+  }catch(e){}
 }
 
-function renderBoletos(){
-  const key=`lg_boletos_${CFG.name}`;
-  const saved=JSON.parse(localStorage.getItem(key)||'[]');
+async function uploadBoletoImg(base64,slug,id){
+  const res=await fetch(base64);
+  const blob=await res.blob();
+  const filename=`${slug}/${id}.jpg`;
+  const r=await fetch(`${SUPA_URL}/storage/v1/object/boletos/${filename}`,{
+    method:'POST',
+    headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'image/jpeg','x-upsert':'true'},
+    body:blob
+  });
+  if(!r.ok) throw new Error('Upload failed');
+  return `${SUPA_URL}/storage/v1/object/public/boletos/${filename}`;
+}
+
+
+async function renderBoletos(){
   const list=document.getElementById('scanner-saved-list');
   const empty=document.getElementById('scanner-empty');
-  if(!saved.length){list.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
+  if(list) list.innerHTML='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Cargando...</div>';
+  const slug=getSlug();
+  let boletos=[];
+  const seenIds=new Set();
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/boletos?grupo_slug=eq.${encodeURIComponent(slug)}&order=created_at.desc`,{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    if(r.ok){
+      const data=await r.json();
+      if(Array.isArray(data)) data.forEach(b=>{
+        seenIds.add(b.id);
+        boletos.push({id:b.id,lot:b.lot_name,who:b.who,members:b.members?b.members.split(', '):[],fecha:b.fecha,hora:b.hora,imgUrl:b.img_url});
+      });
+    }
+  }catch(e){}
+  try{
+    const local=JSON.parse(localStorage.getItem(`lg_boletos_${CFG.name}`)||'[]');
+    local.forEach(b=>{if(!seenIds.has(b.id)){seenIds.add(b.id);boletos.push(b);}});
+  }catch(e){}
+  boletos.sort((a,b)=>b.id-a.id);
+  if(!list) return;
+  if(!boletos.length){list.innerHTML='';if(empty)empty.style.display='block';return;}
+  if(empty) empty.style.display='none';
   list.innerHTML='';
-  [...saved].reverse().forEach(b=>{
+  boletos.forEach(b=>{
     const div=document.createElement('div');div.className='boleto-item';
-    const membersStr=b.members?b.members.join(', '):(b.who||'—');
+    const membersStr=Array.isArray(b.members)?b.members.join(', '):(b.who||'—');
+    const imgSrc=b.imgUrl||b.img||null;
     div.innerHTML=`
       <div class="boleto-header">
         <div>
-          <div class="boleto-name">${b.lot}</div>
-          <div class="boleto-date">Comprado por <strong>${b.who}</strong> · ${b.fecha} ${b.hora||''}</div>
+          <div class="boleto-name">${b.lot||'Boleto'}</div>
+          <div class="boleto-date">Tiene: <strong>${b.who||'—'}</strong> · ${b.fecha||''} ${b.hora||''}</div>
           <div style="font-size:11px;color:var(--text3);margin-top:2px;">Jugadores: ${membersStr}</div>
         </div>
         <button class="boleto-del" onclick="deleteBoleto(${b.id})">✕</button>
       </div>
-      ${b.img?`<img src="${b.img}" style="width:100%;border-radius:8px;margin-top:8px;max-height:200px;object-fit:contain;cursor:pointer;" onclick="this.style.maxHeight=this.style.maxHeight==='none'?'200px':'none'">`:
-        '<div style="font-size:11px;color:var(--text3);margin-top:4px;">Sin foto adjunta</div>'}`;
+      ${imgSrc?`<img src="${imgSrc}" style="width:100%;border-radius:8px;margin-top:8px;max-height:200px;object-fit:contain;cursor:pointer;" onclick="this.style.maxHeight=this.style.maxHeight==='none'?'200px':'none'">`:'<div style="font-size:11px;color:var(--text3);margin-top:4px;">Sin foto adjunta</div>'}`;
     list.appendChild(div);
   });
 }
+
 
 function deleteBoleto(id){
   const key=`lg_boletos_${CFG.name}`;
