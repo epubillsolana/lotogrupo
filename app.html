@@ -284,9 +284,10 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         <div class="card-label">Mensaje WhatsApp</div>
         <div class="wa-box" id="wa-text">—</div>
         <div class="wa-btns">
-          <button class="btn-wa btn-wa-copy" onclick="copyMsg()">📋 Copiar</button>
-          <button class="btn-wa btn-wa-green" onclick="openWA()">📲 WhatsApp</button>
+          <button class="btn-wa btn-wa-copy" onclick="copyMsg()">📋 Copiar todo</button>
+          <button class="btn-wa btn-wa-green" onclick="openWA()">📲 Enviar todo</button>
         </div>
+        <div id="wa-btns-per-lot" class="wa-btns" style="margin-top:6px;flex-wrap:wrap;"></div>
       </div>
     </div>
   </div>
@@ -1031,15 +1032,40 @@ function checkAllPrizes(){
     detail.appendChild(card);
   });
 
-  // WA
-  const today=new Date().toLocaleDateString('es-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
-  const msg='*'+CFG.name+' — '+today+'*'
-    +'\n'+waLines.join('\n\n'+'─'.repeat(26)+'─'.repeat(26)+'\n\n')
-    +'\n\n'+'─'.repeat(26)
-    +'\n💳 Paga esta ronda: *'+payer+'*'
-    +'\n💸 Bizum de *'+CFG.bizum+'€* a '+payer+':'
-    +'\n'+others.map(o=>'   · '+o).join('\n');
+  // WA - one message per lottery with date
+  const sep26='─'.repeat(26);
+  const bizumLine='\n\n'+sep26+'\n💳 Paga esta ronda: *'+payer+'*\n💸 Bizum de *'+CFG.bizum+'€* a '+payer+':\n'+others.map(o=>'   · '+o).join('\n');
+  
+  // Individual messages per lottery with their draw date
+  window._waByLot=allResults.map(({lot,draw,hitM,hitS,prize,l})=>{
+    const numLine=draw.numeros.sort((a,b)=>a-b).map(n=>`${hitM.includes(n)?'🔵 *'+n+'*':'⚪ '+n}`).join(' ');
+    const starLine=draw.estrellas.sort((a,b)=>a-b).map(n=>`${hitS.includes(n)?'🟡 *'+n+'*':'⚪ '+n}`).join(' ');
+    const resultLine=prize.cat==='none'?'😅 *Sin premio*':'🏆 *'+prize.label+'* — '+prize.approx;
+    return {
+      lot:lot.name,
+      emoji:lot.emoji,
+      fecha:draw.fecha,
+      msg:'*'+CFG.name+' — '+lot.name+' ('+draw.fecha+')*\n'+sep26+'\n'+resultLine+'\n\n🎱 *Nuestros números*\n'+l.main.join(' · ')+' ⭐ '+l.stars.join(' · ')+'\n\n🔢 *Sorteo*\n'+numLine+' ⭐ '+starLine+bizumLine
+    };
+  });
+
+  // Combined message
+  const msg='*'+CFG.name+'*\n'+sep26+'\n'+allResults.map(({lot,draw})=>lot.emoji+' '+lot.name+' — '+draw.fecha).join('\n')+'\n\n'+waLines.join('\n\n'+sep26+sep26+'\n\n')+bizumLine;
   document.getElementById('wa-text').textContent=msg;lastWAMsg=msg;
+  
+  // Build per-lottery buttons
+  const waBox=document.getElementById('wa-btns-per-lot');
+  if(waBox){
+    waBox.innerHTML='';
+    window._waByLot.forEach(item=>{
+      const btn=document.createElement('button');
+      btn.className='btn-wa btn-wa-green';
+      btn.style.fontSize='12px';
+      btn.textContent='📲 '+item.emoji+' '+item.lot;
+      btn.onclick=()=>window.open('https://wa.me/?text='+encodeURIComponent(item.msg),'_blank');
+      waBox.appendChild(btn);
+    });
+  }
   document.getElementById('result-area').style.display='block';
   setTimeout(()=>document.getElementById('result-banner').scrollIntoView({behavior:'smooth',block:'start'}),100);
   track('comprobar_premio',{resultado:totalCat});
