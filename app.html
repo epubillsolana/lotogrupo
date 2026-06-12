@@ -454,6 +454,18 @@ async function supaFetch(path){
   return r;
 }
 
+async function track(tipo,metadata={}){
+  try{
+    const params=new URLSearchParams(window.location.search);
+    const slug=params.get('g')||'unknown';
+    await fetch(SUPA_URL+'/rest/v1/eventos',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({grupo_slug:slug,tipo,metadata})
+    });
+  }catch(e){}
+}
+
 let CFG=null;
 const LOTTERIES={
   euromillones:{name:'Euromillones',emoji:'🌟',mainCount:5,mainMax:50,starCount:2,starMax:12,starLabel:'Estrellas',
@@ -588,7 +600,8 @@ function initApp(){
   renderGroupName();
   renderImportes();
   restoreWho();
-  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()=>{});
+  if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()={});
+  track('apertura',{members:CFG.members.length,lotteries:CFG.lotteries.map(l=>l.lottery)});
 }
 
 function adjustColor(hex,amt){
@@ -771,6 +784,7 @@ function checkAllPrizes(){
   document.getElementById('wa-text').textContent=msg;lastWAMsg=msg;
   document.getElementById('result-area').style.display='block';
   setTimeout(()=>document.getElementById('result-banner').scrollIntoView({behavior:'smooth',block:'start'}),100);
+  track('comprobar_premio',{resultado:totalCat});
 }
 
 function addPrizeFromResult(){
@@ -875,6 +889,7 @@ function toggleBizum(name,btn){
   btn.textContent=state[name]?'✅ Bizum hecho':'⏳ Pendiente';
   showToast(state[name]?`✅ ${name} — confirmado`:`⏳ ${name} — pendiente`);
   buildWABizum();
+  if(state[name]) track('bizum_confirmado');
 }
 
 function buildWABizum(){
@@ -974,6 +989,7 @@ function addPrize(amount,label,fecha){
   saveHistory(h,lotKey);
   renderHistory();
   showToast(`✅ +${formatEur(amount)} añadido`);
+  track('premio_registrado',{amount});
   return true;
 }
 

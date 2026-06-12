@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>LotoGrupo — Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Inter:wght@400;500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:'Inter',sans-serif;background:#0A1F0F;color:#fff;min-height:100vh;padding:24px;}
+.logo{font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:2px;margin-bottom:24px;}
+.logo span{color:#FF8C00;}
+.grid{display:grid;grid-template-columns:repeat(auto-fit,minmax(160px,1fr));gap:12px;margin-bottom:24px;}
+.stat-card{background:rgba(255,255,255,0.07);border-radius:14px;padding:18px;text-align:center;}
+.stat-val{font-family:'Bebas Neue',sans-serif;font-size:42px;color:#FF8C00;}
+.stat-lbl{font-size:11px;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.07em;margin-top:4px;}
+.card{background:rgba(255,255,255,0.05);border-radius:14px;padding:16px;margin-bottom:12px;}
+.card-title{font-size:12px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;}
+.group-row{display:flex;justify-content:space-between;align-items:center;padding:10px 0;border-bottom:.5px solid rgba(255,255,255,0.08);font-size:13px;}
+.group-row:last-child{border-bottom:none;}
+.group-name{font-weight:600;}
+.group-meta{color:rgba(255,255,255,0.4);font-size:11px;}
+.badge{background:rgba(255,140,0,0.2);color:#FF8C00;border-radius:99px;padding:3px 10px;font-size:11px;font-weight:700;}
+.event-row{display:flex;justify-content:space-between;padding:8px 0;border-bottom:.5px solid rgba(255,255,255,0.06);font-size:12px;}
+.event-row:last-child{border-bottom:none;}
+.event-tipo{color:#FF8C00;font-weight:600;}
+.loader{text-align:center;padding:40px;color:rgba(255,255,255,0.4);}
+.refresh{background:#FF8C00;color:#0A1F0F;border:none;border-radius:99px;padding:8px 20px;font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:1px;cursor:pointer;margin-bottom:20px;}
+</style>
+</head>
+<body>
+<div class="logo">Loto<span>Grupo</span> — Admin</div>
+<button class="refresh" onclick="loadData()">↻ Actualizar</button>
+
+<div class="grid">
+  <div class="stat-card"><div class="stat-val" id="stat-grupos">—</div><div class="stat-lbl">Grupos creados</div></div>
+  <div class="stat-card"><div class="stat-val" id="stat-aperturas">—</div><div class="stat-lbl">Aperturas totales</div></div>
+  <div class="stat-card"><div class="stat-val" id="stat-comprobaciones">—</div><div class="stat-lbl">Comprobaciones</div></div>
+  <div class="stat-card"><div class="stat-val" id="stat-bizums">—</div><div class="stat-lbl">Bizums confirmados</div></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Grupos registrados</div>
+  <div id="grupos-list"><div class="loader">Cargando...</div></div>
+</div>
+
+<div class="card">
+  <div class="card-title">Últimos 20 eventos</div>
+  <div id="eventos-list"><div class="loader">Cargando...</div></div>
+</div>
+
+<script>
+const SUPA_URL='https://yvlgnjfjpevusokegjbm.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bGduamZqcGV2dXNva2VnamJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMjQxMjIsImV4cCI6MjA5NjgwMDEyMn0.MUqSaOJU69gT4r8AegtUtRXwZd7eDBY2IWeoMMddXVA';
+
+async function get(path){
+  const r=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+  return r.json();
+}
+
+async function loadData(){
+  // Grupos
+  const grupos=await get('/rest/v1/grupos?select=slug,config,created_at&order=created_at.desc');
+  document.getElementById('stat-grupos').textContent=grupos.length;
+  document.getElementById('grupos-list').innerHTML=grupos.length===0
+    ?'<div class="loader">Sin grupos todavía</div>'
+    :grupos.map(g=>{
+      const cfg=g.config;
+      const date=new Date(g.created_at).toLocaleDateString('es-ES');
+      const lots=cfg.lotteries?.map(l=>l.lottery).join(', ')||cfg.lottery||'—';
+      return `<div class="group-row">
+        <div><div class="group-name">${cfg.name}</div><div class="group-meta">${lots} · ${cfg.members?.length||0} miembros · ${date}</div></div>
+        <span class="badge">${g.slug}</span>
+      </div>`;
+    }).join('');
+
+  // Eventos
+  const eventos=await get('/rest/v1/eventos?select=*&order=created_at.desc&limit=100');
+  document.getElementById('stat-aperturas').textContent=eventos.filter(e=>e.tipo==='apertura').length;
+  document.getElementById('stat-comprobaciones').textContent=eventos.filter(e=>e.tipo==='comprobar_premio').length;
+  document.getElementById('stat-bizums').textContent=eventos.filter(e=>e.tipo==='bizum_confirmado').length;
+  
+  const ultimos=eventos.slice(0,20);
+  document.getElementById('eventos-list').innerHTML=ultimos.length===0
+    ?'<div class="loader">Sin eventos todavía</div>'
+    :ultimos.map(e=>{
+      const date=new Date(e.created_at).toLocaleString('es-ES',{day:'2-digit',month:'2-digit',hour:'2-digit',minute:'2-digit'});
+      return `<div class="event-row">
+        <span class="event-tipo">${e.tipo}</span>
+        <span style="color:rgba(255,255,255,0.6)">${e.grupo_slug}</span>
+        <span style="color:rgba(255,255,255,0.3)">${date}</span>
+      </div>`;
+    }).join('');
+}
+
+loadData();
+</script>
+</body>
+</html>

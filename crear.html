@@ -306,6 +306,12 @@ async function supaFetch(path, method='GET', body=null){
   return r;
 }
 
+async function supaFetch2(path,method,body){
+  try{
+    await fetch(SUPA_URL+path,{method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},body:JSON.stringify(body)});
+  }catch(e){}
+}
+
 function toSlug(name){
   return name.toLowerCase()
     .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
@@ -473,6 +479,8 @@ async function createGroup(){
     const save=await supaFetch('/rest/v1/grupos','POST',{slug,config:cfg});
     if(!save.ok) throw new Error();
     _link=`https://lotogrupo.es/app.html?g=${slug}`;
+    // Track creation
+    await supaFetch2('/rest/v1/eventos','POST',{grupo_slug:slug,tipo:'grupo_creado',metadata:{members:members.length,lotteries:lotConfigs.map(l=>l.lottery)}});
   }catch(e){
     // Fallback to hash
     const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
