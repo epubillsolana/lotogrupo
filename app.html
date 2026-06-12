@@ -755,13 +755,15 @@ async function fetchDraw(lotKey){
     const dateStr=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
     const weekAgo=new Date(now-7*24*3600*1000);
     const dateFrom=`${weekAgo.getFullYear()}${pad(weekAgo.getMonth()+1)}${pad(weekAgo.getDate())}`;
-    const url=`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=EMIL&celebrados=true&num=1&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
+    const gameIds={euromillones:'EMIL',primitiva:'LAPR',bonoloto:'BONO',gordo:'ELGR',loteria_nacional:'LNAC'};
+    const gameId=gameIds[lotKey]||'EMIL';
+    const url=`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=${gameId}&celebrados=true&num=1&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
     const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw new Error();
     const arr=await r.json();
     if(!arr||!arr.length) throw new Error();
     const s=arr[0];
-    const f=s.fecha_sorteo;
+    const f=s.fecha_sorteo.replace(/\s.*/,''); // remove time part
     const fecha=`${f.slice(6,8)}/${f.slice(4,6)}/${f.slice(0,4)}`;
     const comb=s.combinacion.trim().split(/\s+/).map(Number).filter(n=>n>0);
     const numeros=comb.slice(0,lot.mainCount).sort((a,b)=>a-b);
