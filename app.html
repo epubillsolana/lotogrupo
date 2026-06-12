@@ -750,8 +750,8 @@ function getCurrentPayerIdx(){
 async function fetchDraw(lotKey){
   const lot=LOTTERIES[lotKey];
   try{
-    const r=await fetch('https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=EMIL&celebrados=true&num=1',
-      {cache:'no-store',headers:{Accept:'application/json'}});
+    const r=await fetch('https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=EMIL&celebrados=true&num=1&_='+Date.now(),
+      {cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw new Error();
     const arr=await r.json();
     if(!arr||!arr.length) throw new Error();
@@ -773,13 +773,31 @@ async function fetchDraw(lotKey){
 }
 
 async function initAllDraws(){
-  // Show fallback immediately
-  CFG.lotteries.forEach(l=>{drawDataMap[l.lottery]=LOTTERIES[l.lottery].fallback;});
+  // Show cached draw immediately if available
+  CFG.lotteries.forEach(l=>{
+    const cached=localStorage.getItem('lg_draw_'+l.lottery);
+    drawDataMap[l.lottery]=cached?JSON.parse(cached):LOTTERIES[l.lottery].fallback;
+  });
   buildComprobar();
   document.getElementById('btn-check').disabled=false;
-  // Fetch in background
+  // Always fetch fresh from API
   for(const l of CFG.lotteries){
-    try{const fresh=await fetchDraw(l.lottery);if(fresh){drawDataMap[l.lottery]=fresh;}}catch(e){}
+    try{
+      // Clear cache older than 1 hour
+      const cached=localStorage.getItem('lg_draw_'+l.lottery);
+      if(cached){
+        const ts=localStorage.getItem('lg_draw_ts_'+l.lottery);
+        if(ts&&Date.now()-parseInt(ts)<3600000){
+          drawDataMap[l.lottery]=JSON.parse(cached);
+          continue;
+        }
+      }
+      const fresh=await fetchDraw(l.lottery);
+      if(fresh){
+        drawDataMap[l.lottery]=fresh;
+        localStorage.setItem('lg_draw_ts_'+l.lottery,Date.now().toString());
+      }
+    }catch(e){}
   }
   buildComprobar();
 }
