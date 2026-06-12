@@ -623,6 +623,58 @@ function addOtraLoteria(){
   window._lotPicker=picker;
 }
 
+function showLotPicker(){
+  const existing=lotConfigs.map(l=>l.lottery+'_'+l.main.join('-'));
+  const picker=document.createElement('div');
+  picker.id='lot-picker';
+  picker.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:999;display:flex;align-items:flex-end;';
+
+  const lotOptions=Object.entries(LOTS).map(([key,lot])=>`
+    <button onclick="addMoreLot('${key}')"
+      style="display:flex;align-items:center;gap:12px;width:100%;text-align:left;padding:14px 16px;border-radius:12px;background:#F9FAFB;border:1px solid #E5E7EB;margin-bottom:8px;font-size:15px;font-weight:600;cursor:pointer;">
+      <span style="font-size:24px;">${lot.emoji}</span>
+      <div>
+        <div>${lot.name}</div>
+        <div style="font-size:12px;color:#9CA3AF;font-weight:400;">Nueva combinación</div>
+      </div>
+    </button>`).join('');
+
+  picker.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;">
+    <div style="font-size:16px;font-weight:800;color:#1A1A18;margin-bottom:6px;">¿Añadir otra combinación?</div>
+    <div style="font-size:13px;color:#9CA3AF;margin-bottom:16px;">Puedes jugar varias combinaciones del mismo sorteo o de distintos sorteos.</div>
+    ${lotOptions}
+    <button onclick="closeLotPickerAndContinue()"
+      style="width:100%;padding:14px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;">
+      ✅ Continuar con estos números
+    </button>
+  </div>`;
+  document.body.appendChild(picker);
+}
+
+function addMoreLot(key){
+  document.getElementById('lot-picker')?.remove();
+  // Add to selLotteries if not already there
+  if(!selLotteries.includes(key)) selLotteries.push(key);
+  lotIdx=selLotteries.indexOf(key);
+  // Find next unconfigured slot for this key or add new
+  const existingForKey=lotConfigs.filter(l=>l.lottery===key).length;
+  // Add a new empty slot
+  lotIdx=lotConfigs.length;
+  if(!selLotteries[lotIdx]) selLotteries.push(key);
+  else selLotteries[lotIdx]=key;
+  selMain=new Set();selStars=new Set();apuestaType='sencilla';
+  document.querySelectorAll('.apuesta-card').forEach(card=>card.classList.remove('selected'));
+  document.querySelector('.apuesta-card')?.classList.add('selected');
+  buildGrids();
+  document.getElementById('p2-eyebrow').textContent=LOTS[key].emoji+' '+LOTS[key].name;
+  updateUI();window.scrollTo(0,0);
+}
+
+function closeLotPickerAndContinue(){
+  document.getElementById('lot-picker')?.remove();
+  renderMembers();step=3;updateUI();window.scrollTo(0,0);
+}
+
 function selectLotForAdd(idx){
   if(window._lotPicker) window._lotPicker.remove();
   lotIdx=idx;selMain=new Set();selStars=new Set();apuestaType='sencilla';
@@ -641,7 +693,10 @@ function goNext(){
     const lot=LOTS[selLotteries[lotIdx]];
     if(selMain.size<lot.mainCount){toast(`Elige al menos ${lot.mainCount} números`);return;}
     if(lot.starMax>0&&selStars.size<lot.starCount){toast(`Elige al menos ${lot.starCount} estrella${lot.starCount>1?'s':''}`);return;}
-    saveLotConfig();renderMembers();step=3;
+    saveLotConfig();
+    // Show picker: add more or continue
+    showLotPicker();
+    return;
   }else if(step===3){
     if(members.length<2){toast('Añade al menos 2 miembros');return;}
     const cost=parseFloat(document.getElementById('f-cost').value)||20;
