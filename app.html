@@ -1531,9 +1531,21 @@ function updateNotifStatusUI(){
   const dot=document.getElementById('notif-dot');
   const txt=document.getElementById('notif-status-text');
   const btn=document.getElementById('btn-notif');
-  if(perm==='granted'){row.className='notif-status ok';dot.className='dot green';txt.textContent='✅ Activadas. Cada lunes a las 10:00h.';btn.style.display='none';document.getElementById('notif-preview').style.display='block';}
-  else if(perm==='denied'){row.className='notif-status off';dot.className='dot red';txt.textContent='❌ Bloqueadas. Actívalas en ajustes del móvil.';btn.style.display='none';}
-  else{row.className='notif-status warn';dot.className='dot gold';txt.textContent='⚠️ No activadas todavía.';btn.style.display='block';}
+  // Always show preview section
+  document.getElementById('notif-preview').style.display='block';
+  if(perm==='granted'){
+    row.className='notif-status ok';dot.className='dot green';
+    txt.textContent='✅ Activadas. Cada lunes a las 10:00h.';
+    btn.style.display='none';
+  }else if(perm==='denied'){
+    row.className='notif-status off';dot.className='dot red';
+    txt.textContent='❌ Bloqueadas. Actívalas en ajustes del móvil.';
+    btn.style.display='none';
+  }else{
+    row.className='notif-status warn';dot.className='dot gold';
+    txt.textContent='⚠️ Notificaciones no activadas.';
+    btn.style.display='block';
+  }
 }
 
 async function requestNotifPermission(){
@@ -1801,35 +1813,93 @@ function processImage(input){
   input.value='';
 }
 
-function saveBoleto(){
+async function saveBoleto(){
   const {lotKey,who}=getSelectedScanner();
   const lot=LOTTERIES[lotKey];
   const imgData=window._scanImgData||null;
   if(!imgData){showToast('Primero haz una foto al boleto');return;}
-  const members=getSavedMembers()||CFG.members;
-  const params=new URLSearchParams(window.location.search);
-  const slug=params.get('g')||CFG.name;
-  const id=Date.now();
 
-  const boleto={
-    lotKey,lot:lot.name,
-    who:who||(members[getCurrentPayerIdx()%members.length]),
-    members:members.map(m=>getMemberID(m)),
-    fecha:new Date().toLocaleDateString('es-ES'),
-    hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
-    id,imgUrl:null
+  const members=getSavedMembers()||CFG.members;
+  const slug=getSlug();
+  const id=Date.now();
+  const fecha=new Date().toLocaleDateString('es-ES');
+  const hora=new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'});
+  const whoName=who||(members[getCurrentPayerIdx()%members.length]);
+  const membersStr=members.map(m=>getMemberID(m)).join(', ');
+
+  showToast('💾 Guardando boleto...');
+  document.getElementById('scanner-preview-box').style.display='none';
+  window._scanImgData=null;
+
+  // STEP 1: Save metadata to Supabase immediately (no photo yet)
+  const payload={
+    id,
+    grupo_slug:slug,
+    lot_name:lot.name,
+    who:whoName,
+    members:membersStr,
+    fecha,hora,
+    img_url:null
   };
 
-  // Try to upload to Supabase Storage
-  showToast('📤 Guardando boleto...');
-  showToast('📤 Subiendo foto...');
-  uploadBoletoImg(imgData,slug,id).then(async url=>{
-    boleto.imgUrl=url;
-    await storeBoleto(boleto);
-  }).catch(async ()=>{
-    boleto.imgUrl=null;
-    await storeBoleto(boleto);
-  });
+  let savedOk=false;
+  try{
+    const r=await fetch(`${SUPA_URL}/rest/v1/boletos`,{
+      method:'POST',
+      headers:{
+        'apikey':SUPA_KEY,
+        'Authorization':'Bearer '+SUPA_KEY,
+        'Content-Type':'application/json',
+        'Prefer':'return=minimal'
+      },
+      body:JSON.stringify(payload)
+    });
+    savedOk=r.ok||r.status===201||r.status===200;
+    if(!savedOk){
+      const t=await r.text();
+      console.error('Boleto error:',r.status,t);
+    }
+  }catch(e){
+    console.error('Boleto save error:',e);
+  }
+
+  // STEP 2: Save to localStorage always
+  const key=`lg_boletos_${CFG.name}`;
+  try{
+    const saved=JSON.parse(localStorage.getItem(key)||'[]');
+    saved.unshift({id,lotKey,lot:lot.name,who:whoName,members:members.map(m=>getMemberID(m)),fecha,hora,imgUrl:null});
+    localStorage.setItem(key,JSON.stringify(saved.slice(0,50)));
+  }catch(e){}
+
+  // STEP 3: Show boleto immediately (without photo)
+  await renderBoletos();
+  showToast(savedOk?'✅ Boleto guardado':'✅ Guardado localmente');
+
+  // STEP 4: Upload photo in background and update
+  if(imgData){
+    try{
+      const url=await uploadBoletoImg(imgData,slug,id);
+      // Update Supabase record with photo URL
+      await fetch(`${SUPA_URL}/rest/v1/boletos?id=eq.${id}`,{
+        method:'PATCH',
+        headers:{
+          'apikey':SUPA_KEY,
+          'Authorization':'Bearer '+SUPA_KEY,
+          'Content-Type':'application/json'
+        },
+        body:JSON.stringify({img_url:url})
+      });
+      // Update localStorage
+      const key2=`lg_boletos_${CFG.name}`;
+      const saved2=JSON.parse(localStorage.getItem(key2)||'[]');
+      const b=saved2.find(x=>x.id===id);
+      if(b){b.imgUrl=url;localStorage.setItem(key2,JSON.stringify(saved2));}
+      // Refresh list to show photo
+      await renderBoletos();
+    }catch(e){
+      console.error('Photo upload error:',e);
+    }
+  }
 }
 
 async function uploadBoletoImg(base64,slug,id){
@@ -1996,6 +2066,7 @@ function deleteBoleto(id){
 let lastWARecordatorio='';
 
 async function buildRecordatorio(){
+  const myIdx=getMyIdx();
   const members=getSavedMembers()||CFG.members;
   const payerIdx=getCurrentPayerIdx()%members.length;
   const payer=members[payerIdx];
@@ -2063,8 +2134,10 @@ function switchTab(id,el){
   el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
   if(id==='premios') renderHistory();
   if(id==='turnos') buildTurns();
-  if(id==='bizum'){buildBizumConfirm();buildWABizum();}
-  if(id==='grupo'){buildMembers();renderGroupName();}
+  if(id==='bizum'){buildBizumConfirm();}
+  if(id==='grupo'){buildMembers();renderGroupName();renderImportes();}
+  if(id==='avisos'){restoreWho();buildRecordatorio();}
+  if(id==='scanner'){buildScannerLotSelector();buildScannerWhoSelect();renderBoletos();}
 }
 function copyMsg(){navigator.clipboard.writeText(lastWAMsg).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
 function openWA(){window.open('https://wa.me/?text='+encodeURIComponent(lastWAMsg),'_blank');}
