@@ -1904,9 +1904,7 @@ function openWABizum(){window.open('https://wa.me/?text='+encodeURIComponent(las
 
 // ── START ─────────────────────────────────────────────────────────────────────
 loadConfig();
-</script>
-</body>
-</html>async function addPrize(amount,label,fecha){
+async function addPrize(amount,label,fecha){
   if(!amount||amount<=0){showToast('Introduce un importe válido');return false;}
   const lotKey=CFG.lotteries.find(l=>label.includes(LOTTERIES[l.lottery]?.name||''))?.lottery||CFG.lotteries[0].lottery;
   await saveHistoryItem({amount,label,fecha},lotKey);
@@ -1914,5 +1912,7 @@ loadConfig();
   showToast(`✅ +${formatEur(amount)} añadido`);
   return true;
 }
-
-
+loadConfig();
+</script>
+</body>
+</html>
