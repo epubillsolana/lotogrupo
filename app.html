@@ -206,15 +206,6 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;-webkit-appearance:none;}
 
-.scanner-num-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
-.scanner-num-row label{font-size:12px;color:var(--text3);min-width:70px;}
-.scanner-num-input{flex:1;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;}
-.boleto-item{padding:10px 0;border-bottom:.5px solid var(--border);}
-.boleto-item:last-child{border-bottom:none;}
-.boleto-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
-.boleto-name{font-size:13px;font-weight:700;}
-.boleto-date{font-size:11px;color:var(--text3);}
-.boleto-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 6px;}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 </style>
@@ -226,25 +217,6 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <div class="setup-title">LotoGrupo</div>
   <div class="setup-sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
   <a href="https://lotogrupo.es/crear.html" class="setup-btn">Crear una peña nueva →</a>
-</div>
-
-
-<!-- ONBOARDING -->
-<div id="onboarding-screen" style="display:none;min-height:100vh;background:#0A1F0F;color:#fff;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;">
-  <div style="font-size:64px;margin-bottom:20px;">🎰</div>
-  <div style="font-size:28px;font-weight:900;margin-bottom:8px;" id="ob-group-name">Tu Peña</div>
-  <div style="font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:32px;line-height:1.6;">Te han invitado a unirte al grupo.<br>Gestiona turnos, Bizums y premios<br>desde un solo enlace.</div>
-  <div style="background:rgba(255,255,255,0.08);border-radius:16px;padding:20px;width:100%;max-width:320px;margin-bottom:24px;text-align:left;">
-    <div style="font-size:13px;font-weight:700;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:.07em;margin-bottom:12px;">Qué encontrarás</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">🔍</span><span style="font-size:14px;">Comprobar el sorteo automáticamente</span></div>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">💸</span><span style="font-size:14px;">Confirmar tu Bizum al pagador</span></div>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">🏆</span><span style="font-size:14px;">Historial de premios del grupo</span></div>
-      <div style="display:flex;align-items:center;gap:12px;"><span style="font-size:22px;">📷</span><span style="font-size:14px;">Foto del boleto como prueba</span></div>
-    </div>
-  </div>
-  <button onclick="finishOnboarding()" style="width:100%;max-width:320px;padding:16px;border-radius:99px;background:#FF8C00;color:#0A1F0F;border:none;font-size:17px;font-weight:800;cursor:pointer;margin-bottom:14px;">¡Entrar a la peña! →</button>
-  <div style="font-size:12px;color:rgba(255,255,255,0.35);">Guarda este enlace para volver siempre</div>
 </div>
 
 <div id="main-app" style="display:none;">
@@ -262,7 +234,6 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <button class="tab-btn" onclick="switchTab('premios',this)"><i class="ti ti-trophy"></i>Premios</button>
     <button class="tab-btn" onclick="switchTab('avisos',this)"><i class="ti ti-bell"></i>Avisos</button>
     <button class="tab-btn" onclick="switchTab('grupo',this)"><i class="ti ti-users"></i>Grupo</button>
-    <button class="tab-btn" onclick="switchTab('scanner',this)"><i class="ti ti-scan"></i>Scanner</button>
   </div>
 
   <!-- COMPROBAR -->
@@ -410,42 +381,6 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
   </div>
 
-  <!-- SCANNER -->
-  <div class="section" id="tab-scanner">
-    <div class="card">
-      <div class="card-label">📷 Fotografiar boleto</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Haz una foto al boleto como prueba de compra. Queda registrado quién juega y cuándo se compró.</p>
-
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Lotería</div>
-      <div id="scanner-loteria-selector" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
-
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién tiene el boleto físicamente?</div>
-      <input type="text" id="scan-holder" placeholder="Nombre de quien lo tiene..." style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;margin-bottom:8px;">
-      <div id="scan-who-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
-
-      <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;">📷 Hacer foto al boleto</button>
-      <button onclick="openGallery()" class="btn btn-gray">🖼️ Elegir foto de galería</button>
-      <input type="file" id="scanner-file" accept="image/*" capture="environment" style="display:none;" onchange="processImage(this)">
-      <input type="file" id="gallery-file" accept="image/*" style="display:none;" onchange="processImage(this)">
-    </div>
-
-    <div id="scanner-preview-box" class="card" style="display:none;">
-      <div class="card-label">Vista previa del boleto</div>
-      <img id="scanner-img" style="width:100%;border-radius:10px;margin-bottom:12px;max-height:300px;object-fit:contain;">
-      <div style="font-size:13px;color:var(--text2);margin-bottom:10px;" id="scanner-who-confirm"></div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="document.getElementById('scanner-preview-box').style.display='none'" class="btn btn-gray" style="margin-top:0;">Cancelar</button>
-        <button onclick="saveBoleto()" class="btn btn-primary" style="margin-top:0;">💾 Confirmar y guardar</button>
-      </div>
-    </div>
-
-    <div class="card">
-      <div class="card-label">Boletos registrados</div>
-      <div id="scanner-saved-list"></div>
-      <div class="empty-state" id="scanner-empty" style="padding:16px 0;font-size:13px;">Sin boletos registrados todavía 🎟️<br><span style="font-size:11px;">Fotografía el boleto cada vez que lo compréis</span></div>
-    </div>
-  </div>
-
   <!-- GRUPO -->
   <div class="section" id="tab-grupo">
     <div class="card">
@@ -582,49 +517,6 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
-// ── ONBOARDING & TUTORIAL ────────────────────────────────────────────────────
-function finishOnboarding(){
-  localStorage.setItem(`lg_ob_${CFG.name}`,'1');
-  document.getElementById('onboarding-screen').style.display='none';
-  showTutorial();
-}
-
-function showTutorial(){
-  const steps=[
-    {emoji:'🔍',color:'#1565C0',bg:'#E3F2FD',tab:'Comprobar',title:'Comprueba el sorteo',desc:'Entra después de cada sorteo para ver si ha tocado premio. La app lo compara con vuestros números automáticamente.'},
-    {emoji:'👥',color:'#2E7D32',bg:'#E8F5E9',tab:'Turnos & Bizum',title:'Gestiona los pagos',desc:'El sistema sabe quién paga esta ronda. Confirma tu Bizum con un toque para que el pagador lo vea al momento.'},
-    {emoji:'🏆',color:'#F57F17',bg:'#FFF9C4',tab:'Premios',title:'Historial de premios',desc:'Cuando toque algo, se añade al balance del grupo. Veis cuánto habéis gastado y ganado.'},
-    {emoji:'📷',color:'#6A1B9A',bg:'#F3E5F5',tab:'Scanner',title:'Fotografía el boleto',desc:'Haz una foto al boleto como prueba de compra. Queda registrado quién lo tiene y quiénes jugáis.'},
-    {emoji:'📱',color:'#0A1F0F',bg:'#F1F3F4',tab:'',title:'Añádela a tu inicio',desc:'Para entrar siempre con un toque.\n\niPhone: Safari → Compartir → Añadir a pantalla de inicio\n\nAndroid: Chrome → Menú → Añadir a pantalla de inicio'},
-    {emoji:'🍀',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:'¡Disfruta y suerte!',desc:'Ya estáis listos. Que os toque el gordo... y si no, al menos lo gestionáis sin líos 😄'},
-  ];
-  let step=0;
-  const overlay=document.createElement('div');
-  overlay.id='tutorial-overlay';
-  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.75);z-index:500;display:flex;align-items:flex-end;justify-content:center;';
-  function render(){
-    const s=steps[step];
-    const isLast=step===steps.length-1;
-    const dots=steps.map((_,i)=>`<div style="width:${i===step?22:7}px;height:7px;border-radius:4px;background:${i===step?s.color:'#E5E7EB'};transition:all .3s;"></div>`).join('');
-    overlay.innerHTML=`<div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;width:100%;max-width:480px;">
-      <div style="display:flex;justify-content:center;gap:5px;margin-bottom:28px;">${dots}</div>
-      <div style="width:80px;height:80px;border-radius:24px;background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">${s.emoji}</div>
-      ${s.tab?`<div style="text-align:center;margin-bottom:8px;"><span style="background:${s.bg};color:${s.color};border-radius:99px;padding:4px 14px;font-size:12px;font-weight:700;">${s.tab}</span></div>`:''}
-      <div style="text-align:center;font-size:22px;font-weight:900;color:#1A1A18;margin-bottom:10px;">${s.title}</div>
-      <div style="text-align:center;font-size:15px;color:#6B7280;line-height:1.6;margin-bottom:32px;white-space:pre-line;">${s.desc}</div>
-      <button onclick="window._tutNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
-      ${step===0?`<button onclick="window._tutSkip()" style="width:100%;padding:10px;background:none;border:none;color:#9CA3AF;font-size:14px;cursor:pointer;">Saltar</button>`:''}
-    </div>`;
-  }
-  window._tutNext=function(){if(step<steps.length-1){step++;render();}else window._tutSkip();};
-  window._tutSkip=function(){document.getElementById('tutorial-overlay')?.remove();document.getElementById('main-app').style.display='block';};
-  render();
-  document.body.appendChild(overlay);
-  let startX=0;
-  overlay.addEventListener('touchstart',e=>startX=e.touches[0].clientX,{passive:true});
-  overlay.addEventListener('touchend',e=>{const dx=e.changedTouches[0].clientX-startX;if(dx<-50&&step<steps.length-1){step++;render();}else if(dx>50&&step>0){step--;render();}},{passive:true});
-}
-
 async function loadConfig(){
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('g');
@@ -661,18 +553,9 @@ async function loadConfig(){
     document.getElementById('setup-screen').style.display='flex';
     return;
   }
-  try{
-    initApp();
-    document.getElementById('setup-screen').style.display='none';
-    document.getElementById('main-app').style.display='block';
-    const obKey=`lg_ob_${CFG.name}`;
-    if(!localStorage.getItem(obKey)){
-      document.getElementById('ob-group-name').textContent=CFG.name;
-      document.getElementById('onboarding-screen').style.display='flex';
-    }
-  }catch(e){
-    document.querySelector('.setup-sub').textContent='Error: '+e.message;
-  }
+  document.getElementById('setup-screen').style.display='none';
+  document.getElementById('main-app').style.display='block';
+  initApp();
 }
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
@@ -723,6 +606,7 @@ function initApp(){
   initAllDraws();
   buildTurns();
   buildBizumConfirm();
+  buildWABizum();
   buildMembers();
   renderHistory();
   renderGroupName();
@@ -1117,59 +1001,23 @@ function buildTurns(){
 }
 
 // ── BIZUM CONFIRM ─────────────────────────────────────────────────────────────
+function getBizumState(){
+  try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}
+}
 function getBizumKey(){
   const idx=getCurrentPayerIdx();
   const ym=new Date().toISOString().slice(0,7);
   return `lg_bizum_${CFG.name}_${idx}_${ym}`;
 }
+function getBizumState(){try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}}
+function saveBizumState(s){localStorage.setItem(getBizumKey(),JSON.stringify(s));}
 
-function getSlug(){
-  return new URLSearchParams(window.location.search).get('g')||CFG.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
-}
-
-async function loadBizumState(){
-  const slug=getSlug();
-  const turno=getCurrentPayerIdx();
-  try{
-    const r=await fetch(`${SUPA_URL}/rest/v1/bizums?grupo_slug=eq.${encodeURIComponent(slug)}&turno_idx=eq.${turno}&select=member_name,confirmado`,{
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
-    });
-    const data=await r.json();
-    if(Array.isArray(data)&&data.length>0){
-      const state={};
-      data.forEach(row=>{state[row.member_name]=row.confirmado;});
-      return state;
-    }
-  }catch(e){}
-  try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}
-}
-
-async function saveBizumState(name,confirmado){
-  const slug=getSlug();
-  const turno=getCurrentPayerIdx();
-  try{
-    await fetch(`${SUPA_URL}/rest/v1/bizums`,{
-      method:'POST',
-      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({grupo_slug:slug,turno_idx:turno,member_name:name,confirmado,updated_at:new Date().toISOString()})
-    });
-  }catch(e){}
-  try{
-    const state=JSON.parse(localStorage.getItem(getBizumKey())||'{}');
-    state[name]=confirmado;
-    localStorage.setItem(getBizumKey(),JSON.stringify(state));
-  }catch(e){}
-}
-
-
-async function buildBizumConfirm(){
-  const members=getSavedMembers()||CFG.members;
-  const payerIdx=getCurrentPayerIdx()%members.length;
-  const payer=members[payerIdx];
-  const others=members.filter((_,i)=>i!==payerIdx);
+function buildBizumConfirm(){
+  const _mbrs=getSavedMembers();
+  const idx=getCurrentPayerIdx()%_mbrs.length,payer=_mbrs[idx];
+  const others=_mbrs.filter((_,i)=>i!==idx);
+  const state=getBizumState();
   const list=document.getElementById('bizum-confirm-list');if(!list)return;
-  list.innerHTML='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Cargando...</div>';
-  const state=await loadBizumState();
   list.innerHTML='';
   const payerRow=document.createElement('div');payerRow.className='bizum-row';
   payerRow.innerHTML=`<span style="font-size:14px;font-weight:700;">💳 ${payer}</span><span style="font-size:11px;color:var(--text3);">Paga el boleto</span>`;
@@ -1181,25 +1029,18 @@ async function buildBizumConfirm(){
       <button class="bizum-btn ${done?'done':'pending'}" onclick="toggleBizum('${m}',this)">${done?'✅ Bizum hecho':'⏳ Pendiente'}</button>`;
     list.appendChild(row);
   });
-  buildWABizum(state,payer,others);
 }
 
-
-async function toggleBizum(name,btn){
-  const current=btn.classList.contains('done');
-  const newState=!current;
-  btn.className='bizum-btn '+(newState?'done':'pending');
-  btn.textContent=newState?'✅ Bizum hecho':'⏳ Pendiente';
-  btn.disabled=true;
-  await saveBizumState(name,newState);
-  btn.disabled=false;
-  showToast(newState?`✅ ${name} confirmado`:`⏳ ${name} pendiente`);
-  const state=await loadBizumState();
-  const members=getSavedMembers()||CFG.members;
-  const payerIdx=getCurrentPayerIdx()%members.length;
-  buildWABizum(state,members[payerIdx],members.filter((_,i)=>i!==payerIdx));
+function toggleBizum(name,btn){
+  const state=getBizumState();
+  state[name]=!state[name];
+  saveBizumState(state);
+  btn.className='bizum-btn '+(state[name]?'done':'pending');
+  btn.textContent=state[name]?'✅ Bizum hecho':'⏳ Pendiente';
+  showToast(state[name]?`✅ ${name} — confirmado`:`⏳ ${name} — pendiente`);
+  buildWABizum();
+  if(state[name]) track('bizum_confirmado');
 }
-
 
 function buildWABizum(){
   const _mbrs=getSavedMembers();
@@ -1390,7 +1231,6 @@ function buildMembers(){
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--border);';
     const avatar=getAvatar(m)||'😀';
-    const dni=getDNI(m);
     row.innerHTML=`
       <span style="font-size:28px;flex-shrink:0;cursor:pointer;" onclick="openAvatarPopup('${m}')">${avatar}</span>
       <div style="flex:1;">
@@ -1398,12 +1238,6 @@ function buildMembers(){
         <input id="member-name-input-${i}" type="text" value="${m}" maxlength="20"
           style="display:none;width:100%;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:14px;font-family:inherit;outline:none;"
           onkeydown="if(event.key==='Enter')saveMemberName(${i})">
-        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
-          <span style="font-size:11px;color:var(--text3);">DNI (últimos 4):</span>
-          <input type="text" maxlength="4" placeholder="----" value="${dni}"
-            style="width:48px;padding:2px 6px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);font-size:12px;font-family:inherit;text-align:center;outline:none;"
-            onchange="saveDNI('${m}',this.value)" oninput="this.value=this.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase()">
-        </div>
       </div>
       <div style="display:flex;gap:6px;">
         <button onclick="toggleEditMember(${i})" id="member-edit-btn-${i}"
@@ -1585,17 +1419,6 @@ function addMemberFromGrupo(){
   showToast(`✅ ${name} añadido · Bizum ${bizum}€`);
 }
 
-// ── DNI ───────────────────────────────────────────────────────────────────────
-function getDNI(name){return localStorage.getItem(`lg_dni_${CFG.name}_${name}`)||'';}
-function saveDNI(name,val){
-  if(val) localStorage.setItem(`lg_dni_${CFG.name}_${name}`,val.toUpperCase());
-  else localStorage.removeItem(`lg_dni_${CFG.name}_${name}`);
-}
-function getMemberID(name){
-  const dni=getDNI(name);
-  return dni?`${name} (DNI: ***${dni})`:name;
-}
-
 // ── EDIT NAME ─────────────────────────────────────────────────────────────────
 function getGroupName(){return localStorage.getItem(`lg_name_${CFG.name._orig||CFG.name}`)||CFG.name;}
 
@@ -1636,147 +1459,6 @@ function saveName(){
   buildTurns();
   buildWABizum();
   showToast('✅ Nombre actualizado');
-}
-
-// ── SCANNER ───────────────────────────────────────────────────────────────────
-function buildScannerWhoSelect(){
-  const container=document.getElementById('scan-who-list');
-  const input=document.getElementById('scan-holder');
-  if(!container) return;
-  const members=getSavedMembers()||CFG.members;
-  const payerIdx=getCurrentPayerIdx()%members.length;
-  container.innerHTML='';
-  if(input) input.value=members[payerIdx];
-  members.forEach(m=>{
-    const btn=document.createElement('button');
-    btn.style.cssText='padding:5px 12px;border-radius:99px;font-size:12px;font-weight:600;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);';
-    btn.textContent=(getAvatar(m)||'😀')+' '+m;
-    btn.onclick=()=>{if(input) input.value=m;};
-    container.appendChild(btn);
-  });
-}
-
-function getSelectedScanner(){
-  const lotEl=document.getElementById('scanner-loteria-selector');
-  const holderInput=document.getElementById('scan-holder');
-  const members=getSavedMembers()||CFG.members;
-  return{
-    lotKey:lotEl?._selected||CFG?.lotteries[0]?.lottery,
-    who:holderInput?.value.trim()||members[getCurrentPayerIdx()%members.length]
-  };
-}
-
-function buildScannerLotSelector(){
-  const el=document.getElementById('scanner-loteria-selector');
-  if(!el||!CFG) return;
-  el.innerHTML='';
-  el._selected=CFG.lotteries[0].lottery;
-  CFG.lotteries.forEach(l=>{
-    const lot=LOTTERIES[l.lottery];
-    const btn=document.createElement('button');
-    const isFirst=l===CFG.lotteries[0];
-    btn.style.cssText=`padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid ${isFirst?'var(--primary)':'var(--border2)'};background:${isFirst?'var(--primary)':'var(--surface2)'};color:${isFirst?'#fff':'var(--text2)'};`;
-    btn.textContent=lot.emoji+' '+lot.name;
-    btn.dataset.lot=l.lottery;
-    btn.onclick=()=>{
-      el.querySelectorAll('button').forEach(b=>{
-        b.style.background='var(--surface2)';b.style.color='var(--text2)';b.style.borderColor='var(--border2)';
-      });
-      btn.style.background='var(--primary)';btn.style.color='#fff';btn.style.borderColor='var(--primary)';
-      el._selected=l.lottery;
-    };
-    el.appendChild(btn);
-  });
-}
-
-function getSelectedScannerLot(){
-  const el=document.getElementById('scanner-loteria-selector');
-  return el?._selected||CFG?.lotteries[0]?.lottery;
-}
-
-function openCamera(){
-  document.getElementById('scanner-file').click();
-}
-
-function openGallery(){
-  document.getElementById('gallery-file').click();
-}
-
-function processImage(input){
-  const file=input.files[0];
-  if(!file) return;
-  const reader=new FileReader();
-  reader.onload=e=>{
-    const img=document.getElementById('scanner-img');
-    img.src=e.target.result;
-    // Store image data for saving
-    window._scanImgData=e.target.result;
-    const who=document.getElementById('scan-who').value;
-    const lot=LOTTERIES[getSelectedScanner().lotKey];
-    document.getElementById('scanner-who-confirm').innerHTML=
-      `<strong>${who}</strong> · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}`;
-    document.getElementById('scanner-preview-box').style.display='block';
-    document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
-  };
-  reader.readAsDataURL(file);
-  input.value='';
-}
-
-function saveBoleto(){
-  const {lotKey,who}=getSelectedScanner();
-  const lot=LOTTERIES[lotKey];
-  const imgData=window._scanImgData||null;
-  const members=getSavedMembers()||CFG.members;
-  const boleto={
-    lotKey,lot:lot.name,who,
-    members:members.map(m=>getMemberID(m)), // snapshot con DNI si disponible
-    fecha:new Date().toLocaleDateString('es-ES'),
-    hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
-    img:imgData, // foto del boleto
-    id:Date.now()
-  };
-  const key=`lg_boletos_${CFG.name}`;
-  const saved=JSON.parse(localStorage.getItem(key)||'[]');
-  saved.push(boleto);
-  localStorage.setItem(key,JSON.stringify(saved));
-  document.getElementById('scanner-preview-box').style.display='none';
-  window._scanImgData=null;
-  renderBoletos();
-  showToast('✅ Boleto registrado');
-}
-
-function renderBoletos(){
-  const key=`lg_boletos_${CFG.name}`;
-  const saved=JSON.parse(localStorage.getItem(key)||'[]');
-  const list=document.getElementById('scanner-saved-list');
-  const empty=document.getElementById('scanner-empty');
-  if(!saved.length){list.innerHTML='';empty.style.display='block';return;}
-  empty.style.display='none';
-  list.innerHTML='';
-  [...saved].reverse().forEach(b=>{
-    const div=document.createElement('div');div.className='boleto-item';
-    const membersStr=b.members?b.members.join(', '):(b.who||'—');
-    div.innerHTML=`
-      <div class="boleto-header">
-        <div>
-          <div class="boleto-name">${b.lot}</div>
-          <div class="boleto-date">Comprado por <strong>${b.who}</strong> · ${b.fecha} ${b.hora||''}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Jugadores: ${membersStr}</div>
-        </div>
-        <button class="boleto-del" onclick="deleteBoleto(${b.id})">✕</button>
-      </div>
-      ${b.img?`<img src="${b.img}" style="width:100%;border-radius:8px;margin-top:8px;max-height:200px;object-fit:contain;cursor:pointer;" onclick="this.style.maxHeight=this.style.maxHeight==='none'?'200px':'none'">`:
-        '<div style="font-size:11px;color:var(--text3);margin-top:4px;">Sin foto adjunta</div>'}`;
-    list.appendChild(div);
-  });
-}
-
-function deleteBoleto(id){
-  const key=`lg_boletos_${CFG.name}`;
-  const saved=JSON.parse(localStorage.getItem(key)||'[]').filter(b=>b.id!==id);
-  localStorage.setItem(key,JSON.stringify(saved));
-  renderBoletos();
-  showToast('Boleto eliminado');
 }
 
 // ── UI ────────────────────────────────────────────────────────────────────────
