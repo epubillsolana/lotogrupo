@@ -766,7 +766,7 @@ async function fetchDraw(lotKey){
     const s=arr[0];
     const f=s.fecha_sorteo.replace(/\s.*/,''); // remove time part
     const fecha=`${f.slice(6,8)}/${f.slice(4,6)}/${f.slice(0,4)}`;
-    const comb=s.combinacion.trim().split(/[\s\-]+/).map(Number).filter(n=>!isNaN(n)&&n>0);
+    const comb=s.combinacion.match(/\d+/g).map(Number).filter(n=>n>0);
     const numeros=comb.slice(0,lot.mainCount).sort((a,b)=>a-b);
     const estrellas=comb.slice(lot.mainCount,lot.mainCount+lot.starCount).sort((a,b)=>a-b);
     if(numeros.length===lot.mainCount&&estrellas.length===lot.starCount){
