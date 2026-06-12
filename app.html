@@ -395,12 +395,14 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <div class="section" id="tab-scanner">
     <div class="card">
       <div class="card-label">📷 Fotografiar boleto</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Haz una foto al boleto como prueba de compra. Queda registrado quién juega y cuándo se compró.</p>
-      <div id="scanner-loteria-selector" style="margin-bottom:12px;"></div>
-      <div style="margin-bottom:10px;">
-        <div style="font-size:12px;color:var(--text3);margin-bottom:6px;">¿Quién ha comprado el boleto?</div>
-        <select id="scan-who" style="width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;-webkit-appearance:none;"></select>
-      </div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Haz una foto al boleto como prueba de compra. Queda registrado quién juega y cuándo se compró.</p>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Lotería</div>
+      <div id="scanner-loteria-selector" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién ha comprado el boleto?</div>
+      <div id="scan-who-list" style="margin-bottom:14px;"></div>
+
       <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;">📷 Hacer foto al boleto</button>
       <button onclick="openGallery()" class="btn btn-gray">🖼️ Elegir foto de galería</button>
       <input type="file" id="scanner-file" accept="image/*" capture="environment" style="display:none;" onchange="processImage(this)">
@@ -1271,6 +1273,7 @@ function buildMembers(){
     const row=document.createElement('div');
     row.style.cssText='display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:.5px solid var(--border);';
     const avatar=getAvatar(m)||'😀';
+    const dni=getDNI(m);
     row.innerHTML=`
       <span style="font-size:28px;flex-shrink:0;cursor:pointer;" onclick="openAvatarPopup('${m}')">${avatar}</span>
       <div style="flex:1;">
@@ -1278,6 +1281,12 @@ function buildMembers(){
         <input id="member-name-input-${i}" type="text" value="${m}" maxlength="20"
           style="display:none;width:100%;padding:6px 10px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:14px;font-family:inherit;outline:none;"
           onkeydown="if(event.key==='Enter')saveMemberName(${i})">
+        <div style="display:flex;align-items:center;gap:6px;margin-top:4px;">
+          <span style="font-size:11px;color:var(--text3);">DNI (últimos 4):</span>
+          <input type="text" maxlength="4" placeholder="----" value="${dni}"
+            style="width:48px;padding:2px 6px;border-radius:6px;border:1px solid var(--border2);background:var(--surface2);font-size:12px;font-family:inherit;text-align:center;outline:none;"
+            onchange="saveDNI('${m}',this.value)" oninput="this.value=this.value.replace(/[^0-9A-Za-z]/g,'').toUpperCase()">
+        </div>
       </div>
       <div style="display:flex;gap:6px;">
         <button onclick="toggleEditMember(${i})" id="member-edit-btn-${i}"
@@ -1459,6 +1468,17 @@ function addMemberFromGrupo(){
   showToast(`✅ ${name} añadido · Bizum ${bizum}€`);
 }
 
+// ── DNI ───────────────────────────────────────────────────────────────────────
+function getDNI(name){return localStorage.getItem(`lg_dni_${CFG.name}_${name}`)||'';}
+function saveDNI(name,val){
+  if(val) localStorage.setItem(`lg_dni_${CFG.name}_${name}`,val.toUpperCase());
+  else localStorage.removeItem(`lg_dni_${CFG.name}_${name}`);
+}
+function getMemberID(name){
+  const dni=getDNI(name);
+  return dni?`${name} (DNI: ***${dni})`:name;
+}
+
 // ── EDIT NAME ─────────────────────────────────────────────────────────────────
 function getGroupName(){return localStorage.getItem(`lg_name_${CFG.name._orig||CFG.name}`)||CFG.name;}
 
@@ -1503,41 +1523,62 @@ function saveName(){
 
 // ── SCANNER ───────────────────────────────────────────────────────────────────
 function buildScannerWhoSelect(){
-  const sel=document.getElementById('scan-who');
-  if(!sel) return;
+  const container=document.getElementById('scan-who-list');
+  if(!container) return;
   const members=getSavedMembers()||CFG.members;
-  sel.innerHTML=members.map(m=>`<option>${m}</option>`).join('');
-  // Default to current payer
-  const idx=getCurrentPayerIdx()%members.length;
-  sel.value=members[idx];
+  const payerIdx=getCurrentPayerIdx()%members.length;
+  container.innerHTML='';
+  container._selected=members[payerIdx];
+  members.forEach((m,i)=>{
+    const btn=document.createElement('button');
+    const isDefault=i===payerIdx;
+    btn.style.cssText=`padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid ${isDefault?'var(--primary)':'var(--border2)'};background:${isDefault?'var(--primary)':'var(--surface2)'};color:${isDefault?'#fff':'var(--text2)'};margin-right:6px;margin-bottom:6px;`;
+    const avatar=getAvatar(m)||'😀';
+    btn.textContent=avatar+' '+m;
+    btn.onclick=()=>{
+      container.querySelectorAll('button').forEach(b=>{
+        b.style.background='var(--surface2)';b.style.color='var(--text2)';b.style.borderColor='var(--border2)';
+      });
+      btn.style.background='var(--primary)';btn.style.color='#fff';btn.style.borderColor='var(--primary)';
+      container._selected=m;
+    };
+    container.appendChild(btn);
+  });
+}
+
+function getSelectedScanner(){
+  const lotEl=document.getElementById('scanner-loteria-selector');
+  const whoEl=document.getElementById('scan-who-list');
+  return{
+    lotKey:lotEl?._selected||CFG?.lotteries[0]?.lottery,
+    who:whoEl?._selected||(getSavedMembers()||CFG.members)[0]
+  };
 }
 
 function buildScannerLotSelector(){
   const el=document.getElementById('scanner-loteria-selector');
   if(!el||!CFG) return;
-  if(CFG.lotteries.length===1){
-    el.innerHTML='';
-    el._selected=CFG.lotteries[0].lottery;
-    return;
-  }
-  el.innerHTML='<div style="font-size:12px;color:var(--text3);margin-bottom:6px;">¿Para qué lotería es el boleto?</div>';
+  el.innerHTML='';
+  el._selected=CFG.lotteries[0].lottery;
   CFG.lotteries.forEach(l=>{
     const lot=LOTTERIES[l.lottery];
     const btn=document.createElement('button');
-    btn.style.cssText='padding:6px 14px;border-radius:99px;margin-right:6px;margin-bottom:6px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text2);';
+    const isFirst=l===CFG.lotteries[0];
+    btn.style.cssText=`padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid ${isFirst?'var(--primary)':'var(--border2)'};background:${isFirst?'var(--primary)':'var(--surface2)'};color:${isFirst?'#fff':'var(--text2)'};`;
     btn.textContent=lot.emoji+' '+lot.name;
+    btn.dataset.lot=l.lottery;
     btn.onclick=()=>{
-      el.querySelectorAll('button').forEach(b=>{ b.style.background='var(--surface2)';b.style.color='var(--text2)';});
-      btn.style.background='var(--primary)';btn.style.color='#fff';
+      el.querySelectorAll('button').forEach(b=>{
+        b.style.background='var(--surface2)';b.style.color='var(--text2)';b.style.borderColor='var(--border2)';
+      });
+      btn.style.background='var(--primary)';btn.style.color='#fff';btn.style.borderColor='var(--primary)';
       el._selected=l.lottery;
     };
     el.appendChild(btn);
   });
-  // Select first by default
-  el.querySelector('button')?.click();
 }
 
-function getSelectedScannerLot(){
+function getSelectedScanner().lotKey{
   const el=document.getElementById('scanner-loteria-selector');
   return el?._selected||CFG?.lotteries[0]?.lottery;
 }
@@ -1560,7 +1601,7 @@ function processImage(input){
     // Store image data for saving
     window._scanImgData=e.target.result;
     const who=document.getElementById('scan-who').value;
-    const lot=LOTTERIES[getSelectedScannerLot()];
+    const lot=LOTTERIES[getSelectedScanner().lotKey];
     document.getElementById('scanner-who-confirm').innerHTML=
       `<strong>${who}</strong> · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}`;
     document.getElementById('scanner-preview-box').style.display='block';
@@ -1571,14 +1612,13 @@ function processImage(input){
 }
 
 function saveBoleto(){
-  const lotKey=getSelectedScannerLot();
+  const {lotKey,who}=getSelectedScanner();
   const lot=LOTTERIES[lotKey];
-  const who=document.getElementById('scan-who').value;
   const imgData=window._scanImgData||null;
   const members=getSavedMembers()||CFG.members;
   const boleto={
     lotKey,lot:lot.name,who,
-    members:[...members], // snapshot de quién jugaba
+    members:members.map(m=>getMemberID(m)), // snapshot con DNI si disponible
     fecha:new Date().toLocaleDateString('es-ES'),
     hora:new Date().toLocaleTimeString('es-ES',{hour:'2-digit',minute:'2-digit'}),
     img:imgData, // foto del boleto
