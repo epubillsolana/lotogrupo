@@ -750,8 +750,13 @@ function getCurrentPayerIdx(){
 async function fetchDraw(lotKey){
   const lot=LOTTERIES[lotKey];
   try{
-    const r=await fetch('https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=EMIL&celebrados=true&num=1&_='+Date.now(),
-      {cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
+    const now=new Date();
+    const pad=n=>String(n).padStart(2,'0');
+    const dateStr=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
+    const weekAgo=new Date(now-7*24*3600*1000);
+    const dateFrom=`${weekAgo.getFullYear()}${pad(weekAgo.getMonth()+1)}${pad(weekAgo.getDate())}`;
+    const url=`https://www.loteriasyapuestas.es/servicios/buscadorSorteos?game_id=EMIL&celebrados=true&num=1&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
+    const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw new Error();
     const arr=await r.json();
     if(!arr||!arr.length) throw new Error();
