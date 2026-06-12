@@ -268,10 +268,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       <div class="result-emoji">🎉</div>
       <div class="result-title" id="res-title">¡Peña creada!</div>
       <div class="result-badges" id="res-badges"></div>
-      <div class="result-sub">Comparte este enlace con tu grupo.<br>Cada miembro lo añade a la pantalla de inicio.</div>
-      <div class="result-link-box" id="res-link">—</div>
+      <div class="result-sub">Comparte con tu grupo por WhatsApp.<br>Cada miembro lo añade a la pantalla de inicio.</div>
       <button class="btn-wa-big" onclick="shareWA()">📲 COMPARTIR POR WHATSAPP</button>
       <button class="btn-copy-big" onclick="copyLink()">📋 COPIAR ENLACE</button>
+      <div style="margin-top:12px;font-size:11px;color:#9CA3AF;text-align:center;">El enlace contiene toda la configuración de tu peña</div>
     </div>
   </div>
 
@@ -295,6 +295,23 @@ const LOTS={
 const AVG_BG=['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];
 const AVG_FG=['#0C447C','#3B6D11','#854F0B','#7A2443','#534AB7','#1B6B4E','#A0430A','#6B2E90'];
 const LIGHT_COLORS=['#90C4F0','#95D5B2','#FAC980'];
+
+const SUPA_URL='https://yvlgnjfjpevusokegjbm.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bGduamZqcGV2dXNva2VnamJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMjQxMjIsImV4cCI6MjA5NjgwMDEyMn0.MUqSaOJU69gT4r8AegtUtRXwZd7eDBY2IWeoMMddXVA';
+
+async function supaFetch(path, method='GET', body=null){
+  const opts={method,headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'}};
+  if(body) opts.body=JSON.stringify(body);
+  const r=await fetch(SUPA_URL+path,opts);
+  return r;
+}
+
+function toSlug(name){
+  return name.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g,'')
+    .replace(/[^a-z0-9]+/g,'-')
+    .replace(/^-+|-+$/g,'');
+}
 
 let step=1, groupColor='#0A1F0F', selLotteries=['euromillones'];
 let lotIdx=0, lotConfigs=[], selMain=new Set(), selStars=new Set(), apuestaType='sencilla';
@@ -435,16 +452,40 @@ function goNext(){
 }
 function goBack(){if(typeof step==='number'&&step>1)step--;updateUI();window.scrollTo(0,0);}
 
-function createGroup(){
-  const cfg={name:document.getElementById('f-name').value.trim(),color:groupColor,lotteries:lotConfigs,members,ticketCost:parseFloat(document.getElementById('f-cost').value)||20,bizum:parseFloat(document.getElementById('f-bizum').value)||4,rotation:rotType,drawsPerTurn:rotType==='draws'?parseInt(document.getElementById('f-draws').value)||4:2,epoch:new Date().toISOString()};
-  const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
-  _link=`${window.location.origin}${window.location.pathname.replace('crear.html','')}app.html#${encoded}`;
-  document.getElementById('res-title').textContent=`¡${cfg.name} lista!`;
+async function createGroup(){
+  const name=document.getElementById('f-name').value.trim();
+  const cfg={name,color:groupColor,lotteries:lotConfigs,members,ticketCost:parseFloat(document.getElementById('f-cost').value)||20,bizum:parseFloat(document.getElementById('f-bizum').value)||4,rotation:rotType,drawsPerTurn:rotType==='draws'?parseInt(document.getElementById('f-draws').value)||4:2,epoch:new Date().toISOString()};
+  
+  const btn=document.getElementById('btn-next');
+  btn.textContent='Creando...';btn.disabled=true;
+  const slug=toSlug(name);
+  
+  try{
+    // Check if slug exists
+    const check=await supaFetch(`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}&select=slug`);
+    const existing=await check.json();
+    if(existing&&existing.length>0){
+      toast(`Ya existe un grupo llamado "${name}". Elige otro nombre.`);
+      btn.textContent='🎰 CREAR MI PEÑA';btn.disabled=false;
+      return;
+    }
+    // Save to Supabase
+    const save=await supaFetch('/rest/v1/grupos','POST',{slug,config:cfg});
+    if(!save.ok) throw new Error();
+    _link=`https://lotogrupo.es/app.html?g=${slug}`;
+  }catch(e){
+    // Fallback to hash
+    const encoded=btoa(unescape(encodeURIComponent(JSON.stringify(cfg))));
+    _link=`https://lotogrupo.es/app.html#${encoded}`;
+  }
+  
+  document.getElementById('res-title').textContent=`¡${name} lista!`;
   const rb=document.getElementById('res-badges');
   rb.innerHTML=lotConfigs.map(c=>`<span style="background:#EAF3DE;color:#3B6D11;border-radius:99px;padding:5px 14px;font-size:13px;font-weight:700;">${LOTS[c.lottery].emoji} ${LOTS[c.lottery].name}</span>`).join('');
   document.getElementById('res-link').textContent=_link;
   step='result';updateUI();window.scrollTo(0,0);
 }
+
 function copyLink(){navigator.clipboard.writeText(_link).then(()=>toast('✅ Enlace copiado')).catch(()=>toast('Copia el enlace manualmente'));}
 function shareWA(){
   const name=document.getElementById('res-title').textContent.replace('¡','').replace(' lista!','');

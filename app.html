@@ -412,6 +412,14 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <script>
 // ── CONFIG ────────────────────────────────────────────────────────────────────
+const SUPA_URL='https://yvlgnjfjpevusokegjbm.supabase.co';
+const SUPA_KEY='eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6Inl2bGduamZqcGV2dXNva2VnamJtIiwicm9sZSI6ImFub24iLCJpYXQiOjE3ODEyMjQxMjIsImV4cCI6MjA5NjgwMDEyMn0.MUqSaOJU69gT4r8AegtUtRXwZd7eDBY2IWeoMMddXVA';
+
+async function supaFetch(path){
+  const r=await fetch(SUPA_URL+path,{headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}});
+  return r;
+}
+
 let CFG=null;
 const LOTTERIES={
   euromillones:{name:'Euromillones',emoji:'🌟',mainCount:5,mainMax:50,starCount:2,starMax:12,starLabel:'Estrellas',
@@ -462,14 +470,31 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
-function loadConfig(){
+async function loadConfig(){
+  const params=new URLSearchParams(window.location.search);
+  const slug=params.get('g');
   const hash=window.location.hash.slice(1);
-  if(hash){
+
+  if(slug){
+    // Load from Supabase
+    try{
+      const r=await supaFetch(`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}&select=config`);
+      const data=await r.json();
+      if(data&&data.length>0){
+        CFG=data[0].config;
+        localStorage.setItem('lg_config_'+slug,JSON.stringify(CFG));
+      }
+    }catch(e){}
+    // Fallback to localStorage
+    if(!CFG){const s=localStorage.getItem('lg_config_'+slug);if(s)try{CFG=JSON.parse(s);}catch(e){}}
+  }else if(hash){
+    // Legacy hash format
     try{CFG=JSON.parse(decodeURIComponent(escape(atob(hash))));localStorage.setItem('lg_config',JSON.stringify(CFG));}
     catch(e){const s=localStorage.getItem('lg_config');if(s)try{CFG=JSON.parse(s);}catch(e2){}}
   }else{
     const s=localStorage.getItem('lg_config');if(s)try{CFG=JSON.parse(s);}catch(e){}
   }
+
   if(!CFG||!CFG.members){document.getElementById('setup-screen').style.display='flex';return;}
   document.getElementById('main-app').style.display='block';
   initApp();
