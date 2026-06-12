@@ -601,54 +601,50 @@ function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
 async function loadConfig(){
-  window.onerror=function(msg,src,line){
-    document.querySelector('.setup-sub').innerHTML='<span style="color:red;font-size:11px;">'+msg+' (line '+line+')</span>';
-    return true;
-  };
-  const params=new URLSearchParams(window.location.search);
-  const slug=params.get('g');
+  const showErr=msg=>document.querySelector('.setup-sub').innerHTML='<span style="color:red;font-size:11px;">'+msg+'</span>';
+  const slug=new URLSearchParams(window.location.search).get('g');
   const hash=window.location.hash.slice(1);
 
   if(slug){
-    // Try localStorage first (instant)
-    try{const s=localStorage.getItem('lg_config_'+slug);if(s)CFG=JSON.parse(s);}catch(e){}
-    // Then try Supabase
     try{
       const r=await fetch(SUPA_URL+'/rest/v1/grupos?slug=eq.'+encodeURIComponent(slug)+'&select=config',{
         headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
       });
+      if(!r.ok){showErr('Supabase HTTP '+r.status);return;}
       const data=await r.json();
       if(data&&data.length>0){
         CFG=data[0].config;
         localStorage.setItem('lg_config_'+slug,JSON.stringify(CFG));
+      }else{
+        showErr('Grupo "'+slug+'" no encontrado en BD');
+        return;
       }
-    }catch(e){}
+    }catch(e){
+      // Network error - try localStorage
+      try{const s=localStorage.getItem('lg_config_'+slug);if(s)CFG=JSON.parse(s);}catch(e2){}
+      if(!CFG){showErr('Error red: '+e.message);return;}
+    }
   }else if(hash){
     try{CFG=JSON.parse(decodeURIComponent(escape(atob(hash))));}catch(e){}
-    if(!CFG){try{const s=localStorage.getItem('lg_config');if(s)CFG=JSON.parse(s);}catch(e){}}
+    if(!CFG){showErr('Hash inválido');return;}
   }else{
     try{const s=localStorage.getItem('lg_config');if(s)CFG=JSON.parse(s);}catch(e){}
+    if(!CFG){showErr('Sin slug ni hash');return;}
   }
 
-
-  if(!CFG||!CFG.members){
-    document.getElementById('setup-screen').style.display='flex';
-    return;
-  }
+  if(!CFG||!CFG.members){showErr('CFG sin members');return;}
 
   try{
     initApp();
     document.getElementById('setup-screen').style.display='none';
     document.getElementById('main-app').style.display='block';
+    const obKey='lg_ob_'+(CFG.name||'');
+    if(!localStorage.getItem(obKey)){
+      try{document.getElementById('ob-group-name').textContent=CFG.name;}catch(e){}
+      document.getElementById('onboarding-screen').style.display='flex';
+    }
   }catch(err){
-    document.getElementById('setup-screen').style.display='flex';
-    document.querySelector('.setup-sub').innerHTML='<span style="color:red;font-size:13px;">'+err.message+'<br>'+err.stack?.split('\n')[1]+'</span>';
-  }
-
-  const obKey='lg_ob_'+(CFG.name||'');
-  if(!localStorage.getItem(obKey)){
-    try{document.getElementById('ob-group-name').textContent=CFG.name;}catch(e){}
-    document.getElementById('onboarding-screen').style.display='flex';
+    showErr('initApp error: '+err.message);
   }
 }
 
