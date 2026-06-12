@@ -221,7 +221,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 </head>
 <body>
 
-<div id="setup-screen" style="display:flex;" class="setup">
+<div id="setup-screen" style="display:none;" class="setup">
   <div class="setup-emoji">🎰</div>
   <div class="setup-title">LotoGrupo</div>
   <div class="setup-sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
@@ -598,7 +598,6 @@ async function loadConfig(){
     document.getElementById('setup-screen').style.display='flex';
     return;
   }
-  document.getElementById('setup-screen').style.display='none';
   document.getElementById('main-app').style.display='block';
   initApp();
 }
@@ -1578,7 +1577,7 @@ function buildScannerLotSelector(){
   });
 }
 
-function getSelectedScanner().lotKey{
+function getSelectedScannerLot(){
   const el=document.getElementById('scanner-loteria-selector');
   return el?._selected||CFG?.lotteries[0]?.lottery;
 }
