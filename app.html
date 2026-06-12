@@ -598,14 +598,14 @@ function showTutorial(){
   function render(){
     const s=steps[step];const isLast=step===steps.length-1;
     const dots=steps.map((_,i)=>`<div style="width:${i===step?22:7}px;height:7px;border-radius:4px;background:${i===step?s.color:'#E5E7EB'};transition:all .3s;"></div>`).join('');
-    overlay.innerHTML=`<div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;width:100%;max-width:480px;">
+    overlay.innerHTML=`<div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;width:100%;max-width:480px;"><div style="text-align:center;font-size:12px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">¡Tutorial obligatorio! 🎉</div>
       <div style="display:flex;justify-content:center;gap:5px;margin-bottom:28px;">${dots}</div>
       <div style="width:80px;height:80px;border-radius:24px;background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">${s.emoji}</div>
       ${s.tab?`<div style="text-align:center;margin-bottom:8px;"><span style="background:${s.bg};color:${s.color};border-radius:99px;padding:4px 14px;font-size:12px;font-weight:700;">${s.tab}</span></div>`:''}
       <div style="text-align:center;font-size:22px;font-weight:900;color:#1A1A18;margin-bottom:10px;">${s.title}</div>
       <div style="text-align:center;font-size:15px;color:#6B7280;line-height:1.6;margin-bottom:32px;white-space:pre-line;">${s.desc}</div>
       <button onclick="window._tNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
-      ${step===0?'<button onclick="window._tSkip()" style="width:100%;padding:10px;background:none;border:none;color:#9CA3AF;font-size:14px;cursor:pointer;">Saltar</button>':''}
+
     </div>`;
   }
   window._tNext=()=>{if(step<steps.length-1){step++;render();}else window._tSkip();};
