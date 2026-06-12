@@ -221,17 +221,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 </head>
 <body>
 
-<!-- Loading indicator shown immediately -->
-<div id="loading-screen" style="min-height:100vh;display:flex;align-items:center;justify-content:center;background:#0A1F0F;flex-direction:column;gap:16px;">
-  <div style="font-size:48px;">🎰</div>
-  <div style="font-family:-apple-system,sans-serif;font-size:18px;font-weight:700;color:#fff;">LotoGrupo</div>
-  <div style="width:40px;height:4px;background:rgba(255,255,255,0.2);border-radius:2px;overflow:hidden;">
-    <div style="height:100%;background:#FF8C00;animation:ld 1.5s ease-in-out infinite;" id="ld-bar"></div>
-  </div>
-  <style>@keyframes ld{0%{width:0;margin-left:0}50%{width:100%;margin-left:0}100%{width:0;margin-left:100%}}</style>
-</div>
-
-<div id="setup-screen" style="display:none;" class="setup">
+<div id="setup-screen" style="display:flex;" class="setup">
   <div class="setup-emoji">🎰</div>
   <div class="setup-title">LotoGrupo</div>
   <div class="setup-sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
@@ -611,59 +601,48 @@ function showToast(msg){toast(msg);}
 
 // ── LOAD CONFIG ───────────────────────────────────────────────────────────────
 async function loadConfig(){
-  try{
   const params=new URLSearchParams(window.location.search);
   const slug=params.get('g');
   const hash=window.location.hash.slice(1);
 
   if(slug){
-    // Try Supabase with timeout
     try{
-      const controller=new AbortController();
-      setTimeout(()=>controller.abort(),5000);
-      const r=await fetch(SUPA_URL+`/rest/v1/grupos?slug=eq.${encodeURIComponent(slug)}&select=config`,{
-        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY},
-        signal:controller.signal
+      const r=await fetch(SUPA_URL+'/rest/v1/grupos?slug=eq.'+encodeURIComponent(slug)+'&select=config',{
+        headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
       });
       const data=await r.json();
       if(data&&data.length>0){
         CFG=data[0].config;
         localStorage.setItem('lg_config_'+slug,JSON.stringify(CFG));
       }
-    }catch(e){console.warn('Supabase error:',e);}
-    // Fallback localStorage
+    }catch(e){}
     if(!CFG){
-      const s=localStorage.getItem('lg_config_'+slug);
-      if(s)try{CFG=JSON.parse(s);}catch(e){}
+      try{const s=localStorage.getItem('lg_config_'+slug);if(s)CFG=JSON.parse(s);}catch(e){}
     }
   }else if(hash){
-    try{CFG=JSON.parse(decodeURIComponent(escape(atob(hash))));localStorage.setItem('lg_config',JSON.stringify(CFG));}
-    catch(e){const s=localStorage.getItem('lg_config');if(s)try{CFG=JSON.parse(s);}catch(e2){}}
+    try{CFG=JSON.parse(decodeURIComponent(escape(atob(hash))));}catch(e){}
+    if(!CFG){try{const s=localStorage.getItem('lg_config');if(s)CFG=JSON.parse(s);}catch(e){}}
   }else{
-    const s=localStorage.getItem('lg_config');if(s)try{CFG=JSON.parse(s);}catch(e){}
+    try{const s=localStorage.getItem('lg_config');if(s)CFG=JSON.parse(s);}catch(e){}
   }
 
+
   if(!CFG||!CFG.members){
-    document.getElementById('loading-screen').style.display='none';
     document.getElementById('setup-screen').style.display='flex';
     return;
   }
-  // Always show main-app
-  document.getElementById('loading-screen').style.display='none';
+
+  document.getElementById('setup-screen').style.display='none';
   document.getElementById('main-app').style.display='block';
   initApp();
-  // Show onboarding on top if first time
-  const obKey=`lg_ob_${CFG.name}`;
+
+  const obKey='lg_ob_'+(CFG.name||'');
   if(!localStorage.getItem(obKey)){
-    document.getElementById('ob-group-name').textContent=CFG.name;
+    try{document.getElementById('ob-group-name').textContent=CFG.name;}catch(e){}
     document.getElementById('onboarding-screen').style.display='flex';
   }
-  }catch(err){
-    console.error('loadConfig failed:',err);
-    const loading=document.getElementById('loading-screen');
-    if(loading) loading.innerHTML=`<div style="font-family:-apple-system,sans-serif;color:#fff;text-align:center;padding:24px;"><div style="font-size:40px;margin-bottom:12px;">😅</div><div style="font-size:16px;font-weight:700;margin-bottom:8px;">Error: ${err.message}</div><button onclick="location.reload()" style="padding:12px 24px;border-radius:99px;background:#FF8C00;color:#0A1F0F;border:none;font-size:15px;font-weight:700;cursor:pointer;">Reintentar</button></div>`;
-  }
 }
+
 
 // ── INIT ──────────────────────────────────────────────────────────────────────
 function initApp(){
@@ -710,16 +689,15 @@ function initApp(){
     });
   }
   // Init all draws
-  initAllDraws();
+  initAllDraws().catch(e=>console.warn(e));
   initTabbarFade();
-  buildTurns();
-  buildBizumConfirm();
-  buildWABizum();
-  buildMembers();
-  renderHistory();
-  renderGroupName();
-  renderImportes();
-  restoreWho();
+  try{buildTurns();}catch(e){console.warn(e);}
+  buildBizumConfirm().catch(()=>{});
+  try{buildMembers();}catch(e){console.warn(e);}
+  renderHistory().catch(()=>{});
+  try{renderGroupName();}catch(e){}
+  try{renderImportes();}catch(e){}
+  try{restoreWho();}catch(e){};
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()=>{});
   track('apertura',{members:CFG.members.length,lotteries:CFG.lotteries.map(l=>l.lottery)});
 }
@@ -1109,6 +1087,10 @@ function buildTurns(){
 }
 
 // ── BIZUM CONFIRM (Supabase sync) ────────────────────────────────────────────
+function getBizumState(){
+  try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}
+}
+
 function getSlug(){
   return new URLSearchParams(window.location.search).get('g')||CFG.name.toLowerCase().replace(/[^a-z0-9]+/g,'-');
 }
@@ -1207,7 +1189,14 @@ async function toggleBizum(name,btn){
 }
 
 function buildWABizum(state,payer,others){
-  if(!state||!payer||!others) return;
+  if(!state||!payer||!others){
+    // Called without args - load from localStorage sync
+    const members=getSavedMembers()||CFG?.members||[];
+    const payerIdx=getCurrentPayerIdx()%members.length;
+    payer=members[payerIdx];
+    others=members.filter((_,i)=>i!==payerIdx);
+    state=getBizumState();
+  }
   const done=others.filter(m=>state[m]);
   const pending=others.filter(m=>!state[m]);
   const sep='─'.repeat(24);
