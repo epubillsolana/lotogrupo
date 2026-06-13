@@ -366,6 +366,175 @@ const LOTS={
   primitiva:{emoji:'🍀',name:'Primitiva',mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
   bonoloto:{emoji:'🎱',name:'Bonoloto',mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
 };
+// ── I18N ─────────────────────────────────────────────────────────────────────
+const TC={
+  es:{
+    step1_eyebrow:'Tu peña',step1_title:'¿Cómo se llama<br>vuestro grupo?',
+    nombre_grupo_lbl:'Nombre del grupo',color_grupo:'Color del grupo',
+    a_que_jugais:'¿A qué jugáis? (puedes elegir varias)',
+    configura_cada:'Configura cada una por separado en el siguiente paso.',
+    step2_title:'¿Cómo jugáis<br>vuestro boleto?',tipo_apuesta:'Tipo de apuesta',
+    apuesta_sencilla:'Sencilla',apuesta_sencilla_desc:'Una combinación fija. La más habitual en grupos.',
+    apuesta_multiple:'Múltiple',apuesta_multiple_desc:'Más números, más combinaciones automáticas.',
+    step3_eyebrow:'El equipo',step3_title:'¿Quiénes jugáis<br>en el grupo?',
+    primer_pagador:'El primero de la lista será el primer pagador.',
+    step4_eyebrow:'Organización',step4_title:'Casi listos 🎯',
+    coste_total:'Coste total boleto',bizum_persona:'Bizum/persona',
+    quien_tira:'¿Quién tira la quiniela?',
+    va_rotando:'Va rotando',miembros_turnan:'Los miembros se turnan',
+    siempre_mismo:'Siempre el mismo',persona_siempre:'Una persona compra siempre',
+    quien_compra:'¿Quién compra siempre?',sorteos_turno:'Sorteos por turno',
+    quien_empieza:'¿Quién empieza tirando?',ya_jugado:'¿Ya habéis jugado antes?',
+    loterias_conf:'Loterías configuradas',
+    result_sub:'Comparte con tu grupo por WhatsApp.<br>Cada miembro lo añade a la pantalla de inicio.',
+    btn_siguiente:'SIGUIENTE →',btn_crear:'🎰 CREAR MI PEÑA',
+    paso_de:'Paso',de:'de',lista:'¡Lista!',
+    nombre_ph:'Ej: Los afortunados...',miembro_ph:'Nombre del miembro...',
+    anadir:'+ Añadir',primer_payer:'Primer pagador',miembro:'Miembro',
+    empezamos_now:'Empezamos ahora',ya_hemos:'Ya hemos jugado',
+    flag:'ES',
+    color_azul:'Azul',color_verde:'Verde',color_naranja:'Naranja',
+    btn_frecuentes:'📊 Frecuentes',btn_aleatorio:'🎲 Aleatorio',
+    desc_frecuentes:'Números que más han salido en los últimos 12 meses en cada lotería',
+    desc_aleatorio:'Selección completamente al azar dentro del rango válido',
+    cancelar_lbl:'Cancelar',
+    elige_loteria:'Elige al menos una lotería',escribe_nombre:'Escribe el nombre del grupo',
+    elige_min:'Elige al menos',numeros_lbl:'números',escribe_nombre_m:'Escribe un nombre',
+    nombre_existe:'Ese nombre ya existe',max_miembros:'Máximo 12 miembros',
+    enlace_copiado:'Enlace copiado',grupo_existe:'Ya existe. Elige otro nombre.',
+    creando:'Creando...',max_nums:'Máximo',
+  },
+  ca:{
+    step1_eyebrow:'La teva penya',step1_title:'Com es diu<br>el vostre grup?',
+    nombre_grupo_lbl:'Nom del grup',color_grupo:'Color del grup',
+    a_que_jugais:'A què jugueu? (podeu triar diverses)',
+    configura_cada:'Configura cada una per separat al pas següent.',
+    step2_title:'Com jugueu<br>el vostre bitllet?',tipo_apuesta:'Tipus d\'aposta',
+    apuesta_sencilla:'Senzilla',apuesta_sencilla_desc:'Una combinació fixa. La més habitual en grups.',
+    apuesta_multiple:'Múltiple',apuesta_multiple_desc:'Més números, més combinacions automàtiques.',
+    step3_eyebrow:'L\'equip',step3_title:'Qui juga<br>al grup?',
+    primer_pagador:'El primer de la llista serà el primer pagador.',
+    step4_eyebrow:'Organització',step4_title:'Quasi a punt 🎯',
+    coste_total:'Cost total bitllet',bizum_persona:'Bizum/persona',
+    quien_tira:'Qui compra el bitllet?',
+    va_rotando:'Va rotant',miembros_turnan:'Els membres es van tornant',
+    siempre_mismo:'Sempre el mateix',persona_siempre:'Una persona compra sempre',
+    quien_compra:'Qui compra sempre?',sorteos_turno:'Sorteigs per torn',
+    quien_empieza:'Qui comença comprant?',ya_jugado:'Ja heu jugat abans?',
+    loterias_conf:'Loteries configurades',
+    result_sub:'Comparteix amb el teu grup per WhatsApp.<br>Cada membre l\'afegeix a la pantalla d\'inici.',
+    btn_siguiente:'SEGÜENT →',btn_crear:'🎰 CREAR LA MEVA PENYA',
+    paso_de:'Pas',de:'de',lista:'Llesta!',
+    nombre_ph:'Ex: Els afortunats...',miembro_ph:'Nom del membre...',
+    anadir:'+ Afegir',primer_payer:'Primer pagador',miembro:'Membre',
+    empezamos_now:'Comencem ara',ya_hemos:'Ja hem jugat',
+    flag:'CA',
+    color_azul:'Blau',color_verde:'Verd',color_naranja:'Taronja',
+    btn_frecuentes:'📊 Freqüents',btn_aleatorio:'🎲 Aleatori',
+    desc_frecuentes:'Números que han sortit més els últims 12 mesos a cada loteria',
+    desc_aleatorio:'Selecció completament a l\'atzar dins el rang vàlid',
+    cancelar_lbl:'Cancel·lar',
+    elige_loteria:'Tria almenys una loteria',escribe_nombre:'Escriu el nom del grup',
+    elige_min:'Tria almenys',numeros_lbl:'números',escribe_nombre_m:'Escriu un nom',
+    nombre_existe:'Aquest nom ja existeix',max_miembros:'Màxim 12 membres',
+    enlace_copiado:'Enllaç copiat',grupo_existe:'Ja existeix. Tria un altre nom.',
+    creando:'Creant...',max_nums:'Màxim',
+  },
+  en:{
+    step1_eyebrow:'Your group',step1_title:'What\'s your<br>group called?',
+    nombre_grupo_lbl:'Group name',color_grupo:'Group color',
+    a_que_jugais:'What do you play? (you can choose several)',
+    configura_cada:'Configure each one separately in the next step.',
+    step2_title:'How do you play<br>your ticket?',tipo_apuesta:'Bet type',
+    apuesta_sencilla:'Simple',apuesta_sencilla_desc:'One fixed combination. Most common in groups.',
+    apuesta_multiple:'Multiple',apuesta_multiple_desc:'More numbers, more automatic combinations.',
+    step3_eyebrow:'The team',step3_title:'Who plays<br>in the group?',
+    primer_pagador:'The first on the list will be the first payer.',
+    step4_eyebrow:'Organisation',step4_title:'Almost ready 🎯',
+    coste_total:'Total ticket cost',bizum_persona:'Payment/person',
+    quien_tira:'Who buys the ticket?',
+    va_rotando:'Rotating',miembros_turnan:'Members take turns',
+    siempre_mismo:'Always the same',persona_siempre:'One person always buys',
+    quien_compra:'Who always buys?',sorteos_turno:'Draws per turn',
+    quien_empieza:'Who starts buying?',ya_jugado:'Have you played before?',
+    loterias_conf:'Configured lotteries',
+    result_sub:'Share with your group on WhatsApp.<br>Each member adds it to their home screen.',
+    btn_siguiente:'NEXT →',btn_crear:'🎰 CREATE MY GROUP',
+    paso_de:'Step',de:'of',lista:'Ready!',
+    nombre_ph:'E.g: The lucky ones...',miembro_ph:'Member name...',
+    anadir:'+ Add',primer_payer:'First payer',miembro:'Member',
+    empezamos_now:'Starting now',ya_hemos:'We\'ve played before',
+    flag:'EN',
+    color_azul:'Blue',color_verde:'Green',color_naranja:'Orange',
+    btn_frecuentes:'📊 Frequent',btn_aleatorio:'🎲 Random',
+    desc_frecuentes:'Numbers drawn most often in the last 12 months for each lottery',
+    desc_aleatorio:'Completely random selection within the valid range',
+    cancelar_lbl:'Cancel',
+    elige_loteria:'Choose at least one lottery',escribe_nombre:'Enter the group name',
+    elige_min:'Choose at least',numeros_lbl:'numbers',escribe_nombre_m:'Enter a name',
+    nombre_existe:'That name already exists',max_miembros:'Maximum 12 members',
+    enlace_copiado:'Link copied',grupo_existe:'Already exists. Choose another name.',
+    creando:'Creating...',max_nums:'Maximum',
+  }
+};function getLang(){return localStorage.getItem('lg_lang')||'es';}
+function tc(key){return TC[getLang()]?.[key]||TC.es[key]||key;}
+
+function openLang(){
+  const lang=getLang();
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  document.getElementById('lang-overlay').classList.add('open');
+  document.getElementById('lang-popup').classList.add('open');
+}
+function closeLang(){
+  document.getElementById('lang-overlay').classList.remove('open');
+  document.getElementById('lang-popup').classList.remove('open');
+}
+function setLang(lang){
+  localStorage.setItem('lg_lang',lang);
+  closeLang();
+  applyLangCrear();
+}
+function applyLangCrear(){
+  const lang=getLang();
+  const T=TC[lang]||TC.es;
+  const langLabel=document.getElementById('lang-label');
+  if(langLabel) langLabel.textContent=T.flag;
+  // Apply data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(T[key]) el.innerHTML=T[key];
+  });
+  // Update placeholders
+  const namePh=document.getElementById('f-name');
+  if(namePh) namePh.placeholder=T.nombre_ph;
+  const memberPh=document.getElementById('new-member');
+  if(memberPh) memberPh.placeholder=T.miembro_ph;
+  // Update buttons - only if step is initialized
+  if(typeof step!=='undefined'){
+    const btnNext=document.getElementById('btn-next');
+    if(btnNext) btnNext.textContent=step===4?T.btn_crear:T.btn_siguiente;
+    // Update radio labels
+    const radios=document.querySelectorAll('input[name="epoch-type"]');
+    if(radios.length>=2){
+      radios[0].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.empezamos_now;});
+      radios[1].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.ya_hemos;});
+    }
+    // Re-render members with translated roles
+    renderMembers();
+  }
+}
+
+// Override renderMembers to use tc()
+const _origRenderMembers=renderMembers;
+function renderMembers(){
+  const list=document.getElementById('member-list');if(!list)return;
+  list.innerHTML='';
+  members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?tc('primer_payer'):tc('miembro')}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
+}
+
+// Apply on load
+applyLangCrear();
+
 const AVG_BG=['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];
 const AVG_FG=['#0C447C','#3B6D11','#854F0B','#7A2443','#534AB7','#1B6B4E','#A0430A','#6B2E90'];
 const LIGHT_COLORS=['#90C4F0','#95D5B2','#FAC980'];
@@ -494,7 +663,8 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 
 function updateUI(){
   const isResult=step==='result';
-  document.getElementById('top-step').textContent=isResult?tc('lista'):`${tc('paso_de')} ${typeof step==='number'?Math.min(step,4):2} ${tc('de')} 4`;
+  const stepLabel=typeof TC!=='undefined'?`${tc('paso_de')} ${typeof step==='number'?Math.min(step,4):2} ${tc('de')} 4`:`Paso ${typeof step==='number'?Math.min(step,4):2} de 4`;
+  document.getElementById('top-step').textContent=isResult?(typeof TC!=='undefined'?tc('lista'):'¡Lista!'):stepLabel;
   document.getElementById('progress-bar').style.width=(isResult?100:Math.min(step,4)*25)+'%';
   document.querySelectorAll('.config-step').forEach(s=>s.classList.remove('active'));
   document.getElementById(isResult?'cs-result':`cs-${step}`).classList.add('active');
@@ -783,171 +953,6 @@ function shareWA(){
 }
 updateUI();
 
-// ── I18N ─────────────────────────────────────────────────────────────────────
-const TC={
-  es:{
-    step1_eyebrow:'Tu peña',step1_title:'¿Cómo se llama<br>vuestro grupo?',
-    nombre_grupo_lbl:'Nombre del grupo',color_grupo:'Color del grupo',
-    a_que_jugais:'¿A qué jugáis? (puedes elegir varias)',
-    configura_cada:'Configura cada una por separado en el siguiente paso.',
-    step2_title:'¿Cómo jugáis<br>vuestro boleto?',tipo_apuesta:'Tipo de apuesta',
-    apuesta_sencilla:'Sencilla',apuesta_sencilla_desc:'Una combinación fija. La más habitual en grupos.',
-    apuesta_multiple:'Múltiple',apuesta_multiple_desc:'Más números, más combinaciones automáticas.',
-    step3_eyebrow:'El equipo',step3_title:'¿Quiénes jugáis<br>en el grupo?',
-    primer_pagador:'El primero de la lista será el primer pagador.',
-    step4_eyebrow:'Organización',step4_title:'Casi listos 🎯',
-    coste_total:'Coste total boleto',bizum_persona:'Bizum/persona',
-    quien_tira:'¿Quién tira la quiniela?',
-    va_rotando:'Va rotando',miembros_turnan:'Los miembros se turnan',
-    siempre_mismo:'Siempre el mismo',persona_siempre:'Una persona compra siempre',
-    quien_compra:'¿Quién compra siempre?',sorteos_turno:'Sorteos por turno',
-    quien_empieza:'¿Quién empieza tirando?',ya_jugado:'¿Ya habéis jugado antes?',
-    loterias_conf:'Loterías configuradas',
-    result_sub:'Comparte con tu grupo por WhatsApp.<br>Cada miembro lo añade a la pantalla de inicio.',
-    btn_siguiente:'SIGUIENTE →',btn_crear:'🎰 CREAR MI PEÑA',
-    paso_de:'Paso',de:'de',lista:'¡Lista!',
-    nombre_ph:'Ej: Los afortunados...',miembro_ph:'Nombre del miembro...',
-    anadir:'+ Añadir',primer_payer:'Primer pagador',miembro:'Miembro',
-    empezamos_now:'Empezamos ahora',ya_hemos:'Ya hemos jugado',
-    flag:'ES',
-    color_azul:'Azul',color_verde:'Verde',color_naranja:'Naranja',
-    btn_frecuentes:'📊 Frecuentes',btn_aleatorio:'🎲 Aleatorio',
-    desc_frecuentes:'Números que más han salido en los últimos 12 meses en cada lotería',
-    desc_aleatorio:'Selección completamente al azar dentro del rango válido',
-    cancelar_lbl:'Cancelar',
-    elige_loteria:'Elige al menos una lotería',escribe_nombre:'Escribe el nombre del grupo',
-    elige_min:'Elige al menos',numeros_lbl:'números',escribe_nombre_m:'Escribe un nombre',
-    nombre_existe:'Ese nombre ya existe',max_miembros:'Máximo 12 miembros',
-    enlace_copiado:'Enlace copiado',grupo_existe:'Ya existe. Elige otro nombre.',
-    creando:'Creando...',max_nums:'Máximo',
-  },
-  ca:{
-    step1_eyebrow:'La teva penya',step1_title:'Com es diu<br>el vostre grup?',
-    nombre_grupo_lbl:'Nom del grup',color_grupo:'Color del grup',
-    a_que_jugais:'A què jugueu? (podeu triar diverses)',
-    configura_cada:'Configura cada una per separat al pas següent.',
-    step2_title:'Com jugueu<br>el vostre bitllet?',tipo_apuesta:'Tipus d\'aposta',
-    apuesta_sencilla:'Senzilla',apuesta_sencilla_desc:'Una combinació fixa. La més habitual en grups.',
-    apuesta_multiple:'Múltiple',apuesta_multiple_desc:'Més números, més combinacions automàtiques.',
-    step3_eyebrow:'L\'equip',step3_title:'Qui juga<br>al grup?',
-    primer_pagador:'El primer de la llista serà el primer pagador.',
-    step4_eyebrow:'Organització',step4_title:'Quasi a punt 🎯',
-    coste_total:'Cost total bitllet',bizum_persona:'Bizum/persona',
-    quien_tira:'Qui compra el bitllet?',
-    va_rotando:'Va rotant',miembros_turnan:'Els membres es van tornant',
-    siempre_mismo:'Sempre el mateix',persona_siempre:'Una persona compra sempre',
-    quien_compra:'Qui compra sempre?',sorteos_turno:'Sorteigs per torn',
-    quien_empieza:'Qui comença comprant?',ya_jugado:'Ja heu jugat abans?',
-    loterias_conf:'Loteries configurades',
-    result_sub:'Comparteix amb el teu grup per WhatsApp.<br>Cada membre l\'afegeix a la pantalla d\'inici.',
-    btn_siguiente:'SEGÜENT →',btn_crear:'🎰 CREAR LA MEVA PENYA',
-    paso_de:'Pas',de:'de',lista:'Llesta!',
-    nombre_ph:'Ex: Els afortunats...',miembro_ph:'Nom del membre...',
-    anadir:'+ Afegir',primer_payer:'Primer pagador',miembro:'Membre',
-    empezamos_now:'Comencem ara',ya_hemos:'Ja hem jugat',
-    flag:'CA',
-    color_azul:'Blau',color_verde:'Verd',color_naranja:'Taronja',
-    btn_frecuentes:'📊 Freqüents',btn_aleatorio:'🎲 Aleatori',
-    desc_frecuentes:'Números que han sortit més els últims 12 mesos a cada loteria',
-    desc_aleatorio:'Selecció completament a l\'atzar dins el rang vàlid',
-    cancelar_lbl:'Cancel·lar',
-    elige_loteria:'Tria almenys una loteria',escribe_nombre:'Escriu el nom del grup',
-    elige_min:'Tria almenys',numeros_lbl:'números',escribe_nombre_m:'Escriu un nom',
-    nombre_existe:'Aquest nom ja existeix',max_miembros:'Màxim 12 membres',
-    enlace_copiado:'Enllaç copiat',grupo_existe:'Ja existeix. Tria un altre nom.',
-    creando:'Creant...',max_nums:'Màxim',
-  },
-  en:{
-    step1_eyebrow:'Your group',step1_title:'What\'s your<br>group called?',
-    nombre_grupo_lbl:'Group name',color_grupo:'Group color',
-    a_que_jugais:'What do you play? (you can choose several)',
-    configura_cada:'Configure each one separately in the next step.',
-    step2_title:'How do you play<br>your ticket?',tipo_apuesta:'Bet type',
-    apuesta_sencilla:'Simple',apuesta_sencilla_desc:'One fixed combination. Most common in groups.',
-    apuesta_multiple:'Multiple',apuesta_multiple_desc:'More numbers, more automatic combinations.',
-    step3_eyebrow:'The team',step3_title:'Who plays<br>in the group?',
-    primer_pagador:'The first on the list will be the first payer.',
-    step4_eyebrow:'Organisation',step4_title:'Almost ready 🎯',
-    coste_total:'Total ticket cost',bizum_persona:'Payment/person',
-    quien_tira:'Who buys the ticket?',
-    va_rotando:'Rotating',miembros_turnan:'Members take turns',
-    siempre_mismo:'Always the same',persona_siempre:'One person always buys',
-    quien_compra:'Who always buys?',sorteos_turno:'Draws per turn',
-    quien_empieza:'Who starts buying?',ya_jugado:'Have you played before?',
-    loterias_conf:'Configured lotteries',
-    result_sub:'Share with your group on WhatsApp.<br>Each member adds it to their home screen.',
-    btn_siguiente:'NEXT →',btn_crear:'🎰 CREATE MY GROUP',
-    paso_de:'Step',de:'of',lista:'Ready!',
-    nombre_ph:'E.g: The lucky ones...',miembro_ph:'Member name...',
-    anadir:'+ Add',primer_payer:'First payer',miembro:'Member',
-    empezamos_now:'Starting now',ya_hemos:'We\'ve played before',
-    flag:'EN',
-    color_azul:'Blue',color_verde:'Green',color_naranja:'Orange',
-    btn_frecuentes:'📊 Frequent',btn_aleatorio:'🎲 Random',
-    desc_frecuentes:'Numbers drawn most often in the last 12 months for each lottery',
-    desc_aleatorio:'Completely random selection within the valid range',
-    cancelar_lbl:'Cancel',
-    elige_loteria:'Choose at least one lottery',escribe_nombre:'Enter the group name',
-    elige_min:'Choose at least',numeros_lbl:'numbers',escribe_nombre_m:'Enter a name',
-    nombre_existe:'That name already exists',max_miembros:'Maximum 12 members',
-    enlace_copiado:'Link copied',grupo_existe:'Already exists. Choose another name.',
-    creando:'Creating...',max_nums:'Maximum',
-  }
-};function getLang(){return localStorage.getItem('lg_lang')||'es';}
-function tc(key){return TC[getLang()]?.[key]||TC.es[key]||key;}
-
-function openLang(){
-  const lang=getLang();
-  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
-  document.getElementById('lang-overlay').classList.add('open');
-  document.getElementById('lang-popup').classList.add('open');
-}
-function closeLang(){
-  document.getElementById('lang-overlay').classList.remove('open');
-  document.getElementById('lang-popup').classList.remove('open');
-}
-function setLang(lang){
-  localStorage.setItem('lg_lang',lang);
-  closeLang();
-  applyLangCrear();
-}
-function applyLangCrear(){
-  const lang=getLang();
-  const T=TC[lang]||TC.es;
-  document.getElementById('lang-label').textContent=T.flag;
-  // Apply data-i18n
-  document.querySelectorAll('[data-i18n]').forEach(el=>{
-    const key=el.getAttribute('data-i18n');
-    if(T[key]) el.innerHTML=T[key];
-  });
-  // Update placeholders
-  const namePh=document.getElementById('f-name');
-  if(namePh) namePh.placeholder=T.nombre_ph;
-  const memberPh=document.getElementById('new-member');
-  if(memberPh) memberPh.placeholder=T.miembro_ph;
-  // Update buttons
-  const btnNext=document.getElementById('btn-next');
-  if(btnNext) btnNext.textContent=step===4?T.btn_crear:T.btn_siguiente;
-  // Update radio labels
-  const radios=document.querySelectorAll('input[name="epoch-type"]');
-  if(radios.length>=2){
-    radios[0].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.empezamos_now;});
-    radios[1].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.ya_hemos;});
-  }
-  // Re-render members with translated roles
-  renderMembers();
-}
-
-// Override renderMembers to use tc()
-const _origRenderMembers=renderMembers;
-function renderMembers(){
-  const list=document.getElementById('member-list');if(!list)return;
-  list.innerHTML='';
-  members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?tc('primer_payer'):tc('miembro')}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
-}
-
-// Apply on load
-applyLangCrear();
 </script>
 </body>
 </html>
