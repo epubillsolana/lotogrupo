@@ -892,7 +892,7 @@ async function fetchDraw(lotKey){
     const now=new Date();
     const pad=n=>String(n).padStart(2,'0');
     const dateStr=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
-    const weekAgo=new Date(now-7*24*3600*1000);
+    const weekAgo=new Date(now-14*24*3600*1000);
     const dateFrom=`${weekAgo.getFullYear()}${pad(weekAgo.getMonth()+1)}${pad(weekAgo.getDate())}`;
     const gameIds={euromillones:'EMIL',primitiva:'LAPR',bonoloto:'BONO',gordo:'ELGR',loteria_nacional:'LNAC'};
     const gameId=gameIds[lotKey]||'EMIL';
@@ -909,10 +909,13 @@ async function fetchDraw(lotKey){
     const comb=s.combinacion.match(/\d+/g).map(Number).filter(n=>n>0);
     const numeros=comb.slice(0,lot.mainCount).sort((a,b)=>a-b);
     const estrellas=comb.slice(lot.mainCount,lot.mainCount+lot.starCount).sort((a,b)=>a-b);
-    if(numeros.length===lot.mainCount&&estrellas.length===lot.starCount){
-      const result={fecha,numeros,estrellas,bote:s.bote_ganado||'—'};
+    // For Primitiva/Bonoloto complementario may be missing - accept if main numbers are correct
+    const mainOk=numeros.length===lot.mainCount;
+    const starOk=estrellas.length===lot.starCount||(lot.starCount===1&&estrellas.length===0);
+    if(mainOk&&starOk){
+      const result={fecha,numeros,estrellas:estrellas.length?estrellas:[0],bote:s.bote_ganado||'—'};
       localStorage.setItem('lg_draw_'+lotKey,JSON.stringify(result));
-        return result;
+      return result;
     }
   }catch(e){dbg('ERROR: '+e.message);}
   return null;
