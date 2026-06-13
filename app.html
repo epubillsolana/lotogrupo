@@ -266,8 +266,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
-    <button onclick="openSuggestions()" style="position:absolute;top:80px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:16px;cursor:pointer;" aria-label="Suggeriments">💬</button>
-    <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:44px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;color:#fff;display:flex;align-items:center;gap:4px;">🌐 <span id="lang-label">ES</span></button>
+        <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:44px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;color:#fff;display:flex;align-items:center;gap:4px;">🌐 <span id="lang-label">ES</span></button>
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;"><svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg><span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">Loto<span style="color:#FF8C00;">Grupo</span></span></div>
     <h1 id="header-title" style="font-size:20px;font-weight:900;letter-spacing:.5px;">Mi Peña</h1>
     <div class="header-loterias" id="header-loterias"></div>
@@ -351,6 +350,17 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <div class="metric"><div class="metric-val" id="m-bizum">—</div><div class="metric-lbl" data-i18n="bizum_persona">Bizum por persona</div></div>
     </div>
     <div class="info-box green"><p id="bizum-text">—</p></div>
+    <div class="card">
+      <div class="card-label" data-i18n="importes">Importes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);">
+        <span style="font-size:13px;color:var(--text2);" data-i18n="coste_boleto">Coste del boleto</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:15px;font-weight:700;">€</span>
+          <input type="number" id="grupo-ticket-cost" min="1" max="500" step="0.5"
+            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
+            onchange="recalcFromCost()">
+        </div>
+      </div>
     <div class="card">
       <div class="card-label" data-i18n="rotacion_grupo">Rotación del grupo</div>
       <div id="turns-list"></div>
@@ -591,17 +601,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-label" data-i18n="importes">Importes</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);">
-        <span style="font-size:13px;color:var(--text2);" data-i18n="coste_boleto">Coste del boleto</span>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:15px;font-weight:700;">€</span>
-          <input type="number" id="grupo-ticket-cost" min="1" max="500" step="0.5"
-            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
-            onchange="recalcFromCost()">
-        </div>
-      </div>
+
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
         <span style="font-size:13px;color:var(--text2);" data-i18n="bizum_persona_lbl">Bizum por persona</span>
         <div style="display:flex;align-items:center;gap:6px;">
@@ -621,6 +621,16 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:none;"></textarea>
       <button onclick="sendSuggestion()" class="btn btn-primary" style="margin-top:8px;" data-i18n="sugg_btn">Enviar suggeriment</button>
     </div>
+  <div class="card" style="background:linear-gradient(135deg,#FFF5E6,#FFF9F0);border:1.5px solid #FF8C00;">
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:10px;">
+      <div style="font-size:32px;">💬</div>
+      <div>
+        <div style="font-size:15px;font-weight:800;color:#0A1F0F;" data-i18n="sugg_promo_title">Tens alguna idea?</div>
+        <div style="font-size:12px;color:#6B7280;margin-top:2px;" data-i18n="sugg_promo_sub">Ajuda'ns a millorar LotoGrupo</div>
+      </div>
+    </div>
+    <button onclick="openSuggestions()" style="width:100%;padding:13px;border-radius:10px;background:#FF8C00;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;" data-i18n="sugg_btn">Enviar suggeriment</button>
+  </div>
   </div>
 </div>
 
@@ -1640,7 +1650,7 @@ function buildMembers(){
     const avatar=getAvatar(m)||'😀';
     const dni=getDNI(m);
     row.innerHTML=`
-      <span style="font-size:28px;flex-shrink:0;cursor:pointer;" onclick="openAvatarPopup('${m}')">${avatar}</span>
+      <span style="font-size:28px;flex-shrink:0;cursor:pointer;position:relative;display:inline-block;" onclick="openAvatarPopup('${m}')" title="${t('cambiar_avatar')}">${avatar}<span style="position:absolute;bottom:-2px;right:-4px;background:#FF8C00;color:#fff;border-radius:50%;width:14px;height:14px;font-size:9px;display:flex;align-items:center;justify-content:center;line-height:1;">✏️</span></span>
       <div style="flex:1;">
         <div id="member-name-view-${i}" style="font-size:14px;font-weight:600;">${m}</div>
         <input id="member-name-input-${i}" type="text" value="${m}" maxlength="20"
@@ -2418,7 +2428,9 @@ const T={
     sugg_title:'💬 Sugerencias',sugg_desc:'¿Tienes alguna idea para mejorar la app? Cuéntanos.',
     sugg_btn:'Enviar sugerencia',sugg_open:'💬 Enviar una sugerencia',sugg_open_short:'💬 Sugerencias',
     sugg_ok:'✅ ¡Gracias! Sugerencia enviada.',sugg_error:'Error al enviar. Inténtalo de nuevo.',
-    sugg_empty:'Escribe tu sugerencia primero.',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
+    sugg_empty:'Escribe tu sugerencia primero.',
+    sugg_promo_title:'¿Tienes alguna idea?',
+    cambiar_avatar:'Toca para cambiar avatar',sugg_promo_sub:'Ayúdanos a mejorar LotoGrupo',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
     onboarding_sub:'Se han terminado los líos\njugando a la lotería.',onboarding_mas:'...¡Y mucho más! 🚀',
     boleto_word:'boleto',boletos_word:'boletos',
     notif_toca:'¡Te toca jugar en',notif_todos_pagado:'¡Todos han pagado el Bizum! Recuerda comprar el boleto.',
@@ -2507,7 +2519,9 @@ const T={
     sugg_title:'💬 Suggeriments',sugg_desc:'Tens alguna idea per millorar l\'app? Explica\'ns-ho.',
     sugg_btn:'Enviar suggeriment',sugg_open:'💬 Enviar un suggeriment',sugg_open_short:'💬 Suggeriments',
     sugg_ok:'✅ Gràcies! Suggeriment enviat.',sugg_error:'Error en enviar. Torna-ho a provar.',
-    sugg_empty:'Escriu el teu suggeriment primer.',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
+    sugg_empty:'Escriu el teu suggeriment primer.',
+    sugg_promo_title:'Tens alguna idea?',
+    cambiar_avatar:'Toca per canviar avatar',sugg_promo_sub:'Ajuda\'ns a millorar LotoGrupo',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
     onboarding_sub:'S\'han acabat els embolicaments\njugant a la loteria.',onboarding_mas:'...I molt més! 🚀',
     boleto_word:'bitllet',boletos_word:'bitllets',
     notif_toca:'Et toca jugar a',notif_todos_pagado:'Tothom ha fet el Bizum! Recorda comprar el bitllet.',
@@ -2596,7 +2610,9 @@ const T={
     sugg_title:'💬 Suggestions',sugg_desc:'Got an idea to improve the app? Let us know.',
     sugg_btn:'Send suggestion',sugg_open:'💬 Send a suggestion',sugg_open_short:'💬 Suggestions',
     sugg_ok:'✅ Thanks! Suggestion sent.',sugg_error:'Error sending. Please try again.',
-    sugg_empty:'Write your suggestion first.',onboarding_title:'Your friends\nlove you! 🧡',
+    sugg_empty:'Write your suggestion first.',
+    sugg_promo_title:'Got an idea?',
+    cambiar_avatar:'Tap to change avatar',sugg_promo_sub:'Help us improve LotoGrupo',onboarding_title:'Your friends\nlove you! 🧡',
     onboarding_sub:"No more hassle\nplaying the lottery.",onboarding_mas:'...And much more! 🚀',
     boleto_word:'ticket',boletos_word:'tickets',
     notif_toca:'It\'s your turn to play in',notif_todos_pagado:'Everyone has paid! Remember to buy the ticket.',
