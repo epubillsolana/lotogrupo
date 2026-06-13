@@ -133,7 +133,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
   <button onclick="setLang('en')" class="lang-opt" data-lang="en">EN — English</button>
 </div>
 <div class="top">
-  <div class="top-logo">Loto<span>Grupo</span></div>
+  <div class="top-logo" style="display:flex;align-items:center;gap:8px;"><svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>Loto<span>Grupo</span></div>
   <div style="display:flex;align-items:center;gap:10px;">
     <button onclick="openLang()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;">🌐 <span id="lang-label">ES</span></button>
     <div class="top-step" id="top-step">Paso 1 de 4</div>
@@ -532,8 +532,6 @@ function renderMembers(){
   members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?tc('primer_payer'):tc('miembro')}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
 }
 
-// Apply on load
-applyLangCrear();
 
 const AVG_BG=['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];
 const AVG_FG=['#0C447C','#3B6D11','#854F0B','#7A2443','#534AB7','#1B6B4E','#A0430A','#6B2E90'];
@@ -952,6 +950,7 @@ function shareWA(){
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 updateUI();
+applyLangCrear();
 
 </script>
 </body>
