@@ -279,7 +279,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <button onclick="closeSuggestions()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;padding:0 4px;">✕</button>
     </div>
     <p style="font-size:13px;color:#6B7280;margin-bottom:12px;" data-i18n="sugg_desc">Tens alguna idea per millorar l'app? Explica'ns-ho.</p>
-    <textarea id="sugg-text" rows="4" placeholder="Escriu aquí..."
+    <textarea id="sugg-text" rows="4" id="sugg-placeholder" placeholder="Escriu aquí..."
       style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #E5E7EB;background:#F9FAFB;color:#111827;font-size:15px;font-family:inherit;outline:none;resize:none;margin-bottom:12px;"></textarea>
     <button onclick="sendSuggestion()" style="width:100%;padding:14px;border-radius:12px;background:#FF8C00;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;" data-i18n="sugg_btn">Enviar suggeriment</button>
   </div>
@@ -617,7 +617,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <div style="font-size:32px;margin-bottom:6px;">💬</div>
       <div class="card-label" data-i18n="sugg_title" style="font-size:14px;color:#0A1F0F;">💬 Suggeriments</div>
       <p style="font-size:13px;color:var(--text2);margin-bottom:10px;" data-i18n="sugg_desc">Tens alguna idea per millorar l'app? Explica'ns-ho.</p>
-      <textarea id="sugg-text" rows="3" id="sugg-placeholder" placeholder="Escriu aquí el teu suggeriment..."
+      <textarea id="sugg-text-grup" rows="3" placeholder="Escriu aquí el teu suggeriment..."
         style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:none;"></textarea>
       <button onclick="sendSuggestion()" class="btn btn-primary" style="margin-top:8px;font-size:15px;font-weight:700;" data-i18n="sugg_btn">Enviar suggeriment</button>
     </div>
@@ -2265,7 +2265,7 @@ function toggleSuggestions(){
 }
 
 async function sendSuggestion(){
-  const text=document.getElementById('sugg-text')?.value?.trim();
+  const text=(document.getElementById('sugg-text')?.value||document.getElementById('sugg-text-grup')?.value||'').trim();
   if(!text){showToast(t('sugg_empty'));return;}
   const slug=new URLSearchParams(window.location.search).get('g')||'unknown';
   try{
@@ -2275,7 +2275,7 @@ async function sendSuggestion(){
       body:JSON.stringify({grupo_slug:slug,tipo:'suggeriment',metadata:{text,lang:getLang()}})
     });
     showToast(t('sugg_ok'));
-    document.getElementById('sugg-text').value='';
+    const ta1=document.getElementById('sugg-text');const ta2=document.getElementById('sugg-text-grup');if(ta1)ta1.value='';if(ta2)ta2.value='';
     closeSuggestions();
   }catch(e){showToast(t('sugg_error'));}
 }
@@ -2421,7 +2421,8 @@ const T={
     sugg_title:'💬 Sugerencias',sugg_desc:'¿Tienes alguna idea para mejorar la app? Cuéntanos.',
     sugg_btn:'Enviar sugerencia',sugg_open:'💬 Enviar una sugerencia',sugg_open_short:'💬 Sugerencias',
     sugg_ok:'✅ ¡Gracias! Sugerencia enviada.',sugg_error:'Error al enviar. Inténtalo de nuevo.',
-    sugg_empty:'Escribe tu sugerencia primero.',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
+    sugg_empty:'Escribe tu sugerencia primero.',
+    sugg_placeholder:'Escribe aquí tu sugerencia...',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
     onboarding_sub:'Se han terminado los líos\njugando a la lotería.',onboarding_mas:'...¡Y mucho más! 🚀',
     boleto_word:'boleto',boletos_word:'boletos',
     notif_toca:'¡Te toca jugar en',notif_todos_pagado:'¡Todos han pagado el Bizum! Recuerda comprar el boleto.',
@@ -2510,7 +2511,8 @@ const T={
     sugg_title:'💬 Suggeriments',sugg_desc:'Tens alguna idea per millorar l\'app? Explica\'ns-ho.',
     sugg_btn:'Enviar suggeriment',sugg_open:'💬 Enviar un suggeriment',sugg_open_short:'💬 Suggeriments',
     sugg_ok:'✅ Gràcies! Suggeriment enviat.',sugg_error:'Error en enviar. Torna-ho a provar.',
-    sugg_empty:'Escriu el teu suggeriment primer.',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
+    sugg_empty:'Escriu el teu suggeriment primer.',
+    sugg_placeholder:'Escriu aquí el teu suggeriment...',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
     onboarding_sub:'S\'han acabat els embolicaments\njugant a la loteria.',onboarding_mas:'...I molt més! 🚀',
     boleto_word:'bitllet',boletos_word:'bitllets',
     notif_toca:'Et toca jugar a',notif_todos_pagado:'Tothom ha fet el Bizum! Recorda comprar el bitllet.',
@@ -2599,7 +2601,8 @@ const T={
     sugg_title:'💬 Suggestions',sugg_desc:'Got an idea to improve the app? Let us know.',
     sugg_btn:'Send suggestion',sugg_open:'💬 Send a suggestion',sugg_open_short:'💬 Suggestions',
     sugg_ok:'✅ Thanks! Suggestion sent.',sugg_error:'Error sending. Please try again.',
-    sugg_empty:'Write your suggestion first.',onboarding_title:'Your friends\nlove you! 🧡',
+    sugg_empty:'Write your suggestion first.',
+    sugg_placeholder:'Write your suggestion here...',onboarding_title:'Your friends\nlove you! 🧡',
     onboarding_sub:"No more hassle\nplaying the lottery.",onboarding_mas:'...And much more! 🚀',
     boleto_word:'ticket',boletos_word:'tickets',
     notif_toca:'It\'s your turn to play in',notif_todos_pagado:'Everyone has paid! Remember to buy the ticket.',
@@ -2649,6 +2652,11 @@ function applyLang(){
     const val=t(key);
     if(val) el.innerHTML=val;
   });
+  // Update suggestion placeholders
+  const suggPh=document.getElementById('sugg-placeholder');
+  if(suggPh) suggPh.placeholder=t('sugg_placeholder');
+  const suggGrupPh=document.getElementById('sugg-text-grup');
+  if(suggGrupPh) suggGrupPh.placeholder=t('sugg_placeholder');
   // Rebuild all dynamic content so language takes effect immediately
   if(CFG){
     buildComprobar();
