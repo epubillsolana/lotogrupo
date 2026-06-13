@@ -301,7 +301,6 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
   </div>
 
-  <div id="debug-box" style="display:block;background:#000;color:#0f0;font-size:11px;font-family:monospace;padding:8px;max-height:120px;overflow-y:auto;border-bottom:1px solid #333;"></div>
   <div class="tabbar">
     <button class="tab-btn active" onclick="switchTab('comprobar',this)"><i class="ti ti-search"></i><span data-i18n="tab_comprobar">Comprobar</span></button>
     <button class="tab-btn" onclick="switchTab('turnos',this)"><i class="ti ti-users"></i><span data-i18n="tab_turnos">Turnos</span></button>
@@ -597,6 +596,13 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         </div>
       </div>
     </div>
+    <!-- Gestionar loterias -->
+    <div class="card">
+      <div class="card-label" data-i18n="gestionar_loterias_lbl">🎰 Loterias del grup</div>
+      <div id="grup-loterias-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+      <button onclick="openAddLoteria()" style="width:100%;padding:11px;border-radius:10px;background:transparent;border:1.5px dashed var(--border2);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;" data-i18n="añadir_loteria_btn">+ Añadir lotería</button>
+    </div>
+
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="card-label" style="margin-bottom:0;" data-i18n="miembros_grupo">Miembros del grupo</div>
@@ -2271,6 +2277,81 @@ function updatePauseBtn(){
   lbl.textContent=paused?t('notif_unsilence_btn'):t('notif_pause_btn');
 }
 
+// ── LOTERIAS MANAGEMENT ──────────────────────────────────────────────────────
+const ALL_LOTS = {
+  euromillones:{name:'Euromillones',emoji:'🌟'},
+  primitiva:{name:'Primitiva',emoji:'🍀'},
+  bonoloto:{name:'Bonoloto',emoji:'🎱'},
+};
+
+function buildGrupLoterias(){
+  const list=document.getElementById('grup-loterias-list');
+  if(!list||!CFG) return;
+  list.innerHTML=CFG.lotteries.map((l,i)=>{
+    const lot=ALL_LOTS[l.lottery]||{name:l.lottery,emoji:'🎰'};
+    return `<div style="display:flex;align-items:center;gap:10px;padding:10px 12px;background:var(--surface2);border-radius:10px;border:.5px solid var(--border);">
+      <span style="font-size:22px;">${lot.emoji}</span>
+      <span style="flex:1;font-size:14px;font-weight:700;">${lot.name}</span>
+      <span style="font-size:11px;color:var(--green);font-weight:700;">${t('loteria_activa')}</span>
+      ${CFG.lotteries.length>1?`<button onclick="removeLoteria(${i})" style="padding:5px 10px;border-radius:8px;background:transparent;border:1px solid var(--border2);color:var(--text3);font-size:11px;cursor:pointer;">${t('eliminar_loteria_btn')}</button>`:''}
+    </div>`;
+  }).join('');
+}
+
+function removeLoteria(idx){
+  if(CFG.lotteries.length<=1){showToast(t('min_one_lot'));return;}
+  if(!confirm(t('confirm_del_lot'))) return;
+  CFG.lotteries.splice(idx,1);
+  saveGroupConfig();
+  buildGrupLoterias();
+  buildComprobar();
+  showToast(t('loteria_removed'));
+}
+
+function openAddLoteria(){
+  const existing=CFG.lotteries.map(l=>l.lottery);
+  const available=Object.entries(ALL_LOTS).filter(([k])=>!existing.includes(k));
+  if(!available.length){showToast('Ja tens totes les loteríes!');return;}
+  
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:flex-end;';
+  overlay.innerHTML=`<div style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 16px 40px;width:100%;">
+    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;" data-i18n="añadir_loteria_btn">${t('añadir_loteria_btn')}</div>
+    ${available.map(([k,lot])=>`
+      <button onclick="addLoteria('${k}',this)" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;font-size:15px;font-weight:700;cursor:pointer;color:var(--text);">
+        <span style="font-size:24px;">${lot.emoji}</span>${lot.name}
+      </button>`).join('')}
+    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:12px;border-radius:10px;background:var(--surface2);border:none;font-size:14px;color:var(--text2);cursor:pointer;margin-top:4px;">${t('cancelar')}</button>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+function addLoteria(key, btn){
+  btn.closest('[style*=fixed]').remove();
+  // Add with default numbers
+  const lot=LOTTERIES[key];
+  if(!lot) return;
+  const newLot={lottery:key,apuesta:'sencilla',main:[],stars:[]};
+  CFG.lotteries.push(newLot);
+  saveGroupConfig();
+  buildGrupLoterias();
+  buildComprobar();
+  showToast(t('loteria_added'));
+}
+
+async function saveGroupConfig(){
+  try{
+    const slug=new URLSearchParams(window.location.search).get('g');
+    if(!slug) return;
+    await fetch(SUPA_URL+'/rest/v1/grupos?slug=eq.'+encodeURIComponent(slug),{
+      method:'PATCH',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({config:CFG})
+    });
+    localStorage.setItem('lg_config_'+slug,JSON.stringify(CFG));
+  }catch(e){console.error(e);}
+}
+
 // ── SUGGESTIONS ──────────────────────────────────────────────────────────────
 function openSuggestions(){
   document.getElementById('sugg-overlay').style.display='block';
@@ -2692,6 +2773,7 @@ function applyLang(){
     buildMembers();
     renderRotation();
     renderHistory();
+    buildGrupLoterias();
   }
 }
 

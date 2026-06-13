@@ -398,6 +398,7 @@ const TC={
     desc_frecuentes:'Números que más han salido en los últimos 12 meses en cada lotería',
     desc_aleatorio:'Selección completamente al azar dentro del rango válido',
     cancelar_lbl:'Cancelar',
+    no_mas_loterias:'✅ No, avanzar al siguiente paso',
     elige_loteria:'Elige al menos una lotería',escribe_nombre:'Escribe el nombre del grupo',
     elige_min:'Elige al menos',numeros_lbl:'números',escribe_nombre_m:'Escribe un nombre',
     nombre_existe:'Ese nombre ya existe',max_miembros:'Máximo 12 miembros',
@@ -434,6 +435,7 @@ const TC={
     desc_frecuentes:'Números que han sortit més els últims 12 mesos a cada loteria',
     desc_aleatorio:'Selecció completament a l\'atzar dins el rang vàlid',
     cancelar_lbl:'Cancel·lar',
+    no_mas_loterias:'✅ No, avançar al següent pas',
     elige_loteria:'Tria almenys una loteria',escribe_nombre:'Escriu el nom del grup',
     elige_min:'Tria almenys',numeros_lbl:'números',escribe_nombre_m:'Escriu un nom',
     nombre_existe:'Aquest nom ja existeix',max_miembros:'Màxim 12 membres',
@@ -470,6 +472,7 @@ const TC={
     desc_frecuentes:'Numbers drawn most often in the last 12 months for each lottery',
     desc_aleatorio:'Completely random selection within the valid range',
     cancelar_lbl:'Cancel',
+    no_mas_loterias:'✅ No, go to next step',
     elige_loteria:'Choose at least one lottery',escribe_nombre:'Enter the group name',
     elige_min:'Choose at least',numeros_lbl:'numbers',escribe_nombre_m:'Enter a name',
     nombre_existe:'That name already exists',max_miembros:'Maximum 12 members',
@@ -828,8 +831,8 @@ function showLotPicker(){
     <div style="font-size:13px;color:#9CA3AF;margin-bottom:16px;">Puedes jugar varias combinaciones del mismo sorteo o de distintos sorteos.</div>
     ${lotOptions}
     <button onclick="closeLotPickerAndContinue()"
-      style="width:100%;padding:14px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;">
-      ✅ Continuar con estos números
+      style="width:100%;padding:14px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-top:4px;" data-i18n="no_mas_loterias">
+      ✅ No, avançar al següent pas
     </button>
   </div>`;
   document.body.appendChild(picker);
