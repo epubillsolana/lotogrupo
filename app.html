@@ -1166,7 +1166,9 @@ async function loadBizumState(){
     const data=await r.json();
     if(Array.isArray(data)&&data.length>0){
       const state={};
-      data.forEach(row=>{state[row.member_name]=row.confirmado;});
+      data.forEach(row=>{state[row.member_name]=row.confirmado===true||row.confirmado==='true';});
+      // Save to localStorage
+      localStorage.setItem(getBizumKey(),JSON.stringify(state));
       return state;
     }
   }catch(e){}
@@ -1196,7 +1198,6 @@ function getBizumKey(){
   return `lg_bizum_${CFG.name}_${idx}_${ym}`;
 }
 function getBizumState(){try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}}
-function saveBizumState(s){localStorage.setItem(getBizumKey(),JSON.stringify(s));}
 
 async function buildBizumConfirm(){
   const members=getSavedMembers()||CFG.members;
