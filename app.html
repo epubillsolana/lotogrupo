@@ -32,7 +32,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .setup-btn{display:inline-block;padding:14px 28px;background:#FF8C00;color:#fff;border-radius:99px;font-size:16px;font-weight:700;text-decoration:none;}
 
 /* HEADER */
-.header{padding:58px 20px 22px;text-align:center;position:relative;overflow:hidden;}
+.header{padding:58px 20px 22px;text-align:center;position:relative;overflow:hidden;animation:fadeDown .4s ease-out;} @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
 .header::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.07);}
 .header::after{content:'';position:absolute;bottom:-40px;left:-20px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.05);}
 .header-badge{background:#fff;border-radius:10px;padding:5px 14px;display:inline-block;margin-bottom:6px;}
@@ -54,7 +54,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .section.active{display:block;}
 
 /* CARDS */
-.card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:.5px solid var(--border);box-shadow:var(--shadow);}
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:.5px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.07);}
 .card-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
 
 /* BALLS */
@@ -85,14 +85,14 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* BUTTONS */
 .btn{width:100%;padding:14px;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;border:none;margin-top:8px;}
-.btn-primary{color:#fff;}
+.btn-primary{color:#fff;} .btn#btn-check{background:linear-gradient(135deg,#1B5E20,#2E7D32,#388E3C)!important;font-size:17px;letter-spacing:.5px;box-shadow:0 4px 16px rgba(46,125,50,.35);transition:transform .15s,box-shadow .15s;} .btn#btn-check:active{transform:scale(.97);box-shadow:0 2px 8px rgba(46,125,50,.25);}
 .btn-gray{background:var(--surface2);color:var(--text);border:.5px solid var(--border2);}
 .btn:disabled{opacity:.35;cursor:not-allowed;}
 
 /* METRICS */
 .metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.metric{background:var(--surface);border-radius:var(--radius);padding:14px;border:.5px solid var(--border);text-align:center;box-shadow:var(--shadow);}
-.metric-val{font-size:22px;font-weight:800;color:var(--primary);}
+.metric{background:var(--surface);border-radius:var(--radius);padding:18px 14px;border:.5px solid var(--border);text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.metric-val{font-size:26px;font-weight:900;color:var(--primary);letter-spacing:-.5px;}
 .metric-lbl{font-size:11px;color:var(--text3);margin-top:3px;font-weight:600;}
 
 /* PEOPLE */
@@ -116,7 +116,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* INFO BOX */
 .info-box{border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.6;}
-.info-box.green{background:var(--green-light);color:var(--green);border:.5px solid #A5D6A7;}
+.info-box.green{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);color:#1B5E20;border:.5px solid #A5D6A7;box-shadow:0 2px 8px rgba(46,125,50,.08);}
 .info-box.gold{background:var(--gold-light);color:var(--gold);border:.5px solid var(--gold-mid);}
 .info-box.blue{background:var(--blue-light);color:var(--blue);border:.5px solid #90CAF9;}
 
@@ -130,11 +130,11 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* PRIZES */
 .total-box{border-radius:var(--radius);padding:24px 16px;text-align:center;margin-bottom:12px;color:#fff;}
 .total-label{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
-.total-amount{font-size:42px;font-weight:800;letter-spacing:-1px;}
+.total-amount{font-size:48px;font-weight:900;letter-spacing:-1.5px;}
 .total-sub{font-size:12px;opacity:.7;margin-top:5px;}
 .balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.balance-card{border-radius:var(--radius);padding:14px;text-align:center;border:.5px solid var(--border);background:var(--surface);box-shadow:var(--shadow);}
-.balance-val{font-size:20px;font-weight:800;margin-bottom:3px;}
+.balance-card{border-radius:var(--radius);padding:18px 14px;text-align:center;border:.5px solid var(--border);background:var(--surface);box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.balance-val{font-size:24px;font-weight:900;margin-bottom:4px;letter-spacing:-.5px;}
 .balance-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
 .stat-card{background:var(--surface);border-radius:var(--radius);padding:16px 14px;border:.5px solid var(--border);text-align:center;box-shadow:var(--shadow);}
@@ -834,9 +834,9 @@ function buildComprobar(){
           style="padding:3px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);">✏️ Editar</button>
       </div>
       <div class="ball-row" id="our-balls-${l.lottery}" style="margin-bottom:14px;">
-        ${nums.main.map(n=>`<div class="ball our-main">${n}</div>`).join('')}
-        <span class="star-sep">⭐</span>
-        ${nums.stars.map(n=>`<div class="ball our-star">${n}</div>`).join('')}
+        ${nums.main.length===0&&nums.stars.length===0
+          ? `<div style="width:100%;text-align:center;padding:10px;background:#FFF9C4;border-radius:10px;font-size:13px;color:#F57F17;font-weight:700;">✏️ Pulsa Editar para añadir tus números</div>`
+          : nums.main.map(n=>`<div class="ball our-main">${n}</div>`).join('')+'<span class="star-sep">⭐</span>'+nums.stars.map(n=>`<div class="ball our-star">${n}</div>`).join('')}
       </div>
 
       <!-- Editor números -->
