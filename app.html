@@ -243,40 +243,47 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 <div id="setup-screen" style="display:flex;" class="setup">
   <div class="setup-emoji">🎰</div>
   <div class="setup-title">LotoGrupo</div>
-  <div class="setup-sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
+  <div class="setup-sub" data-i18n="setup_sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
   <a href="https://lotogrupo.es/crear.html" class="setup-btn">Crear una peña nueva →</a>
 </div>
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
-    <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:52px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:13px;cursor:pointer;z-index:10;">🇪🇸</button>
+    <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:52px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;color:#fff;display:flex;align-items:center;gap:4px;">🌐 <span id="lang-label">ES</span></button>
     <h1 id="header-title" style="font-size:20px;font-weight:900;letter-spacing:.5px;">Mi Peña</h1>
     <div class="header-loterias" id="header-loterias"></div>
   </div>
   <div id="lang-overlay" onclick="closeLangSelector()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;"></div>
   <div id="lang-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:301;box-shadow:0 -4px 24px rgba(0,0,0,0.15);">
     <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:20px;">🌐 Idioma / Language</div>
-    <div style="display:flex;flex-direction:column;gap:10px;">
+    <div style="font-size:11px;font-weight:700;color:#9AA0A6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">App</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
       <button onclick="setLang('es')" class="lang-opt" data-lang="es">🇪🇸 Español</button>
-      <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">🏴󠁥󠁳󠁣󠁴󠁿 Català</button>
+      <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">🏴 Català</button>
       <button onclick="setLang('en')" class="lang-opt" data-lang="en">🇬🇧 English</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:#9AA0A6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">📲 Missatges WhatsApp</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button onclick="setWALang('es')" class="lang-opt wa-lang-opt" data-lang="es">🇪🇸 Español</button>
+      <button onclick="setWALang('ca')" class="lang-opt wa-lang-opt" data-lang="ca">🏴 Català</button>
+      <button onclick="setWALang('en')" class="lang-opt wa-lang-opt" data-lang="en">🇬🇧 English</button>
     </div>
   </div>
 
   <div class="tabbar">
-    <button class="tab-btn active" onclick="switchTab('comprobar',this)"><i class="ti ti-search"></i>Comprobar</button>
-    <button class="tab-btn" onclick="switchTab('turnos',this)"><i class="ti ti-users"></i>Turnos</button>
-    <button class="tab-btn" onclick="switchTab('bizum',this)"><i class="ti ti-cash"></i>Bizum</button>
-    <button class="tab-btn" onclick="switchTab('premios',this)"><i class="ti ti-trophy"></i>Premios</button>
-    <button class="tab-btn" onclick="switchTab('avisos',this)"><i class="ti ti-bell"></i>Avisos</button>
-    <button class="tab-btn" onclick="switchTab('grupo',this)"><i class="ti ti-users"></i>Grupo</button>
-    <button class="tab-btn" onclick="switchTab('scanner',this)"><i class="ti ti-scan"></i>Scanner</button>
+    <button class="tab-btn active" onclick="switchTab('comprobar',this)"><i class="ti ti-search"></i><span data-i18n="tab_comprobar">Comprobar</span></button>
+    <button class="tab-btn" onclick="switchTab('turnos',this)"><i class="ti ti-users"></i><span data-i18n="tab_turnos">Turnos</span></button>
+    <button class="tab-btn" onclick="switchTab('bizum',this)"><i class="ti ti-cash"></i><span data-i18n="tab_bizum">Bizum</span></button>
+    <button class="tab-btn" onclick="switchTab('premios',this)"><i class="ti ti-trophy"></i><span data-i18n="tab_premios">Premios</span></button>
+    <button class="tab-btn" onclick="switchTab('avisos',this)"><i class="ti ti-bell"></i><span data-i18n="tab_avisos">Avisos</span></button>
+    <button class="tab-btn" onclick="switchTab('grupo',this)"><i class="ti ti-users"></i><span data-i18n="tab_grupo">Grupo</span></button>
+    <button class="tab-btn" onclick="switchTab('scanner',this)"><i class="ti ti-scan"></i><span data-i18n="tab_scanner">Scanner</span></button>
   </div>
 
   <!-- COMPROBAR -->
   <div class="section active" id="tab-comprobar">
     <div id="loterias-comprobar"></div>
-    <button class="btn btn-primary" id="btn-check" onclick="checkAllPrizes()" disabled style="margin-bottom:12px;">Comprobar premio</button>
+    <button class="btn btn-primary" id="btn-check" onclick="checkAllPrizes()" disabled style="margin-bottom:12px;" data-i18n="btn_comprobar">Comprobar premio</button>
     <div id="result-area" style="display:none;">
       <div id="result-banner" class="result-banner none" style="display:none;">
         <div id="rb-emoji" class="rb-emoji">🎰</div>
@@ -286,7 +293,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
       <div id="hits-detail"></div>
       <div id="add-prize-box" class="card" style="display:none;">
-        <div class="card-label">💰 Añadir premio al historial</div>
+        <div class="card-label" data-i18n="add_prize_label">💰 Añadir premio al historial</div>
         <p style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="add-prize-hint">Introduce el importe real cobrado.</p>
         <div class="add-prize-row">
           <input type="number" id="real-amount" placeholder="€ importe real cobrado" min="0" step="0.01">
@@ -294,7 +301,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         </div>
       </div>
       <div class="card">
-        <div class="card-label">Mensaje WhatsApp</div>
+        <div class="card-label" data-i18n="wa_label">Mensaje WhatsApp</div>
         <div class="wa-box" id="wa-text">—</div>
         <div class="wa-btns">
           <button class="btn-wa btn-wa-copy" onclick="copyMsg()">📋 Copiar todo</button>
@@ -308,39 +315,39 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <!-- TURNOS -->
   <div class="section" id="tab-turnos">
     <div class="metrics">
-      <div class="metric"><div class="metric-val" id="m-payer">—</div><div class="metric-lbl">Paga esta ronda</div></div>
-      <div class="metric"><div class="metric-val" id="m-bizum">—</div><div class="metric-lbl">Bizum por persona</div></div>
+      <div class="metric"><div class="metric-val" id="m-payer">—</div><div class="metric-lbl" data-i18n="paga_ronda">Paga esta ronda</div></div>
+      <div class="metric"><div class="metric-val" id="m-bizum">—</div><div class="metric-lbl" data-i18n="bizum_persona">Bizum por persona</div></div>
     </div>
     <div class="info-box green"><p id="bizum-text">—</p></div>
     <div class="card">
-      <div class="card-label">Rotación del grupo</div>
+      <div class="card-label" data-i18n="rotacion_grupo">Rotación del grupo</div>
       <div id="turns-list"></div>
     </div>
     <div class="card">
-      <div class="card-label">Rotación de pagos</div>
+      <div class="card-label" data-i18n="rotacion_pagos">Rotación de pagos</div>
       <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
         <label style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1.5px solid var(--border2);cursor:pointer;" id="rot-auto-label">
           <input type="radio" name="rotation-mode" id="rot-auto" value="auto" onchange="saveRotationMode()" style="width:18px;height:18px;accent-color:var(--primary);">
           <div>
-            <div style="font-size:14px;font-weight:700;">🔄 Rotación automática</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Cada X sorteos cambia quien paga</div>
+            <div style="font-size:14px;font-weight:700;" data-i18n="rot_auto_title">🔄 Rotación automática</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;" data-i18n="rot_auto_desc">Cada X sorteos cambia quien paga</div>
           </div>
         </label>
         <label style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1.5px solid var(--border2);cursor:pointer;" id="rot-fixed-label">
           <input type="radio" name="rotation-mode" id="rot-fixed" value="fixed" onchange="saveRotationMode()" style="width:18px;height:18px;accent-color:var(--primary);">
           <div>
-            <div style="font-size:14px;font-weight:700;">📌 Siempre la misma persona</div>
-            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Una persona paga siempre</div>
+            <div style="font-size:14px;font-weight:700;" data-i18n="rot_fixed_title">📌 Siempre la misma persona</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;" data-i18n="rot_fixed_desc">Una persona paga siempre</div>
           </div>
         </label>
       </div>
       <div id="fixed-payer-selector" style="display:none;margin-top:4px;">
-        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">¿Quién paga siempre?</div>
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;" data-i18n="quien_paga_siempre">¿Quién paga siempre?</div>
         <div id="fixed-payer-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
       </div>
     </div>
     <div class="card">
-      <div class="card-label">Aviso cambio de turno</div>
+      <div class="card-label" data-i18n="aviso_turno">Aviso cambio de turno</div>
       <div class="wa-box" id="wa-turn">—</div>
       <div class="wa-btns">
         <button class="btn-wa btn-wa-copy" onclick="copyTurn()">📋 Copiar</button>
@@ -352,12 +359,12 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <!-- BIZUM -->
   <div class="section" id="tab-bizum">
     <div class="card">
-      <div class="card-label">¿Has hecho el Bizum?</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;">Pulsa para confirmar. Cualquiera puede actualizar.</p>
+      <div class="card-label" data-i18n="has_hecho_bizum">¿Has hecho el Bizum?</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;" data-i18n="pulsa_confirmar">Pulsa para confirmar. Cualquiera puede actualizar.</p>
       <div id="bizum-confirm-list"></div>
     </div>
     <div class="card">
-      <div class="card-label">Compartir estado por WhatsApp</div>
+      <div class="card-label" data-i18n="compartir_bizum">Compartir estado por WhatsApp</div>
       <div class="wa-box" id="wa-bizum">—</div>
       <div class="wa-btns">
         <button class="btn-wa btn-wa-copy" onclick="copyBizum()">📋 Copiar</button>
@@ -374,33 +381,33 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div class="balance-grid">
       <div class="balance-card" style="background:var(--red-light);border-color:#FFCDD2;">
         <div class="balance-val" id="bal-gastado" style="color:var(--red);">0,00 €</div>
-        <div class="balance-lbl">Total gastado</div>
+        <div class="balance-lbl" data-i18n="total_gastado">Total gastado</div>
       </div>
       <div class="balance-card" style="background:var(--green-light);border-color:#A5D6A7;">
         <div class="balance-val" id="bal-balance" style="color:var(--green);">0,00 €</div>
-        <div class="balance-lbl">Balance neto</div>
+        <div class="balance-lbl" data-i18n="balance_neto">Balance neto</div>
       </div>
     </div>
     <div class="total-box" id="total-box">
-      <div class="total-label">Total ganado por el grupo</div>
+      <div class="total-label" data-i18n="total_ganado">Total ganado por el grupo</div>
       <div class="total-amount" id="total-amount">0,00 €</div>
       <div class="total-sub" id="total-sub">Sin premios registrados</div>
     </div>
     <div class="card">
-      <div class="card-label">Estadísticas</div>
+      <div class="card-label" data-i18n="estadisticas">Estadísticas</div>
       <div class="stats-grid">
-        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">😬</div><div class="stat-val" id="stat-peor-racha">—</div><div class="stat-lbl">Peor racha sin premio</div></div>
-        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🔥</div><div class="stat-val" id="stat-mejor-racha">—</div><div class="stat-lbl">Mejor racha con premio</div></div>
-        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🏆</div><div class="stat-val" id="stat-mejor">—</div><div class="stat-lbl">Mejor premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">😬</div><div class="stat-val" id="stat-peor-racha">—</div><div class="stat-lbl" data-i18n="peor_racha">Peor racha sin premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🔥</div><div class="stat-val" id="stat-mejor-racha">—</div><div class="stat-lbl" data-i18n="mejor_racha">Mejor racha con premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🏆</div><div class="stat-val" id="stat-mejor">—</div><div class="stat-lbl" data-i18n="mejor_premio">Mejor premio</div></div>
         <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🍀</div>
           <div class="stat-val" id="stat-premiados">—</div>
           <div id="stat-premiados-pct" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
-          <div class="stat-lbl">Sorteos premiados</div>
+          <div class="stat-lbl" data-i18n="sorteos_premiados">Sorteos premiados</div>
         </div>
       </div>
     </div>
     <div class="card">
-      <div class="card-label">Historial de premios</div>
+      <div class="card-label" data-i18n="historial_premios">Historial de premios</div>
       <div id="history-list"></div>
       <div class="add-prize-row" style="margin-top:10px;">
         <input type="number" id="manual-amount" placeholder="€ premios anteriores a la app" min="0" step="0.01">
@@ -415,8 +422,8 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <!-- AVISOS -->
   <div class="section" id="tab-avisos">
     <div class="card">
-      <div class="card-label">¿Quién eres tú?</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;">Selecciona tu nombre para personalizar los avisos.</p>
+      <div class="card-label" data-i18n="quien_eres">¿Quién eres tú?</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;" data-i18n="selecciona_nombre">Selecciona tu nombre para personalizar los avisos.</p>
       <select id="who-select" onchange="onPersonChange()">
         <option value="">— Selecciona tu nombre —</option>
       </select>
@@ -426,7 +433,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         <div class="dot gold" id="notif-dot"></div>
         <span id="notif-status-text">—</span>
       </div>
-      <button class="btn btn-primary" id="btn-notif" onclick="requestNotifPermission()" style="margin-bottom:12px;">🔔 Activar notificaciones</button>
+      <button class="btn btn-primary" id="btn-notif" onclick="requestNotifPermission()" style="margin-bottom:12px;" data-i18n="activar_notif">🔔 Activar notificaciones</button>
     </div>
     <div id="notif-preview" style="display:none;">
       <div class="card">
@@ -438,31 +445,31 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         <div class="schedule-list" id="schedule-list"></div>
       </div>
       <div class="info-box blue" style="font-size:12px;">⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para recibir notificaciones.<br><br><strong>iPhone:</strong> Safari → Compartir → "Añadir a pantalla de inicio"<br><strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"</div>
-      <button class="btn btn-gray" onclick="testNotif()" style="margin-bottom:12px;">🧪 Notificación de prueba</button>
+      <button class="btn btn-gray" onclick="testNotif()" style="margin-bottom:12px;" data-i18n="notif_prueba">🧪 Notificación de prueba</button>
     </div>
   </div>
 
   <!-- SCANNER -->
   <div class="section" id="tab-scanner">
     <div class="card">
-      <div class="card-label">📷 Fotografiar boleto</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;">Haz una foto al boleto como prueba de compra. Queda registrado quién juega y cuándo se compró.</p>
+      <div class="card-label" data-i18n="fotografiar">📷 Fotografiar boleto</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;" data-i18n="foto_desc">Haz una foto al boleto como prueba de compra. Queda registrado quién juega y cuándo se compró.</p>
 
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">Lotería</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="loteria_lbl">Lotería</div>
       <div id="scanner-loteria-selector" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
 
-      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;">¿Quién tiene el boleto físicamente?</div>
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="quien_boleto">¿Quién tiene el boleto físicamente?</div>
       <input type="text" id="scan-holder" placeholder="Nombre de quien lo tiene..." style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;margin-bottom:8px;">
       <div id="scan-who-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
 
-      <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;font-size:16px;padding:16px;">📷 Hacer foto al boleto</button>
-      <button onclick="openGallery()" class="btn btn-gray" style="font-size:15px;padding:14px;border:1.5px solid var(--border2);">🖼️ Elegir de galería</button>
+      <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;font-size:16px;padding:16px;" data-i18n="hacer_foto">📷 Hacer foto al boleto</button>
+      <button onclick="openGallery()" class="btn btn-gray" style="font-size:15px;padding:14px;border:1.5px solid var(--border2);" data-i18n="elegir_galeria">🖼️ Elegir de galería</button>
       <input type="file" id="scanner-file" accept="image/*" capture="environment" style="display:none;" onchange="processImage(this)">
       <input type="file" id="gallery-file" accept="image/*" style="display:none;" onchange="processImage(this)">
     </div>
 
     <div id="scanner-preview-box" class="card" style="display:none;">
-      <div class="card-label">Vista previa del boleto</div>
+      <div class="card-label" data-i18n="vista_previa">Vista previa del boleto</div>
       <img id="scanner-img" style="width:100%;border-radius:10px;margin-bottom:12px;max-height:300px;object-fit:contain;">
       <div style="font-size:13px;color:var(--text2);margin-bottom:10px;" id="scanner-who-confirm"></div>
       <div style="display:flex;gap:8px;">
@@ -472,9 +479,9 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
 
     <div class="card">
-      <div class="card-label">Boletos registrados</div>
+      <div class="card-label" data-i18n="boletos_registrados">Boletos registrados</div>
       <div id="scanner-saved-list"></div>
-      <div class="empty-state" id="scanner-empty" style="padding:16px 0;font-size:13px;">Sin boletos registrados todavía 🎟️<br><span style="font-size:11px;">Fotografía el boleto cada vez que lo compréis</span></div>
+      <div class="empty-state" id="scanner-empty" style="padding:16px 0;font-size:13px;" data-i18n="scanner_empty">Sin boletos registrados todavía 🎟️<br><span style="font-size:11px;">Fotografía el boleto cada vez que lo compréis</span></div>
     </div>
   </div>
 
@@ -482,7 +489,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <div class="section" id="tab-grupo">
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div class="card-label" style="margin-bottom:0;">Nombre del grupo</div>
+        <div class="card-label" style="margin-bottom:0;" data-i18n="nombre_grupo">Nombre del grupo</div>
         <button onclick="toggleEditName()" id="edit-name-btn" style="padding:4px 12px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);">✏️ Editar</button>
       </div>
       <div id="name-view" style="font-size:18px;font-weight:700;color:var(--text);padding:4px 0;"></div>
@@ -496,7 +503,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
-        <div class="card-label" style="margin-bottom:0;">Miembros del grupo</div>
+        <div class="card-label" style="margin-bottom:0;" data-i18n="miembros_grupo">Miembros del grupo</div>
       </div>
       <div id="members-list"></div>
       <div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--border);">
@@ -511,9 +518,9 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
     <div class="card">
-      <div class="card-label">Importes</div>
+      <div class="card-label" data-i18n="importes">Importes</div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);">
-        <span style="font-size:13px;color:var(--text2);">Coste del boleto</span>
+        <span style="font-size:13px;color:var(--text2);" data-i18n="coste_boleto">Coste del boleto</span>
         <div style="display:flex;align-items:center;gap:6px;">
           <span style="font-size:15px;font-weight:700;">€</span>
           <input type="number" id="grupo-ticket-cost" min="1" max="500" step="0.5"
@@ -522,7 +529,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         </div>
       </div>
       <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
-        <span style="font-size:13px;color:var(--text2);">Bizum por persona</span>
+        <span style="font-size:13px;color:var(--text2);" data-i18n="bizum_persona_lbl">Bizum por persona</span>
         <div style="display:flex;align-items:center;gap:6px;">
           <span style="font-size:15px;font-weight:700;">€</span>
           <input type="number" id="grupo-bizum" min="0.5" max="100" step="0.5"
@@ -530,7 +537,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
             onchange="saveImportes()">
         </div>
       </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px;">Se actualiza al añadir o eliminar miembros</div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;" data-i18n="actualiza_miembros">Se actualiza al añadir o eliminar miembros</div>
     </div>
   </div>
 </div>
@@ -857,7 +864,7 @@ function buildComprobar(){
     const div=document.createElement('div');div.className='card';
     const playedState=getPlayedState(l.lottery,draw.fecha);
     const playedClass=playedState==='yes'?'yes':playedState==='no'?'no':'unknown';
-    const playedText=playedState==='yes'?'✅ Jugado':playedState==='no'?'❌ No jugado':'Sin marcar';
+    const playedText=playedState==='yes'?t('jugado'):playedState==='no'?t('no_jugado'):t('sin_marcar');
     div.innerHTML=`
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div style="display:flex;align-items:center;gap:8px;">
@@ -1024,7 +1031,7 @@ function checkAllPrizes(){
     // WA lines
     const numLine=draw.numeros.sort((a,b)=>a-b).map(n=>hitM.includes(n)?`🔵 *${n}*`:`⚪ ${n}`).join(' ');
     const starLine=draw.estrellas.sort((a,b)=>a-b).map(n=>hitS.includes(n)?`🟡 *${n}*`:`⚪ ${n}`).join(' ');
-    const resultLine=prize.cat==='none'?'😅 *Sin premio*':'🏆 *'+prize.label+'* — '+prize.approx;
+    const resultLine=prize.cat==='none'?'😅 *'+twa('sin_premio')+'*':'🏆 *'+prize.label+'* — '+prize.approx;
     waLines.push(`${lot.name}\n${lineSep}\n${resultLine}\n\n🎱 *Nuestros números*\n${_nums.main.join(' · ')}  ⭐ ${_nums.stars.join(' · ')}\n\n🔢 *Sorteo premiado*\n${numLine}  ⭐ ${starLine}\n✅ Aciertos: *${hitM.length>0?hitM.join(', '):'ninguno'}*${hitS.length>0?'  ·  ⭐ *'+hitS.join(', ')+'*':''}`);
   });
 
@@ -1034,10 +1041,10 @@ function checkAllPrizes(){
   if(totalCat==='none'){
     banner.className='result-banner none';
     document.getElementById('rb-emoji').textContent='😅';
-    document.getElementById('rb-title').textContent='Sin premio esta vez';
+    document.getElementById('rb-title').textContent=t('sin_premio');
     document.getElementById('rb-title').style.color='var(--text)';
     document.getElementById('rb-amount').style.display='none';
-    document.getElementById('rb-sub').textContent='¡Suerte el próximo sorteo!';
+    document.getElementById('rb-sub').textContent=t('suerte');
   }else{
     banner.className='result-banner prize'+(totalCat==='big'?' big':'');
     const best=allResults.find(r=>r.prize.cat===totalCat)?.prize;
@@ -1048,12 +1055,12 @@ function checkAllPrizes(){
     document.getElementById('rb-amount').style.display='block';
     document.getElementById('rb-amount').style.color=colors[totalCat];
     document.getElementById('rb-amount').textContent=best?.approx||'';
-    document.getElementById('rb-sub').textContent='¡Enhorabuena! 🎊';
+    document.getElementById('rb-sub').textContent=t('enhorabuena');
     // Update hint for jackpot
     const hint=document.getElementById('add-prize-hint');
     if(hint){
-      if(totalCat==='big') hint.textContent='¡PREMIO GORDO! Introduce el importe real que habéis cobrado.';
-      else hint.textContent='Introduce el importe real cobrado por el grupo.';
+      if(totalCat==='big') hint.textContent=t('add_prize_hint_big');
+      else hint.textContent=t('add_prize_hint');
     }
     // Show add prize box only if not already added for this draw
     const prizeKey=`lg_autoprize_${allResults[0]?.draw?.fecha}_${CFG.name}`;
@@ -1093,7 +1100,7 @@ function checkAllPrizes(){
   window._waByLot=allResults.map(({lot,draw,hitM,hitS,prize,l})=>{
     const numLine=draw.numeros.sort((a,b)=>a-b).map(n=>`${hitM.includes(n)?'🔵 *'+n+'*':'⚪ '+n}`).join(' ');
     const starLine=draw.estrellas.sort((a,b)=>a-b).map(n=>`${hitS.includes(n)?'🟡 *'+n+'*':'⚪ '+n}`).join(' ');
-    const resultLine=prize.cat==='none'?'😅 *Sin premio*':'🏆 *'+prize.label+'* — '+prize.approx;
+    const resultLine=prize.cat==='none'?'😅 *'+twa('sin_premio')+'*':'🏆 *'+prize.label+'* — '+prize.approx;
     return {
       lot:lot.name,
       emoji:lot.emoji,
@@ -1146,7 +1153,7 @@ function togglePlayed(lotKey,fecha,btn){
   const next=(!current||current==='unknown')?'yes':current==='yes'?'no':'yes';
   localStorage.setItem(getPlayedKey(lotKey,fecha),next);
   btn.className='played-btn '+next;
-  btn.textContent=next==='yes'?'✅ Jugado':'❌ No jugado';
+  btn.textContent=next==='yes'?t('jugado'):t('no_jugado');
   renderHistory();
   showToast(next==='yes'?'✅ Marcado como jugado':'❌ Marcado como no jugado');
 }
@@ -1177,18 +1184,18 @@ function buildTurns(){
   document.getElementById('m-payer').textContent=payer;
   document.getElementById('m-bizum').textContent=getBizumAmount()+'€';
 
-  document.getElementById('bizum-text').innerHTML=`<strong>${payer}</strong> paga esta ronda.<br>El resto hacéis <strong>Bizum de ${getBizumAmount()}€</strong> a ${payer}: ${others.join(', ')}.`;
+  document.getElementById('bizum-text').innerHTML=`<strong>${payer}</strong> ${t('paga_ronda').toLowerCase()}.<br>${others.join(', ')} → <strong>Bizum ${getBizumAmount()}€</strong> a ${payer}.`;
   const list=document.getElementById('turns-list');list.innerHTML='';
   members.forEach((m,i)=>{
     const isActive=i===idx,isNext=i===(idx+1)%members.length;
     const row=document.createElement('div');row.className='person-row';
     row.innerHTML=`${getAvatarHTML(m,i)}
       <div class="person-info"><div class="person-name">${m}</div>
-      <div class="person-sub">${isActive?'Paga '+CFG.ticketCost+'€ · activo':isNext?'Siguiente turno':'En espera'}</div></div>
-      <span class="badge ${isActive?'badge-active':isNext?'badge-next':'badge-wait'}">${isActive?'Activo':isNext?'Siguiente':'Espera'}</span>`;
+      <div class="person-sub">${isActive?t('paga_active')+' '+CFG.ticketCost+'€':isNext?t('siguiente_turno'):t('en_espera')}</div></div>
+      <span class="badge ${isActive?'badge-active':isNext?'badge-next':'badge-wait'}">${isActive?t('activo'):isNext?t('siguiente'):t('espera')}</span>`;
     list.appendChild(row);
   });
-  const turnMsg=`🔄 ¡Nuevo turno ${getGroupName()}!\n\n➡️ Ahora paga: ${payer}\n📅 ${CFG.drawsPerTurn} sorteos · ${getTicketCost()}€\n\n💸 Bizum de ${getBizumAmount()}€ a ${payer}:\n${others.map(o=>'   · '+o).join('\n')}\n\n¡Suerte! 🍀`;
+  const turnMsg=`🔄 ${getGroupName()}!\n\n➡️ ${twa('paga_ronda')}: ${payer}\n📅 ${CFG.drawsPerTurn} sorteos · ${getTicketCost()}€\n\n💸 Bizum de ${getBizumAmount()}€ a ${payer}:\n${others.map(o=>'   · '+o).join('\n')}\n\n🍀`;
   document.getElementById('wa-turn').textContent=turnMsg;lastWATurn=turnMsg;
 }
 
@@ -1249,13 +1256,13 @@ async function buildBizumConfirm(){
   const state=await loadBizumState();
   list.innerHTML='';
   const payerRow=document.createElement('div');payerRow.className='bizum-row';
-  payerRow.innerHTML=`<span style="font-size:14px;font-weight:700;">💳 ${payer}</span><span style="font-size:11px;color:var(--text3);">Paga el boleto</span>`;
+  payerRow.innerHTML=`<span style="font-size:14px;font-weight:700;">💳 ${payer}</span><span style="font-size:11px;color:var(--text3);">${t('paga_boleto')}</span>`;
   list.appendChild(payerRow);
   others.forEach(m=>{
     const done=!!state[m];
     const row=document.createElement('div');row.className='bizum-row';
     row.innerHTML=`<span class="bizum-name">${m}</span>
-      <button class="bizum-btn ${done?'done':'pending'}" onclick="toggleBizum('${m}',this)">${done?'✅ Bizum hecho':'⏳ Pendiente'}</button>`;
+      <button class="bizum-btn ${done?'done':'pending'}" onclick="toggleBizum('${m}',this)">${done?t('bizum_hecho'):t('pendiente')}</button>`;
     list.appendChild(row);
   });
   buildWABizum(state,payer,others);
@@ -1265,7 +1272,7 @@ async function toggleBizum(name,btn){
   const current=btn.classList.contains('done');
   const newState=!current;
   btn.className='bizum-btn '+(newState?'done':'pending');
-  btn.textContent=newState?'✅ Bizum hecho':'⏳ Pendiente';
+  btn.textContent=newState?t('bizum_hecho'):t('pendiente');
   btn.disabled=true;
   await saveBizumState(name,newState);
   btn.disabled=false;
@@ -1283,11 +1290,11 @@ function buildWABizum(stateParam){
   const state=stateParam||getBizumState();
   const done=others.filter(m=>state[m]);
   const pending=others.filter(m=>!state[m]);
-  const msg='💸 *Estado Bizums — '+CFG.name+'*'
-    +'\n💳 Paga esta ronda: *'+payer+'*'
+  const msg='💸 *'+CFG.name+'*'
+    +'\n💳 '+twa('paga_ronda')+': *'+payer+'*'
     +'\n'+'─'.repeat(24)
-    +(done.length?'\n✅ Confirmados:\n'+done.map(m=>'   · '+m).join('\n'):'')
-    +(pending.length?'\n⏳ Pendientes:\n'+pending.map(m=>'   · '+m).join('\n'):'')
+    +(done.length?'\n✅ '+twa('bizum_hecho').replace('✅ ','')+':\n'+done.map(m=>'   · '+m).join('\n'):'')
+    +(pending.length?'\n⏳ '+twa('pendiente').replace('⏳ ','')+':\n'+pending.map(m=>'   · '+m).join('\n'):'')
     +'\n'+'─'.repeat(24)
     +'\nBizum de *'+CFG.bizum+'€* a '+payer;
   const el=document.getElementById('wa-bizum');if(el)el.textContent=msg;
@@ -1433,7 +1440,7 @@ async function renderHistory(){
 
   if(!list) return;
   if(history.length===0){
-    list.innerHTML='<div class="empty-state">Sin premios todavía 🍀</div>';
+    list.innerHTML=`<div class="empty-state">${t('sin_premios')}</div>`;
     return;
   }
   list.innerHTML='';
@@ -1619,9 +1626,9 @@ function updateNotifStatusUI(){
   const dot=document.getElementById('notif-dot');
   const txt=document.getElementById('notif-status-text');
   const btn=document.getElementById('btn-notif');
-  if(perm==='granted'){row.className='notif-status ok';dot.className='dot green';txt.textContent='✅ Activadas. Cada lunes a las 10:00h.';btn.style.display='none';document.getElementById('notif-preview').style.display='block';}
-  else if(perm==='denied'){row.className='notif-status off';dot.className='dot red';txt.textContent='❌ Bloqueadas. Actívalas en ajustes del móvil.';btn.style.display='none';}
-  else{row.className='notif-status warn';dot.className='dot gold';txt.textContent='⚠️ No activadas todavía.';btn.style.display='block';}
+  if(perm==='granted'){row.className='notif-status ok';dot.className='dot green';txt.textContent=t('activadas_txt');btn.style.display='none';document.getElementById('notif-preview').style.display='block';}
+  else if(perm==='denied'){row.className='notif-status off';dot.className='dot red';txt.textContent=t('bloqueadas_txt');btn.style.display='none';}
+  else{row.className='notif-status warn';dot.className='dot gold';txt.textContent=t('activa_notif_txt');btn.style.display='block';}
 }
 
 async function requestNotifPermission(){
@@ -2095,57 +2102,173 @@ function renderRotation(){
 // ── I18N ─────────────────────────────────────────────────────────────────────
 const T={
   es:{
-    comprobar:'Comprobar',turnos:'Turnos',bizum:'Bizum',premios:'Premios',avisos:'Avisos',grupo:'Grupo',scanner:'Scanner',
-    nuestros_numeros:'Nuestros números',ultimo_sorteo:'Último sorteo oficial',comprobar_premio:'Comprobar premio',
-    paga_ronda:'Paga esta ronda',bizum_persona:'Bizum por persona',rotacion:'Rotación del grupo',
-    aviso_turno:'Aviso cambio de turno',bizum_hecho:'✅ Bizum hecho',pendiente:'⏳ Pendiente',
-    total_ganado:'Total ganado por el grupo',total_gastado:'TOTAL GASTADO',balance_neto:'BALANCE NETO',
-    estadisticas:'Estadísticas',historial:'Historial de premios',nombre_grupo:'Nombre del grupo',
-    miembros:'Miembros del grupo',importes:'Importes',coste_boleto:'Coste del boleto',
-    rotacion_pagos:'Rotación de pagos',rotacion_auto:'🔄 Rotación automática',rotacion_fija:'📌 Siempre la misma persona',
-    quien_paga:'¿Quién paga siempre?',fotografiar:'📷 Fotografiar boleto',hacer_foto:'📷 Hacer foto al boleto',
-    elegir_galeria:'🖼️ Elegir de galería',sin_premio:'Sin premio esta vez',enhorabuena:'¡Enhorabuena! 🎊',
-    jugado:'✅ Jugado',no_jugado:'❌ No jugado',sin_marcar:'Sin marcar',editar:'✏️ Editar',
-    flag:'🇪🇸'
+    // Tabs
+    tab_comprobar:'Comprobar',tab_turnos:'Turnos',tab_bizum:'Bizum',tab_premios:'Premios',
+    tab_avisos:'Avisos',tab_grupo:'Grupo',tab_scanner:'Scanner',
+    // Setup
+    setup_sub:'No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.',
+    // Comprobar
+    btn_comprobar:'Comprobar premio',add_prize_label:'💰 Añadir premio al historial',
+    wa_label:'Mensaje WhatsApp',nuestros_numeros:'Nuestros números',
+    ultimo_sorteo:'Último sorteo oficial',sin_marcar:'Sin marcar',jugado:'✅ Jugado',no_jugado:'❌ No jugado',
+    has_jugado:'¿Hemos jugado este sorteo?',editar:'✏️ Editar',cerrar:'✕ Cerrar',
+    guardar:'Guardar ✅',cancelar:'Cancelar',add_prize_hint:'Introduce el importe real cobrado.',
+    add_prize_hint_big:'¡PREMIO GORDO! Introduce el importe real que habéis cobrado.',
+    anadir:'+ Añadir',copiar:'📋 Copiar todo',enviar_wa:'📲 Enviar todo',
+    // Result banner
+    sin_premio:'Sin premio esta vez',suerte:'¡Suerte el próximo sorteo!',enhorabuena:'¡Enhorabuena! 🎊',
+    // Turnos
+    paga_ronda:'Paga esta ronda',bizum_persona:'Bizum por persona',
+    rotacion_grupo:'Rotación del grupo',aviso_turno:'Aviso cambio de turno',
+    rotacion_pagos:'Rotación de pagos',rot_auto_title:'🔄 Rotación automática',
+    rot_auto_desc:'Cada X sorteos cambia quien paga',rot_fixed_title:'📌 Siempre la misma persona',
+    rot_fixed_desc:'Una persona paga siempre',quien_paga_siempre:'¿Quién paga siempre?',
+    activo:'Activo',siguiente:'Siguiente',espera:'Espera',paga_active:'Paga',siguiente_turno:'Siguiente turno',en_espera:'En espera',
+    copiar_turno:'📋 Copiar',wa_turno:'📲 WhatsApp',
+    // Bizum
+    has_hecho_bizum:'¿Has hecho el Bizum?',pulsa_confirmar:'Pulsa para confirmar. Cualquiera puede actualizar.',
+    compartir_bizum:'Compartir estado por WhatsApp',bizum_hecho:'✅ Bizum hecho',pendiente:'⏳ Pendiente',
+    paga_boleto:'Paga el boleto',copiar_bizum:'📋 Copiar',wa_bizum:'📲 WhatsApp',
+    // Premios
+    total_gastado:'TOTAL GASTADO',balance_neto:'BALANCE NETO',total_ganado:'Total ganado por el grupo',
+    estadisticas:'Estadísticas',peor_racha:'Peor racha sin premio',mejor_racha:'Mejor racha con premio',
+    mejor_premio:'Mejor premio',sorteos_premiados:'Sorteos premiados',historial_premios:'Historial de premios',
+    sin_premios:'Sin premios todavía 🍀',premios_anteriores:'€ premios anteriores a la app',
+    borrar_historial:'🗑️ Borrar historial',
+    // Avisos
+    quien_eres:'¿Quién eres tú?',selecciona_nombre:'Selecciona tu nombre para personalizar los avisos.',
+    activa_notif_txt:'⚠️ No activadas todavía.',activadas_txt:'✅ Activadas. Cada lunes a las 10:00h.',
+    bloqueadas_txt:'❌ Bloqueadas. Actívalas en ajustes del móvil.',
+    activar_notif:'🔔 Activar notificaciones',notif_prueba:'🧪 Notificación de prueba',
+    proximo_aviso:'Tu próximo aviso (lunes 10:00h)',proximos_lunes:'Próximos lunes',
+    aviso_ios:'<strong>iPhone:</strong> Safari → Compartir → "Añadir a pantalla de inicio"',
+    aviso_android:'<strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"',
+    aviso_importante:'⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para recibir notificaciones.',
+    // Scanner
+    fotografiar:'📷 Fotografiar boleto',foto_desc:'Haz una foto al boleto como prueba de compra. Queda registrado quién juega y cuándo se compró.',
+    loteria_lbl:'Lotería',quien_boleto:'¿Quién tiene el boleto físicamente?',
+    hacer_foto:'📷 Hacer foto al boleto',elegir_galeria:'🖼️ Elegir de galería',
+    vista_previa:'Vista previa del boleto',boletos_registrados:'Boletos registrados',
+    scanner_empty:'Sin boletos registrados todavía 🎟️<br><span style="font-size:11px;">Fotografía el boleto cada vez que lo compréis</span>',
+    confirmar_guardar:'💾 Confirmar y guardar',
+    // Grupo
+    nombre_grupo:'Nombre del grupo',miembros_grupo:'Miembros del grupo',importes:'Importes',
+    coste_boleto:'Coste del boleto',bizum_persona_lbl:'Bizum por persona',
+    actualiza_miembros:'Se actualiza al añadir o eliminar miembros',
+    anadir_miembro:'Añadir miembro',nombre_placeholder:'Nombre...',
+    // WA idioma
+    wa_lang_label:'Idioma mensajes WhatsApp',
+    // flag
+    flag:'ES'
   },
   ca:{
-    comprobar:'Comprovar',turnos:'Torns',bizum:'Bizum',premios:'Premis',avisos:'Avisos',grupo:'Grup',scanner:'Scanner',
-    nuestros_numeros:'Els nostres números',ultimo_sorteo:'Últim sorteig oficial',comprobar_premio:'Comprovar premi',
-    paga_ronda:'Paga aquesta ronda',bizum_persona:'Bizum per persona',rotacion:'Rotació del grup',
-    aviso_turno:'Avís canvi de torn',bizum_hecho:'✅ Bizum fet',pendiente:'⏳ Pendent',
-    total_ganado:'Total guanyat pel grup',total_gastado:'TOTAL GASTAT',balance_neto:'BALANÇ NET',
-    estadisticas:'Estadístiques',historial:'Historial de premis',nombre_grupo:'Nom del grup',
-    miembros:'Membres del grup',importes:'Imports',coste_boleto:'Cost del boleto',
-    rotacion_pagos:'Rotació de pagaments',rotacion_auto:'🔄 Rotació automàtica',rotacion_fija:'📌 Sempre la mateixa persona',
-    quien_paga:'Qui paga sempre?',fotografiar:'📷 Fotografiar boleto',hacer_foto:'📷 Fer foto al boleto',
-    elegir_galeria:'🖼️ Triar de galeria',sin_premio:'Sense premi aquesta vegada',enhorabuena:'Enhorabona! 🎊',
-    jugado:'✅ Jugat',no_jugado:'❌ No jugat',sin_marcar:'Sense marcar',editar:'✏️ Editar',
-    flag:'🏴󠁥󠁳󠁣󠁴󠁿'
+    tab_comprobar:'Comprovar',tab_turnos:'Torns',tab_bizum:'Bizum',tab_premios:'Premis',
+    tab_avisos:'Avisos',tab_grupo:'Grup',tab_scanner:'Scanner',
+    setup_sub:'No s\'ha trobat la configuració.<br>Demana a l\'administrador que et reenvïi l\'enllaç.',
+    btn_comprobar:'Comprovar premi',add_prize_label:'💰 Afegir premi a l\'historial',
+    wa_label:'Missatge WhatsApp',nuestros_numeros:'Els nostres números',
+    ultimo_sorteo:'Últim sorteig oficial',sin_marcar:'Sense marcar',jugado:'✅ Jugat',no_jugado:'❌ No jugat',
+    has_jugado:'Hem jugat aquest sorteig?',editar:'✏️ Editar',cerrar:'✕ Tancar',
+    guardar:'Desar ✅',cancelar:'Cancel·lar',add_prize_hint:'Introdueix l\'import real cobrat.',
+    add_prize_hint_big:'PREMI GROS! Introdueix l\'import real que heu cobrat.',
+    anadir:'+ Afegir',copiar:'📋 Copiar tot',enviar_wa:'📲 Enviar tot',
+    sin_premio:'Sense premi aquesta vegada',suerte:'Molta sort al proper sorteig!',enhorabuena:'Enhorabona! 🎊',
+    paga_ronda:'Paga aquesta ronda',bizum_persona:'Bizum per persona',
+    rotacion_grupo:'Rotació del grup',aviso_turno:'Avís canvi de torn',
+    rotacion_pagos:'Rotació de pagaments',rot_auto_title:'🔄 Rotació automàtica',
+    rot_auto_desc:'Cada X sorteigs canvia qui paga',rot_fixed_title:'📌 Sempre la mateixa persona',
+    rot_fixed_desc:'Una persona paga sempre',quien_paga_siempre:'Qui paga sempre?',
+    activo:'Actiu',siguiente:'Següent',espera:'Espera',paga_active:'Paga',siguiente_turno:'Següent torn',en_espera:'En espera',
+    copiar_turno:'📋 Copiar',wa_turno:'📲 WhatsApp',
+    has_hecho_bizum:'Has fet el Bizum?',pulsa_confirmar:'Prem per confirmar. Qualsevol pot actualitzar.',
+    compartir_bizum:'Compartir estat per WhatsApp',bizum_hecho:'✅ Bizum fet',pendiente:'⏳ Pendent',
+    paga_boleto:'Paga el boleto',copiar_bizum:'📋 Copiar',wa_bizum:'📲 WhatsApp',
+    total_gastado:'TOTAL GASTAT',balance_neto:'BALANÇ NET',total_ganado:'Total guanyat pel grup',
+    estadisticas:'Estadístiques',peor_racha:'Pitjor ratxa sense premi',mejor_racha:'Millor ratxa amb premi',
+    mejor_premio:'Millor premi',sorteos_premiados:'Sorteigs premiats',historial_premios:'Historial de premis',
+    sin_premios:'Sense premis encara 🍀',premios_anteriores:'€ premis anteriors a l\'app',
+    borrar_historial:'🗑️ Esborrar historial',
+    quien_eres:'Qui ets tu?',selecciona_nombre:'Selecciona el teu nom per personalitzar els avisos.',
+    activa_notif_txt:'⚠️ Encara no activades.',activadas_txt:'✅ Activades. Cada dilluns a les 10:00h.',
+    bloqueadas_txt:'❌ Bloquejades. Activa-les als ajustos del mòbil.',
+    activar_notif:'🔔 Activar notificacions',notif_prueba:'🧪 Notificació de prova',
+    proximo_aviso:'El teu pròxim avís (dilluns 10:00h)',proximos_lunes:'Propers dilluns',
+    aviso_ios:'<strong>iPhone:</strong> Safari → Compartir → "Afegir a pantalla d\'inici"',
+    aviso_android:'<strong>Android:</strong> Chrome → Menú ⋮ → "Afegir a pantalla d\'inici"',
+    aviso_importante:'⚠️ <strong>Important:</strong> Afegeix l\'app a la pantalla d\'inici per rebre notificacions.',
+    fotografiar:'📷 Fotografiar boleto',foto_desc:'Fes una foto al boleto com a prova de compra. Queda registrat qui juga i quan es va comprar.',
+    loteria_lbl:'Loteria',quien_boleto:'Qui té el boleto físicament?',
+    hacer_foto:'📷 Fer foto al boleto',elegir_galeria:'🖼️ Triar de galeria',
+    vista_previa:'Previsualització del boleto',boletos_registrados:'Boletos registrats',
+    scanner_empty:'Sense boletos registrats encara 🎟️<br><span style="font-size:11px;">Fotografia el boleto cada cop que el compreu</span>',
+    confirmar_guardar:'💾 Confirmar i desar',
+    nombre_grupo:'Nom del grup',miembros_grupo:'Membres del grup',importes:'Imports',
+    coste_boleto:'Cost del boleto',bizum_persona_lbl:'Bizum per persona',
+    actualiza_miembros:'S\'actualitza en afegir o eliminar membres',
+    anadir_miembro:'Afegir membre',nombre_placeholder:'Nom...',
+    wa_lang_label:'Idioma missatges WhatsApp',
+    flag:'CA'
   },
   en:{
-    comprobar:'Check',turnos:'Turns',bizum:'Payment',premios:'Prizes',avisos:'Alerts',grupo:'Group',scanner:'Scanner',
-    nuestros_numeros:'Our numbers',ultimo_sorteo:'Last official draw',comprobar_premio:'Check prize',
-    paga_ronda:'Pays this round',bizum_persona:'Payment per person',rotacion:'Group rotation',
-    aviso_turno:'Turn change alert',bizum_hecho:'✅ Paid',pendiente:'⏳ Pending',
-    total_ganado:'Total won by the group',total_gastado:'TOTAL SPENT',balance_neto:'NET BALANCE',
-    estadisticas:'Statistics',historial:'Prize history',nombre_grupo:'Group name',
-    miembros:'Group members',importes:'Amounts',coste_boleto:'Ticket cost',
-    rotacion_pagos:'Payment rotation',rotacion_auto:'🔄 Automatic rotation',rotacion_fija:'📌 Always the same person',
-    quien_paga:'Who always pays?',fotografiar:'📷 Photograph ticket',hacer_foto:'📷 Take photo',
-    elegir_galeria:'🖼️ Choose from gallery',sin_premio:'No prize this time',enhorabuena:'Congratulations! 🎊',
-    jugado:'✅ Played',no_jugado:'❌ Not played',sin_marcar:'Not marked',editar:'✏️ Edit',
-    flag:'🇬🇧'
+    tab_comprobar:'Check',tab_turnos:'Turns',tab_bizum:'Payment',tab_premios:'Prizes',
+    tab_avisos:'Alerts',tab_grupo:'Group',tab_scanner:'Scanner',
+    setup_sub:'Configuration not found.<br>Ask the administrator to resend you the link.',
+    btn_comprobar:'Check prize',add_prize_label:'💰 Add prize to history',
+    wa_label:'WhatsApp message',nuestros_numeros:'Our numbers',
+    ultimo_sorteo:'Last official draw',sin_marcar:'Not marked',jugado:'✅ Played',no_jugado:'❌ Not played',
+    has_jugado:'Did we play this draw?',editar:'✏️ Edit',cerrar:'✕ Close',
+    guardar:'Save ✅',cancelar:'Cancel',add_prize_hint:'Enter the actual amount received.',
+    add_prize_hint_big:'JACKPOT! Enter the actual amount your group received.',
+    anadir:'+ Add',copiar:'📋 Copy all',enviar_wa:'📲 Send all',
+    sin_premio:'No prize this time',suerte:'Good luck next draw!',enhorabuena:'Congratulations! 🎊',
+    paga_ronda:'Pays this round',bizum_persona:'Payment per person',
+    rotacion_grupo:'Group rotation',aviso_turno:'Turn change alert',
+    rotacion_pagos:'Payment rotation',rot_auto_title:'🔄 Automatic rotation',
+    rot_auto_desc:'Every X draws the payer changes',rot_fixed_title:'📌 Always the same person',
+    rot_fixed_desc:'One person always pays',quien_paga_siempre:'Who always pays?',
+    activo:'Active',siguiente:'Next',espera:'Waiting',paga_active:'Pays',siguiente_turno:'Next turn',en_espera:'Waiting',
+    copiar_turno:'📋 Copy',wa_turno:'📲 WhatsApp',
+    has_hecho_bizum:'Have you paid?',pulsa_confirmar:'Tap to confirm. Anyone can update.',
+    compartir_bizum:'Share status on WhatsApp',bizum_hecho:'✅ Paid',pendiente:'⏳ Pending',
+    paga_boleto:'Pays the ticket',copiar_bizum:'📋 Copy',wa_bizum:'📲 WhatsApp',
+    total_gastado:'TOTAL SPENT',balance_neto:'NET BALANCE',total_ganado:'Total won by the group',
+    estadisticas:'Statistics',peor_racha:'Worst losing streak',mejor_racha:'Best winning streak',
+    mejor_premio:'Best prize',sorteos_premiados:'Winning draws',historial_premios:'Prize history',
+    sin_premios:'No prizes yet 🍀',premios_anteriores:'€ prizes before the app',
+    borrar_historial:'🗑️ Delete history',
+    quien_eres:'Who are you?',selecciona_nombre:'Select your name to personalize alerts.',
+    activa_notif_txt:'⚠️ Not activated yet.',activadas_txt:'✅ Active. Every Monday at 10:00.',
+    bloqueadas_txt:'❌ Blocked. Enable them in your phone settings.',
+    activar_notif:'🔔 Enable notifications',notif_prueba:'🧪 Test notification',
+    proximo_aviso:'Your next alert (Monday 10:00)',proximos_lunes:'Upcoming Mondays',
+    aviso_ios:'<strong>iPhone:</strong> Safari → Share → "Add to Home Screen"',
+    aviso_android:'<strong>Android:</strong> Chrome → Menu ⋮ → "Add to Home Screen"',
+    aviso_importante:'⚠️ <strong>Important:</strong> Add the app to your home screen to receive notifications.',
+    fotografiar:'📷 Photograph ticket',foto_desc:'Take a photo of the ticket as proof of purchase. It records who plays and when it was bought.',
+    loteria_lbl:'Lottery',quien_boleto:'Who has the ticket?',
+    hacer_foto:'📷 Take photo of ticket',elegir_galeria:'🖼️ Choose from gallery',
+    vista_previa:'Ticket preview',boletos_registrados:'Registered tickets',
+    scanner_empty:'No tickets registered yet 🎟️<br><span style="font-size:11px;">Photograph the ticket every time you buy it</span>',
+    confirmar_guardar:'💾 Confirm and save',
+    nombre_grupo:'Group name',miembros_grupo:'Group members',importes:'Amounts',
+    coste_boleto:'Ticket cost',bizum_persona_lbl:'Payment per person',
+    actualiza_miembros:'Updates when adding or removing members',
+    anadir_miembro:'Add member',nombre_placeholder:'Name...',
+    wa_lang_label:'WhatsApp messages language',
+    flag:'EN'
   }
 };
 
 function getLang(){return localStorage.getItem('lg_lang')||'es';}
+function getWALang(){return localStorage.getItem('lg_wa_lang')||getLang();}
 function t(key){return T[getLang()]?.[key]||T.es[key]||key;}
+function twa(key){return T[getWALang()]?.[key]||T.es[key]||key;}
 
 function openLangSelector(){
   const lang=getLang();
-  document.querySelectorAll('.lang-opt').forEach(b=>{
-    b.classList.toggle('active',b.dataset.lang===lang);
-  });
+  const waLang=getWALang();
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  document.querySelectorAll('.wa-lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===waLang));
   document.getElementById('lang-overlay').style.display='block';
   document.getElementById('lang-popup').style.display='block';
 }
@@ -2155,37 +2278,28 @@ function closeLangSelector(){
 }
 function setLang(lang){
   localStorage.setItem('lg_lang',lang);
-  document.getElementById('lang-btn').textContent=T[lang].flag;
   closeLangSelector();
   applyLang();
-  showToast(lang==='es'?'🇪🇸 Español':lang==='ca'?'🏴󠁥󠁳󠁣󠁴󠁿 Català':'🇬🇧 English');
+  showToast(lang==='es'?'🇪🇸 Español':lang==='ca'?'CAT Catalunya':'🇬🇧 English');
 }
+function setWALang(lang){
+  localStorage.setItem('lg_wa_lang',lang);
+  document.querySelectorAll('.wa-lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  showToast(lang==='es'?'📲 WA: Español':lang==='ca'?'📲 WA: Català':'📲 WA: English');
+}
+
 function applyLang(){
-  // Tab buttons
-  const tabs=['comprobar','turnos','bizum','premios','avisos','grupo','scanner'];
-  document.querySelectorAll('.tab-btn').forEach((btn,i)=>{
-    const key=tabs[i];
-    if(key) btn.lastChild.textContent=t(key);
-  });
-  // Check button
-  const checkBtn=document.getElementById('btn-check');
-  if(checkBtn) checkBtn.textContent=t('comprobar_premio');
-  // Lang flag
+  const lang=getLang();
+  // Update lang button
   const langBtn=document.getElementById('lang-btn');
-  if(langBtn) langBtn.textContent=T[getLang()].flag;
-  // Metric labels
-  const mPayerLbl=document.querySelector('#m-payer')?.nextElementSibling;
-  const mBizumLbl=document.querySelector('#m-bizum')?.nextElementSibling;
-  if(mPayerLbl) mPayerLbl.textContent=t('paga_ronda');
-  if(mBizumLbl) mBizumLbl.textContent=t('bizum_persona');
-  // Balance labels
-  const gastadoLbl=document.querySelector('#bal-gastado')?.nextElementSibling;
-  const balanceLbl=document.querySelector('#bal-balance')?.nextElementSibling;
-  if(gastadoLbl) gastadoLbl.textContent=t('total_gastado');
-  if(balanceLbl) balanceLbl.textContent=t('balance_neto');
-  // Total label
-  const totalLbl=document.querySelector('.total-label');
-  if(totalLbl) totalLbl.textContent=t('total_ganado');
+  const langLabel=document.getElementById('lang-label');
+  if(langLabel) langLabel.textContent=T[lang].flag;
+  // Apply all data-i18n elements
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    const val=t(key);
+    if(val) el.innerHTML=val;
+  });
 }
 
 // ── START ─────────────────────────────────────────────────────────────────────
