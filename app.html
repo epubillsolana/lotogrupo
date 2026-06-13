@@ -266,7 +266,6 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
-    <button onclick="openSuggestions()" style="position:absolute;top:80px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:16px;cursor:pointer;" aria-label="Suggeriments">💬</button>
     <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:44px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;color:#fff;display:flex;align-items:center;gap:4px;">🌐 <span id="lang-label">ES</span></button>
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;"><svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg><span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">Loto<span style="color:#FF8C00;">Grupo</span></span></div>
     <h1 id="header-title" style="font-size:20px;font-weight:900;letter-spacing:.5px;">Mi Peña</h1>
@@ -351,6 +350,28 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <div class="metric"><div class="metric-val" id="m-bizum">—</div><div class="metric-lbl" data-i18n="bizum_persona">Bizum por persona</div></div>
     </div>
     <div class="info-box green"><p id="bizum-text">—</p></div>
+<div class="card">
+      <div class="card-label" data-i18n="importes">Importes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);">
+        <span style="font-size:13px;color:var(--text2);" data-i18n="coste_boleto">Coste del boleto</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:15px;font-weight:700;">€</span>
+          <input type="number" id="grupo-ticket-cost" min="1" max="500" step="0.5"
+            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
+            onchange="recalcFromCost()">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+        <span style="font-size:13px;color:var(--text2);" data-i18n="bizum_persona_lbl">Bizum por persona</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:15px;font-weight:700;">€</span>
+          <input type="number" id="grupo-bizum" min="0.5" max="100" step="0.5"
+            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
+            onchange="saveImportes()">
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;" data-i18n="actualiza_miembros">Se actualiza al añadir o eliminar miembros</div>
+    </div>
     <div class="card">
       <div class="card-label" data-i18n="rotacion_grupo">Rotación del grupo</div>
       <div id="turns-list"></div>
@@ -591,29 +612,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         </div>
       </div>
     </div>
-    <div class="card">
-      <div class="card-label" data-i18n="importes">Importes</div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);">
-        <span style="font-size:13px;color:var(--text2);" data-i18n="coste_boleto">Coste del boleto</span>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:15px;font-weight:700;">€</span>
-          <input type="number" id="grupo-ticket-cost" min="1" max="500" step="0.5"
-            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
-            onchange="recalcFromCost()">
-        </div>
-      </div>
-      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
-        <span style="font-size:13px;color:var(--text2);" data-i18n="bizum_persona_lbl">Bizum por persona</span>
-        <div style="display:flex;align-items:center;gap:6px;">
-          <span style="font-size:15px;font-weight:700;">€</span>
-          <input type="number" id="grupo-bizum" min="0.5" max="100" step="0.5"
-            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
-            onchange="saveImportes()">
-        </div>
-      </div>
-      <div style="font-size:11px;color:var(--text3);margin-top:4px;" data-i18n="actualiza_miembros">Se actualiza al añadir o eliminar miembros</div>
-    </div>
-    <!-- Suggeriments -->
+        <!-- Suggeriments -->
     <div id="suggestions-box" class="card" style="background:linear-gradient(135deg,#FFF5E6,#FFF9F0);border:1.5px solid #FF8C00;">
       <div style="font-size:32px;margin-bottom:6px;">💬</div>
       <div class="card-label" data-i18n="sugg_title" style="font-size:14px;color:#0A1F0F;">💬 Suggeriments</div>
