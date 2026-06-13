@@ -258,15 +258,15 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:20px;">🌐 Idioma / Language</div>
     <div style="font-size:11px;font-weight:700;color:#9AA0A6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">App</div>
     <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
-      <button onclick="setLang('es')" class="lang-opt" data-lang="es">🇪🇸 Español</button>
-      <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">🏴 Català</button>
-      <button onclick="setLang('en')" class="lang-opt" data-lang="en">🇬🇧 English</button>
+      <button onclick="setLang('es')" class="lang-opt" data-lang="es">ES — Español</button>
+      <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">CA — Català</button>
+      <button onclick="setLang('en')" class="lang-opt" data-lang="en">EN — English</button>
     </div>
     <div style="font-size:11px;font-weight:700;color:#9AA0A6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">📲 Missatges WhatsApp</div>
     <div style="display:flex;flex-direction:column;gap:8px;">
-      <button onclick="setWALang('es')" class="lang-opt wa-lang-opt" data-lang="es">🇪🇸 Español</button>
-      <button onclick="setWALang('ca')" class="lang-opt wa-lang-opt" data-lang="ca">🏴 Català</button>
-      <button onclick="setWALang('en')" class="lang-opt wa-lang-opt" data-lang="en">🇬🇧 English</button>
+      <button onclick="setWALang('es')" class="lang-opt wa-lang-opt" data-lang="es">ES — Español</button>
+      <button onclick="setWALang('ca')" class="lang-opt wa-lang-opt" data-lang="ca">CA — Català</button>
+      <button onclick="setWALang('en')" class="lang-opt wa-lang-opt" data-lang="en">EN — English</button>
     </div>
   </div>
 
@@ -507,9 +507,9 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
       <div id="members-list"></div>
       <div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--border);">
-        <div style="font-size:12px;color:var(--text3);margin-bottom:8px;">Añadir miembro</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px;" data-i18n="añadir_miembro">Añadir miembro</div>
         <div style="display:flex;gap:8px;">
-          <input type="text" id="new-member-input" maxlength="20" placeholder="Nombre..."
+          <input type="text" id="new-member-input" maxlength="20" placeholder="Nombre..." id_ph="nombre_ph"
             style="flex:1;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;"
             onkeydown="if(event.key==='Enter')addMemberFromGrupo()">
           <button onclick="addMemberFromGrupo()"
@@ -632,7 +632,7 @@ function showTutorial(){
     {emoji:'🔍',color:'#1565C0',bg:'#E3F2FD',tab:'Comprobar',title:'Comprueba el sorteo',desc:'Entra después de cada sorteo para ver si ha tocado premio.'},
     {emoji:'👥',color:'#2E7D32',bg:'#E8F5E9',tab:'Turnos & Bizum',title:'Gestiona los pagos',desc:'El sistema sabe quién paga. Confirma tu Bizum con un toque.'},
     {emoji:'🏆',color:'#F57F17',bg:'#FFF9C4',tab:'Premios',title:'Historial de premios',desc:'Veis cuánto habéis gastado y ganado en todo momento.'},
-    {emoji:'📷',color:'#6A1B9A',bg:'#F3E5F5',tab:'Scanner',title:'Fotografía el boleto',desc:'Foto del boleto como prueba. Queda registrado quién lo tiene.'},
+    {emoji:'📷',color:'#6A1B9A',bg:'#F3E5F5',tab:'Scanner',title:t('tutorial_boleto_title'),desc:t('tutorial_boleto_desc')},
     {emoji:'📱',color:'#0A1F0F',bg:'#F1F3F4',tab:'',title:'Añádela a tu inicio',desc:'iPhone: Safari → Compartir → Añadir a pantalla de inicio\nAndroid: Chrome → ⋮ → Añadir a pantalla de inicio'},
     {emoji:'🍀',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:'¡Disfruta y suerte!',desc:'Que os toque el gordo... y si no, al menos sin líos 😄'},
   ];
@@ -876,7 +876,7 @@ function buildComprobar(){
 
       <!-- Nuestros números (grandes) -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">Nuestros números</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;" data-i18n="nuestros_nums_lbl">Nuestros números</div>
         <button onclick="toggleNumEditor('${l.lottery}')" id="edit-btn-${l.lottery}"
           style="padding:3px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);">✏️ Editar</button>
       </div>
@@ -899,14 +899,14 @@ function buildComprobar(){
       </div>
 
       <!-- Sorteo oficial -->
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">Último sorteo oficial</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;" data-i18n="ultimo_sorteo_lbl">Último sorteo oficial</div>
       <div class="ball-row">
         ${draw.numeros.map(n=>`<div class="ball draw-main" id="dn-${l.lottery}-${n}">${n}</div>`).join('')}
         <span class="star-sep">⭐</span>
         ${draw.estrellas.map(n=>`<div class="ball draw-star" id="ds-${l.lottery}-${n}">${n}</div>`).join('')}
       </div>
       <div class="played-bar">
-        <span class="played-label">¿Hemos jugado este sorteo?</span>
+        <span class="played-label" data-i18n="has_jugado_lbl">¿Hemos jugado este sorteo?</span>
         <button class="played-btn ${playedClass}" onclick="togglePlayed('${l.lottery}','${draw.fecha}',this)">${playedText}</button>
       </div>`;
     container.appendChild(div);
@@ -1032,7 +1032,7 @@ function checkAllPrizes(){
     const numLine=draw.numeros.sort((a,b)=>a-b).map(n=>hitM.includes(n)?`🔵 *${n}*`:`⚪ ${n}`).join(' ');
     const starLine=draw.estrellas.sort((a,b)=>a-b).map(n=>hitS.includes(n)?`🟡 *${n}*`:`⚪ ${n}`).join(' ');
     const resultLine=prize.cat==='none'?'😅 *'+twa('sin_premio')+'*':'🏆 *'+prize.label+'* — '+prize.approx;
-    waLines.push(`${lot.name}\n${lineSep}\n${resultLine}\n\n🎱 *Nuestros números*\n${_nums.main.join(' · ')}  ⭐ ${_nums.stars.join(' · ')}\n\n🔢 *Sorteo premiado*\n${numLine}  ⭐ ${starLine}\n✅ Aciertos: *${hitM.length>0?hitM.join(', '):'ninguno'}*${hitS.length>0?'  ·  ⭐ *'+hitS.join(', ')+'*':''}`);
+    waLines.push(`${lot.name}\n${lineSep}\n${resultLine}\n\n🎱 *${twa('nuestros_nums_wa')}*\n${_nums.main.join(' · ')}  ⭐ ${_nums.stars.join(' · ')}\n\n🔢 *${twa('sorteo_wa')}*\n${numLine}  ⭐ ${starLine}\n✅ ${twa('aciertos')}: *${hitM.length>0?hitM.join(', '):twa('ninguno')}*${hitS.length>0?'  ·  ⭐ *'+hitS.join(', ')+'*':''}`);
   });
 
   // Banner
@@ -1088,7 +1088,7 @@ function checkAllPrizes(){
         <span class="star-sep">⭐</span>
         ${draw.estrellas.sort((a,b)=>a-b).map(n=>`<div class="ball ${hitS.includes(n)?'hit':'no-hit'}">${n}</div>`).join('')}
       </div>
-      <div style="font-size:12px;color:var(--text2);margin-top:8px;text-align:center;">Aciertos: <strong>${hitM.length>0?hitM.join(', '):'ninguno'}</strong>${hitS.length>0?' · ⭐ <strong>'+hitS.join(', ')+'</strong>':''}</div>`;
+      <div style="font-size:12px;color:var(--text2);margin-top:8px;text-align:center;">${t('aciertos')}: <strong>${hitM.length>0?hitM.join(', '):t('ninguno')}</strong>${hitS.length>0?' · ⭐ <strong>'+hitS.join(', ')+'</strong>':''}</div>`;
     detail.appendChild(card);
   });
 
@@ -1105,7 +1105,7 @@ function checkAllPrizes(){
       lot:lot.name,
       emoji:lot.emoji,
       fecha:draw.fecha,
-      msg:'*'+CFG.name+' — '+lot.name+' ('+draw.fecha+')*\n'+sep26+'\n'+resultLine+'\n\n🎱 *Nuestros números*\n'+l.main.join(' · ')+' ⭐ '+l.stars.join(' · ')+'\n\n🔢 *Sorteo*\n'+numLine+' ⭐ '+starLine+bizumLine
+      msg:'*'+CFG.name+' — '+lot.name+' ('+draw.fecha+')*\n'+sep26+'\n'+resultLine+'\n\n🎱 *'+twa('nuestros_nums_wa')+'*\n'+l.main.join(' · ')+' ⭐ '+l.stars.join(' · ')+'\n\n🔢 *'+twa('sorteo_wa')+'*\n'+numLine+' ⭐ '+starLine+bizumLine
     };
   });
 
@@ -1598,10 +1598,10 @@ function getNotifMsg(myIdx){
   const state=getBizumState();
   if(myIdx===payerIdx){
     const pending=others.filter(m=>!state[m]);
-    return{title:`🎰 ¡Te toca jugar en ${CFG.name}!`,body:pending.length===0?'¡Todos han pagado el Bizum! Recuerda comprar el boleto.':`Pendiente de Bizum: ${pending.join(', ')}.`};
+    return{title:`🎰 ${t('notif_toca')} ${CFG.name}!`,body:pending.length===0?t('notif_todos_pagado'):`${t('notif_pendiente')} ${pending.join(', ')}.`};
   }
-  if(state[myName]) return{title:`🎰 ${CFG.name} esta semana`,body:`Ya tienes el Bizum hecho a ${payer}. ¡A esperar el sorteo!`};
-  return{title:`💸 Bizum de ${CFG.bizum}€ a ${payer}`,body:`Esta semana juega ${payer} en ${CFG.name}. Recuerda el Bizum.`};
+  if(state[myName]) return{title:`🎰 ${CFG.name} ${t('notif_esta_semana')}`,body:`${t('notif_ya_hecho')} ${payer}. ${t('notif_esperar')}`};
+  return{title:`💸 Bizum de ${CFG.bizum}€ a ${payer}`,body:`${t('notif_esta_semana')} ${payer} (${CFG.name}). ${t('notif_recuerda')}`};
 }
 
 function buildNotifPreview(myIdx){
@@ -1880,7 +1880,7 @@ function processImage(input){
       const members=getSavedMembers()||CFG.members;
       const membersWithID=members.map(m=>getMemberID(m)).join(', ');
       document.getElementById('scanner-who-confirm').innerHTML=
-        `<strong>${who}</strong> tiene el boleto · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
+        `<strong>${who}</strong> ${t('tiene_boleto')} · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
          <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithID}</span>`;
       document.getElementById('scanner-preview-box').style.display='block';
       document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
@@ -2018,7 +2018,7 @@ async function renderBoletos(){
 
 
 function deleteBoleto(id){
-  if(!confirm('¿Eliminar este boleto?')) return;
+  if(!confirm(t('eliminar_boleto'))) return;
   fetch(`${SUPA_URL}/rest/v1/boletos?id=eq.${id}`,{
     method:'DELETE',
     headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
@@ -2158,7 +2158,18 @@ const T={
     anadir_miembro:'Añadir miembro',nombre_placeholder:'Nombre...',
     // WA idioma
     wa_lang_label:'Idioma mensajes WhatsApp',
-    // flag
+    nuestros_nums_lbl:'NUESTROS NÚMEROS',ultimo_sorteo_lbl:'ÚLTIMO SORTEO OFICIAL',
+    has_jugado_lbl:'¿Hemos jugado este sorteo?',
+    aciertos:'Aciertos',ninguno:'ninguno',
+    nuestros_nums_wa:'Nuestros números',sorteo_wa:'Sorteo premiado',
+    eliminar_boleto:'¿Eliminar este boleto?',eliminar_premio:'¿Eliminar este premio?',
+    tiene_boleto:'tiene el boleto',
+    añadir_miembro:'Añadir miembro',nombre_ph:'Nombre...',
+    tutorial_boleto_title:'Fotografía el boleto',tutorial_boleto_desc:'Foto del boleto como prueba. Queda registrado quién lo tiene.',
+    boleto_word:'boleto',boletos_word:'boletos',
+    notif_toca:'¡Te toca jugar en',notif_todos_pagado:'¡Todos han pagado el Bizum! Recuerda comprar el boleto.',
+    notif_pendiente:'Pendiente de Bizum:',notif_ya_hecho:'Ya tienes el Bizum hecho a',notif_esperar:'¡A esperar el sorteo!',
+    notif_esta_semana:'esta semana',notif_recuerda:'Recuerda el Bizum.',
     flag:'ES'
   },
   ca:{
@@ -2207,6 +2218,18 @@ const T={
     actualiza_miembros:'S\'actualitza en afegir o eliminar membres',
     anadir_miembro:'Afegir membre',nombre_placeholder:'Nom...',
     wa_lang_label:'Idioma missatges WhatsApp',
+    nuestros_nums_lbl:'ELS NOSTRES NÚMEROS',ultimo_sorteo_lbl:'ÚLTIM SORTEIG OFICIAL',
+    has_jugado_lbl:'Hem jugat aquest sorteig?',
+    aciertos:'Encerts',ninguno:'cap',
+    nuestros_nums_wa:'Els nostres números',sorteo_wa:'Sorteig premiat',
+    eliminar_boleto:'Eliminar aquest bitllet?',eliminar_premio:'Eliminar aquest premi?',
+    tiene_boleto:'té el bitllet',
+    añadir_miembro:'Afegir membre',nombre_ph:'Nom...',
+    tutorial_boleto_title:'Fotografía el bitllet',tutorial_boleto_desc:'Foto del bitllet com a prova. Queda registrat qui el té.',
+    boleto_word:'bitllet',boletos_word:'bitllets',
+    notif_toca:'Et toca jugar a',notif_todos_pagado:'Tothom ha fet el Bizum! Recorda comprar el bitllet.',
+    notif_pendiente:'Pendent de Bizum:',notif_ya_hecho:'Ja has fet el Bizum a',notif_esperar:'A esperar el sorteig!',
+    notif_esta_semana:'aquesta setmana',notif_recuerda:'Recorda el Bizum.',
     flag:'CA'
   },
   en:{
@@ -2255,6 +2278,18 @@ const T={
     actualiza_miembros:'Updates when adding or removing members',
     anadir_miembro:'Add member',nombre_placeholder:'Name...',
     wa_lang_label:'WhatsApp messages language',
+    nuestros_nums_lbl:'OUR NUMBERS',ultimo_sorteo_lbl:'LAST OFFICIAL DRAW',
+    has_jugado_lbl:'Did we play this draw?',
+    aciertos:'Matches',ninguno:'none',
+    nuestros_nums_wa:'Our numbers',sorteo_wa:'Winning draw',
+    eliminar_boleto:'Delete this ticket?',eliminar_premio:'Delete this prize?',
+    tiene_boleto:'has the ticket',
+    añadir_miembro:'Add member',nombre_ph:'Name...',
+    tutorial_boleto_title:'Photograph the ticket',tutorial_boleto_desc:'Photo of the ticket as proof. Records who has it.',
+    boleto_word:'ticket',boletos_word:'tickets',
+    notif_toca:'It\'s your turn to play in',notif_todos_pagado:'Everyone has paid! Remember to buy the ticket.',
+    notif_pendiente:'Payment pending:',notif_ya_hecho:'You already paid to',notif_esperar:'Now wait for the draw!',
+    notif_esta_semana:'this week',notif_recuerda:'Remember the payment.',
     flag:'EN'
   }
 };
@@ -2280,7 +2315,7 @@ function setLang(lang){
   localStorage.setItem('lg_lang',lang);
   closeLangSelector();
   applyLang();
-  showToast(lang==='es'?'🇪🇸 Español':lang==='ca'?'CAT Catalunya':'🇬🇧 English');
+  showToast(lang==='es'?'ES — Español':lang==='ca'?'CA — Català':'EN — English');
 }
 function setWALang(lang){
   localStorage.setItem('lg_wa_lang',lang);
