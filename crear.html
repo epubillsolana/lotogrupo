@@ -516,12 +516,7 @@ function applyLangCrear(){
   if(typeof step!=='undefined'){
     const btnNext=document.getElementById('btn-next');
     if(btnNext) btnNext.textContent=step===4?T.btn_crear:T.btn_siguiente;
-    // Update radio labels
-    const radios=document.querySelectorAll('input[name="epoch-type"]');
-    if(radios.length>=2){
-      radios[0].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.empezamos_now;});
-      radios[1].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.ya_hemos;});
-    }
+    // Update radio labels handled by data-i18n
     // Re-render members with translated roles
     renderMembers();
   }
