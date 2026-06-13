@@ -266,12 +266,10 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
-    <div style="display:flex;align-items:center;justify-content:space-between;position:absolute;top:44px;left:16px;right:16px;">
-      <div style="display:flex;align-items:center;gap:7px;">
-        <svg width="28" height="28" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:17px;letter-spacing:2px;color:#fff;">Loto<span style="color:#FF8C00;">Grupo</span></span>
-      </div>
-      <button id="lang-btn" onclick="openLangSelector()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;">🌐 <span id="lang-label">ES</span></button>
+    <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:44px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;z-index:10;">🌐 <span id="lang-label">ES</span></button>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;">
+      <svg width="26" height="26" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">Loto<span id="grupo-text-color" style="color:#FF8C00;">Grupo</span></span>
     </div>
     <h1 id="header-title" style="font-size:20px;font-weight:900;letter-spacing:.5px;">Mi Peña</h1>
     <div class="header-loterias" id="header-loterias"></div>
@@ -683,7 +681,7 @@ const LOTTERIES={
       {m:1,s:2,label:'11ª 1+2⭐',approx:'~9€',cat:'small'},
       {m:2,s:1,label:'12ª 2+1⭐',approx:'~6€',cat:'small'},
     ]},
-  primitiva:{name:'Primitiva',emoji:'🍀',mainCount:6,mainMax:49,starCount:1,starMax:9,starLabel:'Complementario',
+  primitiva:{name:'Primitiva',emoji:'🍀',mainCount:6,mainMax:49,starCount:1,starMax:49,starLabel:'Complementario',
     fallback:{fecha:'07/06/2026',numeros:[3,12,19,31,43,48],estrellas:[7],bote:'—'},
     prizes:[
       {m:6,s:1,label:'1ª 6+C',approx:'Bote',cat:'big'},
@@ -693,7 +691,7 @@ const LOTTERIES={
       {m:4,s:0,label:'5ª 4 números',approx:'~50€',cat:'small'},
       {m:3,s:0,label:'6ª 3 números',approx:'~1€',cat:'small'},
     ]},
-  bonoloto:{name:'Bonoloto',emoji:'🎱',mainCount:6,mainMax:49,starCount:1,starMax:9,starLabel:'Complementario',
+  bonoloto:{name:'Bonoloto',emoji:'🎱',mainCount:6,mainMax:49,starCount:1,starMax:49,starLabel:'Complementario',
     fallback:{fecha:'06/06/2026',numeros:[5,14,22,35,40,47],estrellas:[4],bote:'—'},
     prizes:[
       {m:6,s:1,label:'1ª 6+C',approx:'Bote',cat:'big'},
@@ -827,6 +825,10 @@ function initApp(){
   const color=CFG.color||'#0A1F0F';
   const header=document.getElementById('app-header');
   header.style.background=`linear-gradient(160deg,${adjustColor(color,-30)},${color},${adjustColor(color,20)})`;
+  // Adapt 'Grupo' text: if group color is orange, use white
+  const orangeColors=['#FF8C00','#E67E22','#BA4A00','#7D3500','#FAC980'];
+  const grupoEl=document.getElementById('grupo-text-color');
+  if(grupoEl) grupoEl.style.color=orangeColors.includes(color)?'rgba(255,255,255,0.8)':'#FF8C00';
   document.getElementById('theme-color-meta').content=color;
   document.documentElement.style.setProperty('--primary',color);
   document.documentElement.style.setProperty('--primary-light',hexToRgba(color,0.1));
