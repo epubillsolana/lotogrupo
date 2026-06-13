@@ -50,7 +50,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
 
 /* SECTIONS */
-.section{display:none;padding:14px 16px;}
+.section{display:none;padding:14px 16px;} .section.active{animation:fadeIn .2s ease-out;} @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
 .section.active{display:block;}
 
 /* CARDS */
@@ -110,7 +110,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .bizum-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);}
 .bizum-row:last-child{border-bottom:none;}
 .bizum-name{font-size:14px;font-weight:600;}
-.bizum-btn{padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:none;}
+.bizum-btn{padding:10px 18px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:none;min-width:130px;text-align:center;}
 .bizum-btn.pending{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-mid);}
 .bizum-btn.done{background:var(--green-light);color:var(--green);border:1px solid #A5D6A7;}
 
@@ -420,8 +420,8 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <input type="text" id="scan-holder" placeholder="Nombre de quien lo tiene..." style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;margin-bottom:8px;">
       <div id="scan-who-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
 
-      <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;">📷 Hacer foto al boleto</button>
-      <button onclick="openGallery()" class="btn btn-gray">🖼️ Elegir foto de galería</button>
+      <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;font-size:16px;padding:16px;">📷 Hacer foto al boleto</button>
+      <button onclick="openGallery()" class="btn btn-gray" style="font-size:15px;padding:14px;border:1.5px solid var(--border2);">🖼️ Elegir de galería</button>
       <input type="file" id="scanner-file" accept="image/*" capture="environment" style="display:none;" onchange="processImage(this)">
       <input type="file" id="gallery-file" accept="image/*" style="display:none;" onchange="processImage(this)">
     </div>
@@ -703,7 +703,7 @@ function initApp(){
   sel.innerHTML='<option value="">— Selecciona tu nombre —</option>';
   CFG.members.forEach((m,i)=>{const o=document.createElement('option');o.value=i;o.textContent=m;sel.appendChild(o);});
   // Total box color
-  document.getElementById('total-box').style.background=`linear-gradient(135deg,${adjustColor(color,-30)},${color})`;
+  document.getElementById('total-box').style.background=`linear-gradient(160deg,${adjustColor(color,-40)},${color},${adjustColor(color,15)})`;
   // Build premios lot tabs if multiple lotteries
   if(CFG.lotteries.length>1){
     const tabs=document.getElementById('premios-lot-tabs');
@@ -824,7 +824,7 @@ function buildComprobar(){
           <span style="font-size:18px;">${lot.emoji}</span>
           <span style="font-size:14px;font-weight:700;">${lot.name}</span>
         </div>
-        <span style="font-size:11px;color:var(--text3);">📅 ${draw.fecha}</span>
+        <span style="font-size:11px;font-weight:700;background:#E8F5E9;color:#2E7D32;border:1px solid #A5D6A7;border-radius:99px;padding:3px 10px;">📅 ${draw.fecha}</span>
       </div>
 
       <!-- Nuestros números (grandes) -->
@@ -1136,6 +1136,7 @@ function buildTurns(){
   const others=members.filter((_,i)=>i!==idx);
   document.getElementById('m-payer').textContent=payer;
   document.getElementById('m-bizum').textContent=getBizumAmount()+'€';
+
   document.getElementById('bizum-text').innerHTML=`<strong>${payer}</strong> paga esta ronda.<br>El resto hacéis <strong>Bizum de ${getBizumAmount()}€</strong> a ${payer}: ${others.join(', ')}.`;
   const list=document.getElementById('turns-list');list.innerHTML='';
   members.forEach((m,i)=>{
@@ -1234,11 +1235,11 @@ async function toggleBizum(name,btn){
   buildWABizum(state,members[payerIdx],members.filter((_,i)=>i!==payerIdx));
 }
 
-function buildWABizum(){
+function buildWABizum(stateParam){
   const _mbrs=getSavedMembers();
   const idx=getCurrentPayerIdx()%_mbrs.length,payer=_mbrs[idx];
   const others=_mbrs.filter((_,i)=>i!==idx);
-  const state=getBizumState();
+  const state=stateParam||getBizumState();
   const done=others.filter(m=>state[m]);
   const pending=others.filter(m=>!state[m]);
   const msg='💸 *Estado Bizums — '+CFG.name+'*'
