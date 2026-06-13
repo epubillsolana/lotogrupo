@@ -1570,13 +1570,18 @@ async function renderHistory(){
   }
   history.sort((a,b)=>(b.id||0)-(a.id||0));
 
-  const total=history.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+  // Filter by selected lottery tab
+  const filteredHistory=_currentPremiosLot==='all'?history:history.filter(e=>e.lotKey===_currentPremiosLot);
+  const activeLotteries=_currentPremiosLot==='all'?CFG.lotteries:CFG.lotteries.filter(l=>l.lottery===_currentPremiosLot);
+
+  // Total premios (filtered)
+  const total=filteredHistory.reduce((s,e)=>s+parseFloat(e.amount||0),0);
   const totalEl=document.getElementById('total-amount');
   if(totalEl) totalEl.textContent=formatEur(total);
 
-  // Gasto total
+  // Gasto total (filtered by active lotteries)
   let totalGastado=0;
-  CFG.lotteries.forEach(l=>{
+  activeLotteries.forEach(l=>{
     const jugados=countSorteosJugados(l.lottery);
     const costePorSorteo=(CFG.ticketCost||20)/(CFG.drawsPerTurn||4);
     totalGastado+=jugados*costePorSorteo;
@@ -1591,18 +1596,18 @@ async function renderHistory(){
   }
 
   const subEl=document.getElementById('total-sub');
-  if(subEl) subEl.textContent=history.length===0?t('premios_registrados'):`${history.length} ${history.length!==1?t('n_premios_pl'):t('n_premios')}`;
+  if(subEl) subEl.textContent=filteredHistory.length===0?t('premios_registrados'):`${filteredHistory.length} ${filteredHistory.length!==1?t('n_premios_pl'):t('n_premios')}`;
 
   const statMejor=document.getElementById('stat-mejor');
-  if(statMejor) statMejor.textContent=history.length>0?formatEur(Math.max(...history.map(e=>parseFloat(e.amount||0)))):'—';
+  if(statMejor) statMejor.textContent=filteredHistory.length>0?formatEur(Math.max(...filteredHistory.map(e=>parseFloat(e.amount||0)))):'—';
 
   if(!list) return;
-  if(history.length===0){
+  if(filteredHistory.length===0){
     list.innerHTML=`<div class="empty-state">${t('sin_premios')}</div>`;
     return;
   }
   list.innerHTML='';
-  history.forEach(e=>{
+  filteredHistory.forEach(e=>{
     const lotKey=e.lotKey||CFG.lotteries[0].lottery;
     const row=document.createElement('div');row.className='history-item';
     row.innerHTML=`
