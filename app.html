@@ -757,7 +757,7 @@ async function fetchDraw(lotKey){
     const dateFrom=`${weekAgo.getFullYear()}${pad(weekAgo.getMonth()+1)}${pad(weekAgo.getDate())}`;
     const gameIds={euromillones:'EMIL',primitiva:'LAPR',bonoloto:'BONO',gordo:'ELGR',loteria_nacional:'LNAC'};
     const gameId=gameIds[lotKey]||'EMIL';
-    const url=`https://loteria-proxy2.e-pubill.workers.dev/servicios/buscadorSorteos?game_id=${gameId}&celebrados=true&num=3&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
+    const url=`https://api.lotogrupo.es/servicios/buscadorSorteos?game_id=${gameId}&celebrados=true&num=3&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
     const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const arr=await r.json();
