@@ -301,6 +301,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
   </div>
 
+  <div id="debug-box" style="display:block;background:#000;color:#0f0;font-size:11px;font-family:monospace;padding:8px;max-height:120px;overflow-y:auto;border-bottom:1px solid #333;"></div>
   <div class="tabbar">
     <button class="tab-btn active" onclick="switchTab('comprobar',this)"><i class="ti ti-search"></i><span data-i18n="tab_comprobar">Comprobar</span></button>
     <button class="tab-btn" onclick="switchTab('turnos',this)"><i class="ti ti-users"></i><span data-i18n="tab_turnos">Turnos</span></button>
@@ -886,6 +887,17 @@ function getCurrentPayerIdx(){
 }
 
 // ── DRAWS ─────────────────────────────────────────────────────────────────────
+function dbg(msg){
+  const box=document.getElementById('debug-box');
+  if(box){
+    const line=document.createElement('div');
+    line.textContent=new Date().toLocaleTimeString()+' '+msg;
+    box.appendChild(line);
+    box.scrollTop=box.scrollHeight;
+  }
+  console.log('[DBG]',msg);
+}
+
 async function fetchDraw(lotKey){
   const lot=LOTTERIES[lotKey];
   try{
