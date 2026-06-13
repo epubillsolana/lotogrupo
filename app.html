@@ -636,6 +636,21 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
         <!-- Suggeriments -->
+    <!-- Compartir grup -->
+    <div class="card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;">
+      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
+        <div style="font-size:32px;">📲</div>
+        <div>
+          <div style="font-size:15px;font-weight:800;color:#fff;" data-i18n="share_grup_title">Invita a tu grupo</div>
+          <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;" data-i18n="share_grup_sub">Comparte el enlace para que todos accedan</div>
+        </div>
+      </div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="shareGroupWA()" style="flex:1;padding:12px;border-radius:10px;background:#25D366;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;">📲 WhatsApp</button>
+        <button onclick="copyGroupLink()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);font-size:14px;font-weight:700;cursor:pointer;" data-i18n="copiar">📋 Copiar</button>
+      </div>
+    </div>
+
     <div id="suggestions-box" class="card" style="background:linear-gradient(135deg,#FFF5E6,#FFF9F0);border:1.5px solid #FF8C00;">
       <div style="font-size:32px;margin-bottom:6px;">💬</div>
       <div class="card-label" data-i18n="sugg_title" style="font-size:14px;color:#0A1F0F;">💬 Suggeriments</div>
@@ -744,12 +759,9 @@ function initOnboardingTexts(){
 
 function showTutorial(){
   const steps=[
-    {emoji:'🔍',color:'#1565C0',bg:'#E3F2FD',tab:t('tut1_tab'),title:t('tut1_title'),desc:t('tut1_desc')},
-    {emoji:'👥',color:'#2E7D32',bg:'#E8F5E9',tab:t('tut2_tab'),title:t('tut2_title'),desc:t('tut2_desc')},
-    {emoji:'🏆',color:'#F57F17',bg:'#FFF9C4',tab:t('tut3_tab'),title:t('tut3_title'),desc:t('tut3_desc')},
-    {emoji:'📷',color:'#6A1B9A',bg:'#F3E5F5',tab:'Scanner',title:t('tutorial_boleto_title'),desc:t('tutorial_boleto_desc')},
-    {emoji:'📱',color:'#0A1F0F',bg:'#F1F3F4',tab:'',title:t('tut5_title'),desc:t('tut5_desc')},
-    {emoji:'🍀',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:t('tut6_title'),desc:t('tut6_desc')},
+    {emoji:'🎰',color:'#1565C0',bg:'#E3F2FD',tab:'',title:t('tut1_title'),desc:t('tut1_desc')},
+    {emoji:'💸',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:t('tut2_title'),desc:t('tut2_desc')},
+    {emoji:'🍀',color:'#FF8C00',bg:'#FFF5E6',tab:'',title:t('tut6_title'),desc:t('tut6_desc')},
   ];
   let step=0;
   const overlay=document.createElement('div');
@@ -763,11 +775,12 @@ function showTutorial(){
       ${s.tab?`<div style="text-align:center;margin-bottom:8px;"><span style="background:${s.bg};color:${s.color};border-radius:99px;padding:4px 14px;font-size:12px;font-weight:700;">${s.tab}</span></div>`:''}
       <div style="text-align:center;font-size:22px;font-weight:900;color:#1A1A18;margin-bottom:10px;">${s.title}</div>
       <div style="text-align:center;font-size:15px;color:#6B7280;line-height:1.6;margin-bottom:32px;white-space:pre-line;">${s.desc}</div>
-      <button onclick="window._tNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;">${isLast?t('tut_empezar'):t('tut_siguiente')}</button>
+      <button onclick="window._tNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;margin-bottom:10px;">${isLast?t('tut_empezar'):t('tut_siguiente')}</button>
+      ${!isLast?`<button onclick="window._tSkip()" style="width:100%;padding:10px;border-radius:99px;background:transparent;border:none;font-size:13px;color:#9CA3AF;cursor:pointer;">${t('tut_skip')}</button>`:''}
     </div>`;
   }
   window._tNext=()=>{if(step<steps.length-1){step++;render();}else window._tSkip();};
-  window._tSkip=()=>{overlay.remove();};
+  window._tSkip=()=>{overlay.remove();showNotifPrompt();}; 
   render();
   document.body.appendChild(overlay);
   let sx=0;
@@ -2211,6 +2224,31 @@ function openWATurn(){window.open('https://wa.me/?text='+encodeURIComponent(last
 function copyBizum(){navigator.clipboard.writeText(lastWABizum).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
 function openWABizum(){window.open('https://wa.me/?text='+encodeURIComponent(lastWABizum),'_blank');}
 
+// ── NOTIF PROMPT ─────────────────────────────────────────────────────────────
+function showNotifPrompt(){
+  if(Notification.permission==='granted') return;
+  if(localStorage.getItem('lg_notif_prompt_shown')) return;
+  localStorage.setItem('lg_notif_prompt_shown','1');
+
+  const overlay=document.createElement('div');
+  overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:flex-end;';
+  overlay.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;text-align:center;">
+    <div style="font-size:48px;margin-bottom:12px;">🔔</div>
+    <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">${t('notif_prompt_title')}</div>
+    <div style="font-size:14px;color:#6B7280;margin-bottom:24px;line-height:1.6;">${t('notif_prompt_desc')}</div>
+    <button onclick="acceptNotifPrompt(this)" style="width:100%;padding:15px;border-radius:12px;background:#FF8C00;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;">${t('notif_prompt_yes')}</button>
+    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:12px;border-radius:12px;background:transparent;border:none;font-size:14px;color:#9CA3AF;cursor:pointer;">${t('notif_prompt_later')}</button>
+  </div>`;
+  document.body.appendChild(overlay);
+}
+
+async function acceptNotifPrompt(btn){
+  btn.closest('[style*=fixed]').remove();
+  // Switch to Avisos tab so user can complete setup
+  showTab('tab-avisos');
+  showToast(t('notif_prompt_goto'));
+}
+
 // ── NOTIF SCHEDULE (grup) ─────────────────────────────────────────────────────
 async function saveGroupNotifSchedule(){
   const day=document.getElementById('notif-day-sel')?.value||'1';
@@ -2385,6 +2423,28 @@ async function saveGroupConfig(){
   }catch(e){console.error(e);}
 }
 
+// ── SHARE GROUP ──────────────────────────────────────────────────────────────
+function getGroupLink(){
+  const slug=new URLSearchParams(window.location.search).get('g');
+  return slug?`https://lotogrupo.es/app.html?g=${slug}`:window.location.href;
+}
+function shareGroupWA(){
+  const link=getGroupLink();
+  const lots=CFG.lotteries.map(l=>LOTTERIES[l.lottery]?.name||l.lottery).join(' + ');
+  const msg=`🎰 *${CFG.name}* — LotoGrupo
+
+Uneix-te al nostre grup de loteria!
+🎯 Juguem: ${lots}
+
+👉 Obre l'app:
+${link}`;
+  window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
+}
+function copyGroupLink(){
+  const link=getGroupLink();
+  navigator.clipboard.writeText(link).then(()=>showToast(t('enlace_copiado'))).catch(()=>showToast(link));
+}
+
 // ── SUGGESTIONS ──────────────────────────────────────────────────────────────
 function openSuggestions(){
   document.getElementById('sugg-overlay').style.display='block';
@@ -2556,7 +2616,7 @@ const T={
     tut3_tab:'Premios',tut3_title:'Historial de premios',tut3_desc:'Veis cuánto habéis gastado y ganado en todo momento.',
     tut5_title:'Añádela a tu inicio',tut5_desc:'iPhone: Safari → Compartir → Añadir a pantalla de inicio\nAndroid: Chrome → ⋮ → Añadir a pantalla de inicio',
     tut6_title:'¡Disfruta y suerte!',tut6_desc:'Que os toque el gordo... y si no, al menos sin líos 😄',
-    tut_siguiente:'Siguiente →',tut_empezar:'¡Empezar! 🚀',
+    tut_siguiente:'Siguiente →',tut_skip:'Saltar tutorial',tut_empezar:'¡Empezar! 🚀',
     onboarding_btn:'¡ENTRAR A LA PEÑA! →',
     sugg_title:'💬 Sugerencias',sugg_desc:'¿Tienes alguna idea para mejorar la app? Cuéntanos.',
     sugg_btn:'Enviar sugerencia',sugg_open:'💬 Enviar una sugerencia',sugg_open_short:'💬 Sugerencias',
@@ -2569,6 +2629,7 @@ const T={
     notif_pendiente:'Pendiente de Bizum:',notif_ya_hecho:'Ya tienes el Bizum hecho a',notif_esperar:'¡A esperar el sorteo!',
     notif_esta_semana:'esta semana',notif_recuerda:'Recuerda el Bizum.',
     flag:'ES',
+    notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
   },
   ca:{
@@ -2647,7 +2708,7 @@ const T={
     tut3_tab:'Premis',tut3_title:'Historial de premis',tut3_desc:'Veieu quant heu gastat i guanyat en tot moment.',
     tut5_title:'Afegeix-la a l\'inici',tut5_desc:'iPhone: Safari → Compartir → Afegir a pantalla d\'inici\nAndroid: Chrome → ⋮ → Afegir a pantalla d\'inici',
     tut6_title:'Gaudeix i molta sort!',tut6_desc:'Que us toqui el gordo... i si no, almenys sense embolicaments 😄',
-    tut_siguiente:'Següent →',tut_empezar:'Començar! 🚀',
+    tut_siguiente:'Següent →',tut_skip:'Saltar tutorial',tut_empezar:'Començar! 🚀',
     onboarding_btn:'ENTRAR A LA PENYA! →',
     sugg_title:'💬 Suggeriments',sugg_desc:'Tens alguna idea per millorar l\'app? Explica\'ns-ho.',
     sugg_btn:'Enviar suggeriment',sugg_open:'💬 Enviar un suggeriment',sugg_open_short:'💬 Suggeriments',
@@ -2659,6 +2720,7 @@ const T={
     notif_toca:'Et toca jugar a',notif_todos_pagado:'Tothom ha fet el Bizum! Recorda comprar el bitllet.',
     notif_pendiente:'Pendent de Bizum:',notif_ya_hecho:'Ja has fet el Bizum a',notif_esperar:'A esperar el sorteig!',
     notif_esta_semana:'aquesta setmana',notif_recuerda:'Recorda el Bizum.',
+    notif_prompt_title:'Activar recordatoris?',notif_prompt_desc:'T\'avisem cada setmana de qui paga i qui ha de fer el Bizum.',notif_prompt_yes:'🔔 Sí, vull avisos',notif_prompt_later:'Ara no',notif_prompt_goto:'Ves a Avisos per completar la configuració',
     gestionar_loterias_lbl:'🎰 Loteríes del grup',añadir_loteria_btn:'+ Afegir loteria',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'Eliminar aquesta loteria?',loteria_added:'✅ Loteria afegida',loteria_removed:'✅ Loteria eliminada',min_one_lot:'El grup necessita almenys una loteria',nueva_combinacion:'Ja activa · Nova combinació',nueva_combinacion_desc:'Afegeix una nova combinació de qualsevol loteria',
     flag:'CA'
   },
@@ -2738,7 +2800,7 @@ const T={
     tut3_tab:'Prizes',tut3_title:'Prize history',tut3_desc:'See how much your group has spent and won at any time.',
     tut5_title:'Add it to your home screen',tut5_desc:'iPhone: Safari → Share → Add to Home Screen\nAndroid: Chrome → ⋮ → Add to Home Screen',
     tut6_title:'Enjoy and good luck!',tut6_desc:"May you win the jackpot... and if not, at least no hassle 😄",
-    tut_siguiente:'Next →',tut_empezar:'Start! 🚀',
+    tut_siguiente:'Next →',tut_skip:'Skip tutorial',tut_empezar:'Start! 🚀',
     onboarding_btn:'ENTER THE GROUP! →',
     sugg_title:'💬 Suggestions',sugg_desc:'Got an idea to improve the app? Let us know.',
     sugg_btn:'Send suggestion',sugg_open:'💬 Send a suggestion',sugg_open_short:'💬 Suggestions',
@@ -2750,6 +2812,7 @@ const T={
     notif_toca:'It\'s your turn to play in',notif_todos_pagado:'Everyone has paid! Remember to buy the ticket.',
     notif_pendiente:'Payment pending:',notif_ya_hecho:'You already paid to',notif_esperar:'Now wait for the draw!',
     notif_esta_semana:'this week',notif_recuerda:'Remember the payment.',
+    notif_prompt_title:'Enable reminders?',notif_prompt_desc:'We\'ll remind you each week who buys the ticket and who needs to pay.',notif_prompt_yes:'🔔 Yes, enable alerts',notif_prompt_later:'Not now',notif_prompt_goto:'Go to Alerts to complete setup',
     gestionar_loterias_lbl:'🎰 Group lotteries',añadir_loteria_btn:'+ Add lottery',eliminar_loteria_btn:'Remove',loteria_activa:'Active',confirm_del_lot:'Remove this lottery?',loteria_added:'✅ Lottery added',loteria_removed:'✅ Lottery removed',min_one_lot:'The group needs at least one lottery',nueva_combinacion:'Already active · New combination',nueva_combinacion_desc:'Add a new combination from any lottery',
     flag:'EN'
   }
