@@ -899,6 +899,7 @@ function dbg(msg){
 }
 
 async function fetchDraw(lotKey){
+  dbg('fetchDraw START: '+lotKey);
   const lot=LOTTERIES[lotKey];
   try{
     const now=new Date();
@@ -909,6 +910,7 @@ async function fetchDraw(lotKey){
     const gameIds={euromillones:'EMIL',primitiva:'LAPR',bonoloto:'BONO',gordo:'ELGR',loteria_nacional:'LNAC'};
     const gameId=gameIds[lotKey]||'EMIL';
     const url=`https://api.lotogrupo.es/servicios/buscadorSorteos?game_id=${gameId}&celebrados=true&num=3&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
+    dbg('URL: '+url.split('?')[1].split('&').slice(0,3).join('&'));
     const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const arr=await r.json();
@@ -941,6 +943,7 @@ async function fetchDraw(lotKey){
 }
 
 async function initAllDraws(){
+  dbg('initAllDraws START - lotteries: '+CFG.lotteries.map(l=>l.lottery).join(','));
   // Always start with hardcoded fallback - never use localStorage cache
   CFG.lotteries.forEach(l=>{
     drawDataMap[l.lottery]=LOTTERIES[l.lottery].fallback;
@@ -949,6 +952,7 @@ async function initAllDraws(){
   document.getElementById('btn-check').disabled=false;
   // Fetch fresh from API directly
   for(const l of CFG.lotteries){
+    dbg('Fetching: '+l.lottery);
     try{
       const fresh=await fetchDraw(l.lottery);
       if(fresh) drawDataMap[l.lottery]=fresh;
