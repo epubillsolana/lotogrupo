@@ -45,7 +45,7 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 /* TABBAR */
 .tabbar{display:flex;background:var(--surface);border-bottom:.5px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 1px 0 var(--border);overflow-x:auto;scrollbar-width:none;}
 .tabbar::-webkit-scrollbar{display:none;}
-.tab-btn{flex:0 0 auto;padding:12px 10px 10px;font-size:10px;font-weight:600;color:var(--text3);border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:3px;border-bottom:2px solid transparent;transition:color .15s;min-width:60px;}
+.tab-btn{flex:0 0 auto;padding:13px 10px 10px;font-size:10px;font-weight:700;color:var(--text3);border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2.5px solid transparent;transition:color .15s;min-width:62px;}
 .tab-btn i{font-size:20px;}
 .tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
 
@@ -59,21 +59,21 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 
 /* BALLS */
 .ball-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center;}
-.ball{width:36px;height:36px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:13px;font-weight:800;}
+.ball{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;}
 .ball.our-main{background:linear-gradient(135deg,#1976D2,#42A5F5);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,.3);}
 .ball.our-star{background:linear-gradient(135deg,#F57F17,#FFD54F);color:#fff;box-shadow:0 2px 8px rgba(245,127,23,.3);}
 .ball.draw-main{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border2);}
 .ball.draw-star{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border2);}
-.ball.hit{background:linear-gradient(135deg,#E53935,#EF9A9A);color:#fff;box-shadow:0 2px 8px rgba(229,57,53,.4);}
+.ball.hit{background:linear-gradient(135deg,#2E7D32,#66BB6A);color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.4);}
 .ball.no-hit{background:var(--surface2);color:var(--text3);opacity:.35;}
 .star-sep{font-size:14px;color:var(--gold);}
 
 /* RESULT BANNER */
 .result-banner{border-radius:var(--radius);padding:18px 16px;margin-bottom:12px;text-align:center;box-shadow:var(--shadow);}
 .result-banner.none{background:var(--surface2);border:.5px solid var(--border);}
-.result-banner.prize{background:linear-gradient(135deg,#FFF9C4,#FFF3E0);border:.5px solid #FFD54F;}
+.result-banner.prize{background:linear-gradient(135deg,#FFF8E1,#FFF3E0);border:1.5px solid #FFD54F;box-shadow:0 4px 16px rgba(245,127,23,.15);}
 .result-banner.prize.big{background:linear-gradient(135deg,#E3F2FD,#E8EAF6);border:.5px solid #90CAF9;}
-.rb-emoji{font-size:44px;margin-bottom:8px;}
+.rb-emoji{font-size:56px;margin-bottom:10px;}
 .rb-title{font-size:18px;font-weight:800;margin-bottom:4px;}
 .rb-amount{font-size:26px;font-weight:800;margin-bottom:4px;}
 .rb-sub{font-size:13px;color:var(--text2);}
@@ -1047,7 +1047,7 @@ function checkAllPrizes(){
 
   // WA - one message per lottery with date
   const sep26='─'.repeat(26);
-  const bizumLine='\n\n'+sep26+'\n💳 Paga esta ronda: *'+payer+'*\n💸 Bizum de *'+CFG.bizum+'€* a '+payer+':\n'+others.map(o=>'   · '+o).join('\n');
+  const bizumLine='';
   
   // Individual messages per lottery with their draw date
   window._waByLot=allResults.map(({lot,draw,hitM,hitS,prize,l})=>{
