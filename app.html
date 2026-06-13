@@ -2300,7 +2300,7 @@ function buildGrupLoterias(){
       <span style="font-size:22px;">${lot.emoji}</span>
       <span style="flex:1;font-size:14px;font-weight:700;">${lot.name}</span>
       <span style="font-size:11px;color:var(--green);font-weight:700;">${t('loteria_activa')}</span>
-      ${CFG.lotteries.length>1?`<button onclick="removeLoteria(${i})" style="padding:5px 10px;border-radius:8px;background:transparent;border:1px solid var(--border2);color:var(--text3);font-size:11px;cursor:pointer;">${t('eliminar_loteria_btn')}</button>`:''}
+      ${CFG.lotteries.length>1?`<button onclick="removeLoteria(${i})" style="padding:5px 10px;border-radius:8px;background:#FEE2E2;border:1px solid #FCA5A5;color:#DC2626;font-size:11px;font-weight:700;cursor:pointer;">${t('eliminar_loteria_btn')}</button>`:''}
     </div>`;
   }).join('');
 }
