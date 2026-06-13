@@ -880,7 +880,7 @@ function buildComprobar(){
 
       <!-- Nuestros números (grandes) -->
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;">
-        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;" data-i18n="nuestros_nums_lbl">Nuestros números</div>
+        <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;">${t('nuestros_nums_lbl')}</div>
         <button onclick="toggleNumEditor('${l.lottery}')" id="edit-btn-${l.lottery}"
           style="padding:3px 10px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);">✏️ Editar</button>
       </div>
@@ -903,14 +903,14 @@ function buildComprobar(){
       </div>
 
       <!-- Sorteo oficial -->
-      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;" data-i18n="ultimo_sorteo_lbl">Último sorteo oficial</div>
+      <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">${t('ultimo_sorteo_lbl')}</div>
       <div class="ball-row">
         ${draw.numeros.map(n=>`<div class="ball draw-main" id="dn-${l.lottery}-${n}">${n}</div>`).join('')}
         <span class="star-sep">⭐</span>
         ${draw.estrellas.map(n=>`<div class="ball draw-star" id="ds-${l.lottery}-${n}">${n}</div>`).join('')}
       </div>
       <div class="played-bar">
-        <span class="played-label" data-i18n="has_jugado_lbl">¿Hemos jugado este sorteo?</span>
+        <span class="played-label">${t('has_jugado_lbl')}</span>
         <button class="played-btn ${playedClass}" onclick="togglePlayed('${l.lottery}','${draw.fecha}',this)">${playedText}</button>
       </div>`;
     container.appendChild(div);
