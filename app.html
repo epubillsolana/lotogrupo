@@ -391,7 +391,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div class="total-box" id="total-box">
       <div class="total-label" data-i18n="total_ganado">Total ganado por el grupo</div>
       <div class="total-amount" id="total-amount">0,00 €</div>
-      <div class="total-sub" id="total-sub">Sin premios registrados</div>
+      <div class="total-sub" id="total-sub" data-i18n="premios_registrados">Sin premios registrados</div>
     </div>
     <div class="card">
       <div class="card-label" data-i18n="estadisticas">Estadísticas</div>
@@ -1003,7 +1003,7 @@ function saveNumEdit(lotKey,mainCount,starCount,mainMax,starMax){
 
 function getPrize(nm,ns,lotKey){
   const prizes=LOTTERIES[lotKey]?.prizes||LOTTERIES.euromillones.prizes;
-  return prizes.find(p=>p.m===nm&&p.s===ns)||{label:'Sin premio',approx:'',cat:'none'};
+  return prizes.find(p=>p.m===nm&&p.s===ns)||{label:t('sin_premio_result'),approx:'',cat:'none'};
 }
 
 function checkAllPrizes(){
@@ -1081,7 +1081,7 @@ function checkAllPrizes(){
     card.innerHTML=`
       <div class="lot-header">
         <span style="font-size:18px;">${lot.emoji}</span>
-        <span class="lot-name">${lot.name} — ${prize.cat==='none'?'Sin premio':'🏆 '+prize.label}</span>
+        <span class="lot-name">${lot.name} — ${prize.cat==='none'?t('sin_premio_result'):'🏆 '+prize.label}</span>
       </div>
       <div class="ball-row">
         ${draw.numeros.sort((a,b)=>a-b).map(n=>`<div class="ball ${hitM.includes(n)?'hit':'no-hit'}">${n}</div>`).join('')}
@@ -1433,7 +1433,7 @@ async function renderHistory(){
   }
 
   const subEl=document.getElementById('total-sub');
-  if(subEl) subEl.textContent=history.length===0?'Sin premios registrados':`${history.length} premio${history.length!==1?'s':''}`;
+  if(subEl) subEl.textContent=history.length===0?t('premios_registrados'):`${history.length} ${history.length!==1?t('n_premios_pl'):t('n_premios')}`;
 
   const statMejor=document.getElementById('stat-mejor');
   if(statMejor) statMejor.textContent=history.length>0?formatEur(Math.max(...history.map(e=>parseFloat(e.amount||0)))):'—';
@@ -1881,7 +1881,7 @@ function processImage(input){
       const membersWithID=members.map(m=>getMemberID(m)).join(', ');
       document.getElementById('scanner-who-confirm').innerHTML=
         `<strong>${who}</strong> ${t('tiene_boleto')} · ${lot.emoji} ${lot.name} · ${new Date().toLocaleDateString('es-ES')}<br>
-         <span style="font-size:11px;color:var(--text3);">Jugadores: ${membersWithID}</span>`;
+         <span style="font-size:11px;color:var(--text3);">${t('jugadores_lbl')} ${membersWithID}</span>`;
       document.getElementById('scanner-preview-box').style.display='block';
       document.getElementById('scanner-preview-box').scrollIntoView({behavior:'smooth',block:'start'});
     };
@@ -1937,7 +1937,7 @@ async function saveBoleto(){
   }catch(e){}
 
   await renderBoletos();
-  showToast(savedOk?'✅ Boleto registrado':'✅ Guardado localmente');
+  showToast(savedOk?t('boleto_registrado'):t('guardado_local'));
 }
 
 
@@ -2006,8 +2006,8 @@ async function renderBoletos(){
       <div class="boleto-header">
         <div>
           <div class="boleto-name">${b.lot||'Boleto'}</div>
-          <div class="boleto-date">Tiene: <strong>${b.who||'—'}</strong> · ${b.fecha||''} ${b.hora||''}</div>
-          <div style="font-size:11px;color:var(--text3);margin-top:2px;">Jugadores: ${membersStr}</div>
+          <div class="boleto-date">${t('tiene_lbl')} <strong>${b.who||'—'}</strong> · ${b.fecha||''} ${b.hora||''}</div>
+          <div style="font-size:11px;color:var(--text3);margin-top:2px;">${t('jugadores_lbl')} ${membersStr}</div>
         </div>
         <button class="boleto-del" onclick="deleteBoleto(${b.id})">✕</button>
       </div>
@@ -2029,7 +2029,7 @@ function deleteBoleto(id){
     localStorage.setItem(key,JSON.stringify(saved));
   }catch(e){}
   renderBoletos();
-  showToast('Boleto eliminado');
+  showToast(t('boleto_eliminado'));
 }
 
 // ── UI ────────────────────────────────────────────────────────────────────────
@@ -2134,6 +2134,10 @@ const T={
     estadisticas:'Estadísticas',peor_racha:'Peor racha sin premio',mejor_racha:'Mejor racha con premio',
     mejor_premio:'Mejor premio',sorteos_premiados:'Sorteos premiados',historial_premios:'Historial de premios',
     sin_premios:'Sin premios todavía 🍀',premios_anteriores:'€ premios anteriores a la app',
+    sin_premio_result:'Sin premio',premios_registrados:'Sin premios registrados',
+    n_premios:'premio',n_premios_pl:'premios',boleto_registrado:'✅ Boleto registrado',
+    guardado_local:'✅ Guardado localmente',boleto_eliminado:'Boleto eliminado',
+    tiene_lbl:'Tiene:',jugadores_lbl:'Jugadores:',
     borrar_historial:'🗑️ Borrar historial',
     // Avisos
     quien_eres:'¿Quién eres tú?',selecciona_nombre:'Selecciona tu nombre para personalizar los avisos.',
@@ -2198,6 +2202,10 @@ const T={
     estadisticas:'Estadístiques',peor_racha:'Pitjor ratxa sense premi',mejor_racha:'Millor ratxa amb premi',
     mejor_premio:'Millor premi',sorteos_premiados:'Sorteigs premiats',historial_premios:'Historial de premis',
     sin_premios:'Sense premis encara 🍀',premios_anteriores:'€ premis anteriors a l\'app',
+    sin_premio_result:'Sense premi',premios_registrados:'Sense premis registrats',
+    n_premios:'premi',n_premios_pl:'premis',boleto_registrado:'✅ Bitllet registrat',
+    guardado_local:'✅ Desat localment',boleto_eliminado:'Bitllet eliminat',
+    tiene_lbl:'Té:',jugadores_lbl:'Jugadors:',
     borrar_historial:'🗑️ Esborrar historial',
     quien_eres:'Qui ets tu?',selecciona_nombre:'Selecciona el teu nom per personalitzar els avisos.',
     activa_notif_txt:'⚠️ Encara no activades.',activadas_txt:'✅ Activades. Cada dilluns a les 10:00h.',
@@ -2258,6 +2266,10 @@ const T={
     estadisticas:'Statistics',peor_racha:'Worst losing streak',mejor_racha:'Best winning streak',
     mejor_premio:'Best prize',sorteos_premiados:'Winning draws',historial_premios:'Prize history',
     sin_premios:'No prizes yet 🍀',premios_anteriores:'€ prizes before the app',
+    sin_premio_result:'No prize',premios_registrados:'No prizes registered',
+    n_premios:'prize',n_premios_pl:'prizes',boleto_registrado:'✅ Ticket registered',
+    guardado_local:'✅ Saved locally',boleto_eliminado:'Ticket deleted',
+    tiene_lbl:'Has:',jugadores_lbl:'Players:',
     borrar_historial:'🗑️ Delete history',
     quien_eres:'Who are you?',selecciona_nombre:'Select your name to personalize alerts.',
     activa_notif_txt:'⚠️ Not activated yet.',activadas_txt:'✅ Active. Every Monday at 10:00.',

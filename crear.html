@@ -115,13 +115,29 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 .config-step.active{display:block;}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
+.lang-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;}
+.lang-popup-overlay.open{display:block;}
+.lang-popup{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:401;box-shadow:0 -4px 24px rgba(0,0,0,0.15);}
+.lang-popup.open{display:block;}
+.lang-opt{width:100%;padding:14px;border-radius:12px;border:1.5px solid #E5E7EB;background:#F9FAFB;font-size:16px;font-weight:700;cursor:pointer;text-align:left;margin-bottom:8px;}
+.lang-opt.active{border-color:#0A1F0F;background:#0A1F0F;color:#fff;}
 </style>
 </head>
 <body>
 
+<div class="lang-popup-overlay" id="lang-overlay" onclick="closeLang()"></div>
+<div class="lang-popup" id="lang-popup">
+  <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:20px;">🌐 Idioma / Language</div>
+  <button onclick="setLang('es')" class="lang-opt" data-lang="es">ES — Español</button>
+  <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">CA — Català</button>
+  <button onclick="setLang('en')" class="lang-opt" data-lang="en">EN — English</button>
+</div>
 <div class="top">
   <div class="top-logo">Loto<span>Grupo</span></div>
-  <div class="top-step" id="top-step">Paso 1 de 4</div>
+  <div style="display:flex;align-items:center;gap:10px;">
+    <button onclick="openLang()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;">🌐 <span id="lang-label">ES</span></button>
+    <div class="top-step" id="top-step">Paso 1 de 4</div>
+  </div>
 </div>
 <div class="progress"><div class="progress-bar" id="progress-bar" style="width:25%;"></div></div>
 
@@ -129,13 +145,13 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 
   <!-- PASO 1 -->
   <div class="config-step active" id="cs-1">
-    <div class="step-eyebrow">Tu peña</div>
-    <div class="step-title">¿Cómo se llama<br>vuestro grupo?</div>
+    <div class="step-eyebrow" data-i18n="step1_eyebrow">Tu peña</div>
+    <div class="step-title" data-i18n="step1_title">¿Cómo se llama<br>vuestro grupo?</div>
     <div class="field">
-      <label>Nombre del grupo</label>
+      <label data-i18n="nombre_grupo_lbl">Nombre del grupo</label>
       <input type="text" id="f-name" placeholder="Ej: Los afortunados..." maxlength="30" oninput="updatePreview()">
     </div>
-    <span class="color-label">Color del grupo</span>
+    <span class="color-label" data-i18n="color_grupo">Color del grupo</span>
     <div class="palettes">
       <div class="palette-row">
         <span class="palette-name">Azul</span>
@@ -175,30 +191,30 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
     </div>
     <div class="preview-label">Vista previa en tiempo real</div>
     <div class="field">
-      <label>¿A qué jugáis? (puedes elegir varias)</label>
+      <label data-i18n="a_que_jugais">¿A qué jugáis? (puedes elegir varias)</label>
       <div class="lottery-badges">
         <div class="lottery-badge-sel lb-euro on" data-l="euromillones" onclick="toggleLot(this)">🌟 Euromillones ✓</div>
         <div class="lottery-badge-sel lb-prim" data-l="primitiva" onclick="toggleLot(this)">🍀 Primitiva</div>
         <div class="lottery-badge-sel lb-bono" data-l="bonoloto" onclick="toggleLot(this)">🎱 Bonoloto</div>
       </div>
-      <div class="field-hint">Configura cada una por separado en el siguiente paso.</div>
+      <div class="field-hint" data-i18n="configura_cada">Configura cada una por separado en el siguiente paso.</div>
     </div>
   </div>
 
   <!-- PASO 2 -->
   <div class="config-step" id="cs-2">
     <div class="step-eyebrow" id="p2-eyebrow">Euromillones</div>
-    <div class="step-title">¿Cómo jugáis<br>vuestro boleto?</div>
+    <div class="step-title" data-i18n="step2_title">¿Cómo jugáis<br>vuestro boleto?</div>
     <div class="field">
-      <label>Tipo de apuesta</label>
+      <label data-i18n="tipo_apuesta">Tipo de apuesta</label>
       <div class="apuesta-grid">
         <div class="apuesta-card selected" data-t="sencilla" onclick="selApuesta(this)">
-          <div class="apuesta-card-title">Sencilla</div>
-          <div class="apuesta-card-desc">Una combinación fija. La más habitual en grupos.</div>
+          <div class="apuesta-card-title" data-i18n="apuesta_sencilla">Sencilla</div>
+          <div class="apuesta-card-desc" data-i18n="apuesta_sencilla_desc">Una combinación fija. La más habitual en grupos.</div>
         </div>
         <div class="apuesta-card" data-t="multiple" onclick="selApuesta(this)">
-          <div class="apuesta-card-title">Múltiple</div>
-          <div class="apuesta-card-desc">Más números, más combinaciones automáticas.</div>
+          <div class="apuesta-card-title" data-i18n="apuesta_multiple">Múltiple</div>
+          <div class="apuesta-card-desc" data-i18n="apuesta_multiple_desc">Más números, más combinaciones automáticas.</div>
         </div>
       </div>
     </div>
@@ -228,29 +244,29 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 
   <!-- PASO 3 -->
   <div class="config-step" id="cs-3">
-    <div class="step-eyebrow">El equipo</div>
-    <div class="step-title">¿Quiénes jugáis<br>en el grupo?</div>
+    <div class="step-eyebrow" data-i18n="step3_eyebrow">El equipo</div>
+    <div class="step-title" data-i18n="step3_title">¿Quiénes jugáis<br>en el grupo?</div>
     <div class="member-list" id="member-list"></div>
     <div class="add-row">
       <input type="text" id="new-member" placeholder="Nombre del miembro..." maxlength="20" onkeydown="if(event.key==='Enter')addMember()">
       <button onclick="addMember()">+ Añadir</button>
     </div>
-    <div class="field-hint" style="margin-top:10px;">El primero de la lista será el primer pagador.</div>
+    <div class="field-hint" style="margin-top:10px;" data-i18n="primer_pagador">El primero de la lista será el primer pagador.</div>
   </div>
 
   <!-- PASO 4 -->
   <div class="config-step" id="cs-4">
-    <div class="step-eyebrow">Organización</div>
-    <div class="step-title">Casi listos 🎯</div>
+    <div class="step-eyebrow" data-i18n="step4_eyebrow">Organización</div>
+    <div class="step-title" data-i18n="step4_title">Casi listos 🎯</div>
 
     <!-- ESENCIALES -->
     <div class="importe-grid">
       <div class="importe-card">
-        <div class="importe-label">Coste total boleto</div>
+        <div class="importe-label" data-i18n="coste_total">Coste total boleto</div>
         <div class="importe-input"><span class="importe-sym">€</span><input class="importe-val" type="number" id="f-cost" value="20" min="1" max="500" oninput="recalcBizum()"></div>
       </div>
       <div class="importe-card">
-        <div class="importe-label">Bizum/persona</div>
+        <div class="importe-label" data-i18n="bizum_persona">Bizum/persona</div>
         <div class="importe-input"><span class="importe-sym">€</span><input class="importe-val" type="number" id="f-bizum" value="4" min="0.5" max="100"></div>
       </div>
     </div>
@@ -259,20 +275,20 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
     </div>
 
     <div class="field">
-      <label>¿Quién tira la quiniela?</label>
+      <label data-i18n="quien_tira">¿Quién tira la quiniela?</label>
       <div class="rotation-grid">
         <div class="rotation-card selected" data-r="draws" onclick="selRot(this)">
-          <div class="rotation-card-title">Va rotando</div>
-          <div class="rotation-card-desc">Los miembros se turnan</div>
+          <div class="rotation-card-title" data-i18n="va_rotando">Va rotando</div>
+          <div class="rotation-card-desc" data-i18n="miembros_turnan">Los miembros se turnan</div>
         </div>
         <div class="rotation-card" data-r="always" onclick="selRot(this)">
-          <div class="rotation-card-title">Siempre el mismo</div>
-          <div class="rotation-card-desc">Una persona compra siempre</div>
+          <div class="rotation-card-title" data-i18n="siempre_mismo">Siempre el mismo</div>
+          <div class="rotation-card-desc" data-i18n="persona_siempre">Una persona compra siempre</div>
         </div>
       </div>
     </div>
     <div class="field" id="always-field" style="display:none;">
-      <label>¿Quién compra siempre?</label>
+      <label data-i18n="quien_compra">¿Quién compra siempre?</label>
       <select id="f-always-payer" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:15px;font-family:inherit;"></select>
     </div>
 
@@ -285,16 +301,16 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       </button>
       <div id="avanzado-panel" style="display:none;padding-top:12px;">
         <div class="field" id="draws-field">
-          <label>Sorteos por turno</label>
+          <label data-i18n="sorteos_turno">Sorteos por turno</label>
           <input type="number" id="f-draws" value="8" min="1">
           <div style="font-size:11px;color:#6B7280;margin-top:4px;">Número de sorteos que cubre cada turno</div>
         </div>
         <div class="field" id="first-payer-field" style="display:none;">
-          <label>¿Quién empieza tirando?</label>
+          <label data-i18n="quien_empieza">¿Quién empieza tirando?</label>
           <select id="f-first-payer" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:15px;font-family:inherit;margin-top:4px;"></select>
         </div>
         <div class="field">
-          <label>¿Ya habéis jugado antes?</label>
+          <label data-i18n="ya_jugado">¿Ya habéis jugado antes?</label>
           <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
             <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
               <input type="radio" name="epoch-type" value="now" checked onchange="toggleEpochField(this)"> Empezamos ahora
@@ -308,7 +324,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
           </div>
         </div>
         <div class="field">
-          <label>Loterías configuradas</label>
+          <label data-i18n="loterias_conf">Loterías configuradas</label>
           <div class="loterias-added" id="loterias-added"></div>
           <button class="btn-add-lot" id="btn-add-lot" onclick="addOtraLoteria()" style="display:none;">+ Añadir otra lotería</button>
         </div>
@@ -322,7 +338,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       <div class="result-emoji">🎉</div>
       <div class="result-title" id="res-title">¡Peña creada!</div>
       <div class="result-badges" id="res-badges"></div>
-      <div class="result-sub">Comparte con tu grupo por WhatsApp.<br>Cada miembro lo añade a la pantalla de inicio.</div>
+      <div class="result-sub" data-i18n="result_sub">Comparte con tu grupo por WhatsApp.<br>Cada miembro lo añade a la pantalla de inicio.</div>
       <button class="btn-wa-big" onclick="shareWA()">📲 COMPARTIR POR WHATSAPP</button>
       <button class="btn-copy-big" onclick="copyLink()">📋 COPIAR ENLACE</button>
       <div style="margin-top:16px;background:#F0FDF4;border:1.5px solid #86EFAC;border-radius:12px;padding:12px 14px;text-align:left;">
@@ -766,6 +782,144 @@ function shareWA(){
   window.open('https://wa.me/?text='+encodeURIComponent(msg),'_blank');
 }
 updateUI();
+
+// ── I18N ─────────────────────────────────────────────────────────────────────
+const TC={
+  es:{
+    step1_eyebrow:'Tu peña',step1_title:'¿Cómo se llama<br>vuestro grupo?',
+    nombre_grupo_lbl:'Nombre del grupo',color_grupo:'Color del grupo',
+    a_que_jugais:'¿A qué jugáis? (puedes elegir varias)',
+    configura_cada:'Configura cada una por separado en el siguiente paso.',
+    step2_title:'¿Cómo jugáis<br>vuestro boleto?',tipo_apuesta:'Tipo de apuesta',
+    apuesta_sencilla:'Sencilla',apuesta_sencilla_desc:'Una combinación fija. La más habitual en grupos.',
+    apuesta_multiple:'Múltiple',apuesta_multiple_desc:'Más números, más combinaciones automáticas.',
+    step3_eyebrow:'El equipo',step3_title:'¿Quiénes jugáis<br>en el grupo?',
+    primer_pagador:'El primero de la lista será el primer pagador.',
+    step4_eyebrow:'Organización',step4_title:'Casi listos 🎯',
+    coste_total:'Coste total boleto',bizum_persona:'Bizum/persona',
+    quien_tira:'¿Quién tira la quiniela?',
+    va_rotando:'Va rotando',miembros_turnan:'Los miembros se turnan',
+    siempre_mismo:'Siempre el mismo',persona_siempre:'Una persona compra siempre',
+    quien_compra:'¿Quién compra siempre?',sorteos_turno:'Sorteos por turno',
+    quien_empieza:'¿Quién empieza tirando?',ya_jugado:'¿Ya habéis jugado antes?',
+    loterias_conf:'Loterías configuradas',
+    result_sub:'Comparte con tu grupo por WhatsApp.<br>Cada miembro lo añade a la pantalla de inicio.',
+    btn_siguiente:'SIGUIENTE →',btn_crear:'🎰 CREAR MI PEÑA',
+    paso_de:'Paso',de:'de',lista:'¡Lista!',
+    nombre_ph:'Ej: Los afortunados...',miembro_ph:'Nombre del miembro...',
+    anadir:'+ Añadir',primer_payer:'Primer pagador',miembro:'Miembro',
+    empezamos_now:'Empezamos ahora',ya_hemos:'Ya hemos jugado',
+    flag:'ES'
+  },
+  ca:{
+    step1_eyebrow:'La teva penya',step1_title:'Com es diu<br>el vostre grup?',
+    nombre_grupo_lbl:'Nom del grup',color_grupo:'Color del grup',
+    a_que_jugais:'A què jugueu? (podeu triar diverses)',
+    configura_cada:'Configura cada una per separat al pas següent.',
+    step2_title:'Com jugueu<br>el vostre bitllet?',tipo_apuesta:'Tipus d\'aposta',
+    apuesta_sencilla:'Senzilla',apuesta_sencilla_desc:'Una combinació fixa. La més habitual en grups.',
+    apuesta_multiple:'Múltiple',apuesta_multiple_desc:'Més números, més combinacions automàtiques.',
+    step3_eyebrow:'L\'equip',step3_title:'Qui juga<br>al grup?',
+    primer_pagador:'El primer de la llista serà el primer pagador.',
+    step4_eyebrow:'Organització',step4_title:'Quasi a punt 🎯',
+    coste_total:'Cost total bitllet',bizum_persona:'Bizum/persona',
+    quien_tira:'Qui compra el bitllet?',
+    va_rotando:'Va rotant',miembros_turnan:'Els membres es van tornant',
+    siempre_mismo:'Sempre el mateix',persona_siempre:'Una persona compra sempre',
+    quien_compra:'Qui compra sempre?',sorteos_turno:'Sorteigs per torn',
+    quien_empieza:'Qui comença comprant?',ya_jugado:'Ja heu jugat abans?',
+    loterias_conf:'Loteries configurades',
+    result_sub:'Comparteix amb el teu grup per WhatsApp.<br>Cada membre l\'afegeix a la pantalla d\'inici.',
+    btn_siguiente:'SEGÜENT →',btn_crear:'🎰 CREAR LA MEVA PENYA',
+    paso_de:'Pas',de:'de',lista:'Llesta!',
+    nombre_ph:'Ex: Els afortunats...',miembro_ph:'Nom del membre...',
+    anadir:'+ Afegir',primer_payer:'Primer pagador',miembro:'Membre',
+    empezamos_now:'Comencem ara',ya_hemos:'Ja hem jugat',
+    flag:'CA'
+  },
+  en:{
+    step1_eyebrow:'Your group',step1_title:'What\'s your<br>group called?',
+    nombre_grupo_lbl:'Group name',color_grupo:'Group color',
+    a_que_jugais:'What do you play? (you can choose several)',
+    configura_cada:'Configure each one separately in the next step.',
+    step2_title:'How do you play<br>your ticket?',tipo_apuesta:'Bet type',
+    apuesta_sencilla:'Simple',apuesta_sencilla_desc:'One fixed combination. Most common in groups.',
+    apuesta_multiple:'Multiple',apuesta_multiple_desc:'More numbers, more automatic combinations.',
+    step3_eyebrow:'The team',step3_title:'Who plays<br>in the group?',
+    primer_pagador:'The first on the list will be the first payer.',
+    step4_eyebrow:'Organisation',step4_title:'Almost ready 🎯',
+    coste_total:'Total ticket cost',bizum_persona:'Payment/person',
+    quien_tira:'Who buys the ticket?',
+    va_rotando:'Rotating',miembros_turnan:'Members take turns',
+    siempre_mismo:'Always the same',persona_siempre:'One person always buys',
+    quien_compra:'Who always buys?',sorteos_turno:'Draws per turn',
+    quien_empieza:'Who starts buying?',ya_jugado:'Have you played before?',
+    loterias_conf:'Configured lotteries',
+    result_sub:'Share with your group on WhatsApp.<br>Each member adds it to their home screen.',
+    btn_siguiente:'NEXT →',btn_crear:'🎰 CREATE MY GROUP',
+    paso_de:'Step',de:'of',lista:'Ready!',
+    nombre_ph:'E.g: The lucky ones...',miembro_ph:'Member name...',
+    anadir:'+ Add',primer_payer:'First payer',miembro:'Member',
+    empezamos_now:'Starting now',ya_hemos:'We\'ve played before',
+    flag:'EN'
+  }
+};
+
+function getLang(){return localStorage.getItem('lg_lang')||'es';}
+function tc(key){return TC[getLang()]?.[key]||TC.es[key]||key;}
+
+function openLang(){
+  const lang=getLang();
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  document.getElementById('lang-overlay').classList.add('open');
+  document.getElementById('lang-popup').classList.add('open');
+}
+function closeLang(){
+  document.getElementById('lang-overlay').classList.remove('open');
+  document.getElementById('lang-popup').classList.remove('open');
+}
+function setLang(lang){
+  localStorage.setItem('lg_lang',lang);
+  closeLang();
+  applyLangCrear();
+}
+function applyLangCrear(){
+  const lang=getLang();
+  const T=TC[lang]||TC.es;
+  document.getElementById('lang-label').textContent=T.flag;
+  // Apply data-i18n
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(T[key]) el.innerHTML=T[key];
+  });
+  // Update placeholders
+  const namePh=document.getElementById('f-name');
+  if(namePh) namePh.placeholder=T.nombre_ph;
+  const memberPh=document.getElementById('new-member');
+  if(memberPh) memberPh.placeholder=T.miembro_ph;
+  // Update buttons
+  const btnNext=document.getElementById('btn-next');
+  if(btnNext) btnNext.textContent=step===4?T.btn_crear:T.btn_siguiente;
+  // Update radio labels
+  const radios=document.querySelectorAll('input[name="epoch-type"]');
+  if(radios.length>=2){
+    radios[0].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.empezamos_now;});
+    radios[1].parentElement.childNodes.forEach(n=>{if(n.nodeType===3)n.textContent=' '+T.ya_hemos;});
+  }
+  // Re-render members with translated roles
+  renderMembers();
+}
+
+// Override renderMembers to use tc()
+const _origRenderMembers=renderMembers;
+function renderMembers(){
+  const list=document.getElementById('member-list');if(!list)return;
+  list.innerHTML='';
+  members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?tc('primer_payer'):tc('miembro')}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
+}
+
+// Apply on load
+applyLangCrear();
 </script>
 </body>
 </html>

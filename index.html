@@ -185,6 +185,14 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
   .lottery-opts{grid-template-columns:1fr;}
   .brow{flex-direction:column;}
 }
+.lang-sel{position:absolute;top:16px;right:16px;z-index:10;}
+.lang-sel-btn{background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;}
+.lang-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;}
+.lang-popup-overlay.open{display:block;}
+.lang-popup{display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:301;box-shadow:0 -4px 24px rgba(0,0,0,0.15);}
+.lang-popup.open{display:block;}
+.lang-opt{width:100%;padding:14px;border-radius:12px;border:1.5px solid #E5E7EB;background:#F9FAFB;font-size:16px;font-weight:700;cursor:pointer;text-align:left;margin-bottom:8px;}
+.lang-opt.active{border-color:#0A1F0F;background:#0A1F0F;color:#fff;}
 </style>
 <script type="application/ld+json">
 {
@@ -212,26 +220,36 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
 </head>
 <body>
 
+<!-- Lang overlay + popup -->
+<div class="lang-popup-overlay" id="lang-overlay" onclick="closeLang()"></div>
+<div class="lang-popup" id="lang-popup">
+  <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:20px;">🌐 Idioma / Language</div>
+  <button onclick="setLang('es')" class="lang-opt" data-lang="es">ES — Español</button>
+  <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">CA — Català</button>
+  <button onclick="setLang('en')" class="lang-opt" data-lang="en">EN — English</button>
+</div>
+
 <!-- HERO -->
-<div class="hero">
-  <div class="hero-inner">
+<div class="hero" style="position:relative;">
+  <div class="hero-inner" style="position:relative;">
+    <button onclick="openLang()" style="position:absolute;top:0;right:0;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:5px 12px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;">🌐 <span id="lang-label">ES</span></button>
     <div class="hero-logo">Loto<span>Grupo</span></div>
-    <div class="hero-tagline">Gestión de lotería en grupo · España</div>
+    <div class="hero-tagline" data-i18n="tagline">Gestión de lotería en grupo · España</div>
     <div class="hero-loterias">
       <div class="loteria-badge"><span>🌟</span>Euromillones</div>
       <div class="loteria-badge"><span>🍀</span>Primitiva</div>
       <div class="loteria-badge"><span>🎱</span>Bonoloto</div>
     </div>
-    <div class="hero-headline">Tu peña,<br><em>sin líos<br>ni olvidos</em></div>
-    <div class="hero-sub">Controla <strong>a quién le toca tirar la quiniela</strong>, a quién hacer el <strong>Bizum</strong>, comprueba los <strong>premios</strong>, los <strong>beneficios acumulados</strong>...</div>
+    <div class="hero-headline" data-i18n="headline">Tu peña,<br><em>sin líos<br>ni olvidos</em></div>
+    <div class="hero-sub" data-i18n="hero_sub">Controla <strong>a quién le toca tirar la quiniela</strong>, a quién hacer el <strong>Bizum</strong>, comprueba los <strong>premios</strong>, los <strong>beneficios acumulados</strong>...</div>
     <div class="mas-row">
-      <div class="mas-text">¡Y MUCHO MÁS!</div>
+      <div class="mas-text" data-i18n="y_mas">¡Y MUCHO MÁS!</div>
       <div class="explosion">
         <span class="exp-item">🎉</span><span class="exp-item">🏆</span><span class="exp-item">💸</span><span class="exp-item">🎰</span><span class="exp-item">🍀</span>
       </div>
     </div>
     <a href="crear.html" class="cta">
-      <span class="cta-text">🎰 CREAR MI PEÑA GRATIS</span>
+      <span class="cta-text" data-i18n="cta_crear">🎰 CREAR MI PEÑA GRATIS</span>
       <div class="cta-arrow">→</div>
     </a>
 
@@ -244,7 +262,7 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
 <div class="accordion">
   <div class="acc-item" id="acc-pasos">
     <div class="acc-header" onclick="toggleAcc('pasos')">
-      <div class="acc-title">Cómo funciona</div>
+      <div class="acc-title" data-i18n="como_funciona">Cómo funciona</div>
       <div class="acc-icon"><i class="ti ti-chevron-down" aria-hidden="true"></i></div>
     </div>
     <div class="acc-body">
@@ -252,17 +270,17 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
         <div class="step">
           <div class="step-num">1</div>
           <div class="step-icon"><i class="ti ti-adjustments-horizontal" style="font-size:20px;color:#FF8C00;" aria-hidden="true"></i></div>
-          <div class="step-title">Configuras tu peña</div>
+          <div class="step-title" data-i18n="paso1">Configuras tu peña</div>
         </div>
         <div class="step">
           <div class="step-num">2</div>
           <div class="step-icon"><i class="ti ti-share" style="font-size:20px;color:#FF8C00;" aria-hidden="true"></i></div>
-          <div class="step-title">Compartes el enlace</div>
+          <div class="step-title" data-i18n="paso2">Compartes el enlace</div>
         </div>
         <div class="step">
           <div class="step-num">3</div>
           <div class="step-icon"><i class="ti ti-bolt" style="font-size:20px;color:#FF8C00;" aria-hidden="true"></i></div>
-          <div class="step-title">La app trabaja por vosotros</div>
+          <div class="step-title" data-i18n="paso3">La app trabaja por vosotros</div>
         </div>
       </div>
     </div>
@@ -270,34 +288,34 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
 
   <div class="acc-item" id="acc-features">
     <div class="acc-header" onclick="toggleAcc('features')">
-      <div class="acc-title">Qué incluye</div>
+      <div class="acc-title" data-i18n="que_incluye">Qué incluye</div>
       <div class="acc-icon"><i class="ti ti-chevron-down" aria-hidden="true"></i></div>
     </div>
     <div class="acc-body">
       <div class="carousel-wrap">
         <div class="carousel-track">
-          <div class="feat-card c-blue"><i class="ti ti-search" style="font-size:26px;color:#185FA5;" aria-hidden="true"></i><div class="feat-title">Resultados del sorteo</div></div>
-          <div class="feat-card c-green"><i class="ti ti-repeat" style="font-size:26px;color:#3B6D11;" aria-hidden="true"></i><div class="feat-title">Turno de pagos</div></div>
-          <div class="feat-card c-gold"><i class="ti ti-cash" style="font-size:26px;color:#854F0B;" aria-hidden="true"></i><div class="feat-title">Aviso de Bizums</div></div>
-          <div class="feat-card c-purple"><i class="ti ti-trophy" style="font-size:26px;color:#534AB7;" aria-hidden="true"></i><div class="feat-title">Ganancias acumuladas</div></div>
-          <div class="feat-card c-teal"><i class="ti ti-chart-bar" style="font-size:26px;color:#0F6E56;" aria-hidden="true"></i><div class="feat-title">Gastos del grupo</div></div>
-          <div class="feat-card c-red"><i class="ti ti-bell" style="font-size:26px;color:#A32D2D;" aria-hidden="true"></i><div class="feat-title">Avisos al móvil</div></div>
-          <div class="feat-card c-green"><i class="ti ti-circle-check" style="font-size:26px;color:#3B6D11;" aria-hidden="true"></i><div class="feat-title">Confirmación Bizums</div></div>
+          <div class="feat-card c-blue"><i class="ti ti-search" style="font-size:26px;color:#185FA5;" aria-hidden="true"></i><div class="feat-title" data-i18n="feat1">Resultados del sorteo</div></div>
+          <div class="feat-card c-green"><i class="ti ti-repeat" style="font-size:26px;color:#3B6D11;" aria-hidden="true"></i><div class="feat-title" data-i18n="feat2">Turno de pagos</div></div>
+          <div class="feat-card c-gold"><i class="ti ti-cash" style="font-size:26px;color:#854F0B;" aria-hidden="true"></i><div class="feat-title" data-i18n="feat3">Aviso de Bizums</div></div>
+          <div class="feat-card c-purple"><i class="ti ti-trophy" style="font-size:26px;color:#534AB7;" aria-hidden="true"></i><div class="feat-title" data-i18n="feat4">Ganancias acumuladas</div></div>
+          <div class="feat-card c-teal"><i class="ti ti-chart-bar" style="font-size:26px;color:#0F6E56;" aria-hidden="true"></i><div class="feat-title" data-i18n="feat5">Gastos del grupo</div></div>
+          <div class="feat-card c-red"><i class="ti ti-bell" style="font-size:26px;color:#A32D2D;" aria-hidden="true"></i><div class="feat-title" data-i18n="feat6">Avisos al móvil</div></div>
+          <div class="feat-card c-green"><i class="ti ti-circle-check" style="font-size:26px;color:#3B6D11;" aria-hidden="true"></i><div class="feat-title" data-i18n="feat7">Confirmación Bizums</div></div>
         </div>
       </div>
-      <div class="carousel-hint">← Desliza hacia la izquierda para ver más</div>
+      <div class="carousel-hint" data-i18n="desliza">← Desliza hacia la izquierda para ver más</div>
     </div>
   </div>
 
   <div class="acc-item" id="acc-paraquien">
     <div class="acc-header" onclick="toggleAcc('paraquien')">
-      <div class="acc-title">Para quién</div>
+      <div class="acc-title" data-i18n="para_quien_title">Para quién</div>
       <div class="acc-icon"><i class="ti ti-chevron-down" aria-hidden="true"></i></div>
     </div>
     <div class="acc-body">
       <div class="para-quien-box">
-        <div class="para-quien-title">Para cualquier grupo que quiera <em>control y orden</em> en el juego de la lotería con sus amigos</div>
-        <div class="para-quien-sub">Da igual si sois 3 o 20. Da igual si jugáis cada semana o solo en Navidad. LotoGrupo se adapta a vuestro grupo.</div>
+        <div class="para-quien-title" data-i18n="para_quien_desc">Para cualquier grupo que quiera <em>control y orden</em> en el juego de la lotería con sus amigos</div>
+        <div class="para-quien-sub" data-i18n="para_quien_sub">Da igual si sois 3 o 20. Da igual si jugáis cada semana o solo en Navidad. LotoGrupo se adapta a vuestro grupo.</div>
       </div>
     </div>
   </div>
@@ -305,13 +323,100 @@ footer{background:#0A1F0F;padding:24px;display:flex;justify-content:space-betwee
 
 <footer>
   <div class="footer-logo">Loto<span>Grupo</span></div>
-  <div class="footer-text">Hecho con 🍀 para España<br>lotogrupo.es</div>
+  <div class="footer-text" data-i18n="footer_text">Hecho con 🍀 para España<br>lotogrupo.es</div>
 </footer>
 
 <div class="toast" id="toast"></div>
 
 <script>
+const TI={
+  es:{
+    tagline:'Gestión de lotería en grupo · España',
+    headline:'Tu peña,<br><em>sin líos<br>ni olvidos</em>',
+    hero_sub:'Controla <strong>a quién le toca tirar la quiniela</strong>, a quién hacer el <strong>Bizum</strong>, comprueba los <strong>premios</strong>, los <strong>beneficios acumulados</strong>...',
+    y_mas:'¡Y MUCHO MÁS!',
+    cta_crear:'🎰 CREAR MI PEÑA GRATIS',
+    como_funciona:'Cómo funciona',
+    paso1:'Configuras tu peña',paso2:'Compartes el enlace',paso3:'La app trabaja por vosotros',
+    que_incluye:'Qué incluye',
+    feat1:'Resultados del sorteo',feat2:'Turno de pagos',feat3:'Aviso de Bizums',
+    feat4:'Ganancias acumuladas',feat5:'Gastos del grupo',feat6:'Avisos al móvil',feat7:'Confirmación Bizums',
+    desliza:'← Desliza hacia la izquierda para ver más',
+    para_quien_title:'Para quién',
+    para_quien_desc:'Para cualquier grupo que quiera <em>control y orden</em> en el juego de la lotería con sus amigos',
+    para_quien_sub:'Da igual si sois 3 o 20. Da igual si jugáis cada semana o solo en Navidad. LotoGrupo se adapta a vuestro grupo.',
+    footer_text:'Hecho con 🍀 para España<br>lotogrupo.es',
+    flag:'ES'
+  },
+  ca:{
+    tagline:'Gestió de loteria en grup · Catalunya',
+    headline:'La teva penya,<br><em>sense embolicaments<br>ni oblits</em>',
+    hero_sub:'Controla <strong>a qui li toca comprar el bitllet</strong>, a qui fer el <strong>Bizum</strong>, comprova els <strong>premis</strong>, els <strong>beneficis acumulats</strong>...',
+    y_mas:'I MOLT MÉS!',
+    cta_crear:'🎰 CREAR LA MEVA PENYA GRATIS',
+    como_funciona:'Com funciona',
+    paso1:'Configures la teva penya',paso2:'Comparteixes l'enllaç',paso3:'L'app treballa per vosaltres',
+    que_incluye:'Què inclou',
+    feat1:'Resultats del sorteig',feat2:'Torn de pagaments',feat3:'Avís de Bizums',
+    feat4:'Guanys acumulats',feat5:'Despeses del grup',feat6:'Avisos al mòbil',feat7:'Confirmació Bizums',
+    desliza:'← Llisca cap a l'esquerra per veure més',
+    para_quien_title:'Per a qui',
+    para_quien_desc:'Per a qualsevol grup que vulgui <em>control i ordre</em> en el joc de la loteria amb els seus amics',
+    para_quien_sub:'Tant si sou 3 com 20. Tant si jugueu cada setmana com només a Nadal. LotoGrupo s'adapta al vostre grup.',
+    footer_text:'Fet amb 🍀 per Catalunya<br>lotogrupo.es',
+    flag:'CA'
+  },
+  en:{
+    tagline:'Group lottery management · Spain',
+    headline:'Your group,<br><em>no hassle,<br>no forgotten payments</em>',
+    hero_sub:'Track <strong>who needs to buy the ticket</strong>, who to <strong>pay</strong>, check <strong>prizes</strong>, <strong>accumulated winnings</strong>...',
+    y_mas:'AND MUCH MORE!',
+    cta_crear:'🎰 CREATE MY GROUP FOR FREE',
+    como_funciona:'How it works',
+    paso1:'Set up your group',paso2:'Share the link',paso3:'The app does the work',
+    que_incluye:'What's included',
+    feat1:'Draw results',feat2:'Payment turns',feat3:'Payment alerts',
+    feat4:'Accumulated winnings',feat5:'Group expenses',feat6:'Mobile alerts',feat7:'Payment confirmation',
+    desliza:'← Swipe left to see more',
+    para_quien_title:'Who is it for',
+    para_quien_desc:'For any group that wants <em>control and order</em> when playing the lottery with friends',
+    para_quien_sub:'Whether you're 3 or 20 people. Whether you play every week or just at Christmas. LotoGrupo adapts to your group.',
+    footer_text:'Made with 🍀 for Spain<br>lotogrupo.es',
+    flag:'EN'
+  }
+};
+
+function getLang(){return localStorage.getItem('lg_lang')||'es';}
+function setLang(lang){
+  localStorage.setItem('lg_lang',lang);
+  closeLang();
+  applyLang();
+}
+function openLang(){
+  const lang=getLang();
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
+  document.getElementById('lang-overlay').classList.add('open');
+  document.getElementById('lang-popup').classList.add('open');
+}
+function closeLang(){
+  document.getElementById('lang-overlay').classList.remove('open');
+  document.getElementById('lang-popup').classList.remove('open');
+}
+function applyLang(){
+  const lang=getLang();
+  const T=TI[lang]||TI.es;
+  document.getElementById('lang-label').textContent=T.flag;
+  document.querySelectorAll('[data-i18n]').forEach(el=>{
+    const key=el.getAttribute('data-i18n');
+    if(T[key]) el.innerHTML=T[key];
+  });
+  // Update CTA href language
+  document.querySelector('.cta').href='crear.html';
+}
 function toggleAcc(id){document.getElementById('acc-'+id).classList.toggle('open');}
+
+// Init
+applyLang();
 </script>
 </body>
 </html>
