@@ -600,7 +600,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div class="card">
       <div class="card-label" data-i18n="gestionar_loterias_lbl">🎰 Loterias del grup</div>
       <div id="grup-loterias-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
-      <button onclick="openAddLoteria()" style="width:100%;padding:11px;border-radius:10px;background:transparent;border:1.5px dashed var(--border2);color:var(--text2);font-size:13px;font-weight:700;cursor:pointer;" data-i18n="añadir_loteria_btn">+ Añadir lotería</button>
+      <button onclick="openAddLoteria()" id="btn-add-lot-grup" style="width:100%;padding:13px;border-radius:12px;background:var(--surface2);border:1.5px dashed #FF8C00;color:#FF8C00;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span style="font-size:20px;">🎰</span> <span data-i18n="añadir_loteria_btn">+ Añadir lotería</span></button>
     </div>
 
     <div class="card">
@@ -2309,18 +2309,28 @@ function removeLoteria(idx){
 }
 
 function openAddLoteria(){
+  // Show ALL lotteries - existing ones for new combinations, new ones to add
   const existing=CFG.lotteries.map(l=>l.lottery);
-  const available=Object.entries(ALL_LOTS).filter(([k])=>!existing.includes(k));
-  if(!available.length){showToast('Ja tens totes les loteríes!');return;}
   
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;display:flex;align-items:flex-end;';
-  overlay.innerHTML=`<div style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 16px 40px;width:100%;">
-    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:16px;" data-i18n="añadir_loteria_btn">${t('añadir_loteria_btn')}</div>
-    ${available.map(([k,lot])=>`
-      <button onclick="addLoteria('${k}',this)" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-radius:12px;background:var(--surface2);border:1px solid var(--border);margin-bottom:8px;font-size:15px;font-weight:700;cursor:pointer;color:var(--text);">
-        <span style="font-size:24px;">${lot.emoji}</span>${lot.name}
-      </button>`).join('')}
+  
+  const lotItems=Object.entries(ALL_LOTS).map(([k,lot])=>{
+    const isExisting=existing.includes(k);
+    return `<button onclick="addLoteria('${k}',this)" style="display:flex;align-items:center;gap:12px;width:100%;padding:14px 16px;border-radius:12px;background:var(--surface2);border:1.5px solid ${isExisting?'#FF8C00':'var(--border)'};margin-bottom:8px;font-size:15px;font-weight:700;cursor:pointer;color:var(--text);">
+      <span style="font-size:28px;">${lot.emoji}</span>
+      <div style="flex:1;text-align:left;">
+        <div>${lot.name}</div>
+        ${isExisting?`<div style="font-size:11px;color:#FF8C00;margin-top:2px;">${t('loteria_activa')} · ${t('nueva_combinacion')}</div>`:''}
+      </div>
+      <span style="font-size:20px;">${isExisting?'➕':'🆕'}</span>
+    </button>`;
+  }).join('');
+  
+  overlay.innerHTML=`<div style="background:var(--surface);border-radius:20px 20px 0 0;padding:24px 16px 40px;width:100%;max-height:80vh;overflow-y:auto;">
+    <div style="font-size:16px;font-weight:800;color:var(--text);margin-bottom:6px;">${t('añadir_loteria_btn')}</div>
+    <div style="font-size:12px;color:var(--text3);margin-bottom:16px;">${t('nueva_combinacion_desc')}</div>
+    ${lotItems}
     <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:12px;border-radius:10px;background:var(--surface2);border:none;font-size:14px;color:var(--text2);cursor:pointer;margin-top:4px;">${t('cancelar')}</button>
   </div>`;
   document.body.appendChild(overlay);
@@ -2535,7 +2545,8 @@ const T={
     notif_toca:'¡Te toca jugar en',notif_todos_pagado:'¡Todos han pagado el Bizum! Recuerda comprar el boleto.',
     notif_pendiente:'Pendiente de Bizum:',notif_ya_hecho:'Ya tienes el Bizum hecho a',notif_esperar:'¡A esperar el sorteo!',
     notif_esta_semana:'esta semana',notif_recuerda:'Recuerda el Bizum.',
-    flag:'ES'
+    flag:'ES',
+    gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
   },
   ca:{
     tab_comprobar:'Comprovar',tab_turnos:'Torns',tab_bizum:'Bizum',tab_premios:'Premis',
@@ -2625,6 +2636,7 @@ const T={
     notif_toca:'Et toca jugar a',notif_todos_pagado:'Tothom ha fet el Bizum! Recorda comprar el bitllet.',
     notif_pendiente:'Pendent de Bizum:',notif_ya_hecho:'Ja has fet el Bizum a',notif_esperar:'A esperar el sorteig!',
     notif_esta_semana:'aquesta setmana',notif_recuerda:'Recorda el Bizum.',
+    gestionar_loterias_lbl:'🎰 Loteríes del grup',añadir_loteria_btn:'+ Afegir loteria',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'Eliminar aquesta loteria?',loteria_added:'✅ Loteria afegida',loteria_removed:'✅ Loteria eliminada',min_one_lot:'El grup necessita almenys una loteria',nueva_combinacion:'Ja activa · Nova combinació',nueva_combinacion_desc:'Afegeix una nova combinació de qualsevol loteria',
     flag:'CA'
   },
   en:{
@@ -2715,6 +2727,7 @@ const T={
     notif_toca:'It\'s your turn to play in',notif_todos_pagado:'Everyone has paid! Remember to buy the ticket.',
     notif_pendiente:'Payment pending:',notif_ya_hecho:'You already paid to',notif_esperar:'Now wait for the draw!',
     notif_esta_semana:'this week',notif_recuerda:'Remember the payment.',
+    gestionar_loterias_lbl:'🎰 Group lotteries',añadir_loteria_btn:'+ Add lottery',eliminar_loteria_btn:'Remove',loteria_activa:'Active',confirm_del_lot:'Remove this lottery?',loteria_added:'✅ Lottery added',loteria_removed:'✅ Lottery removed',min_one_lot:'The group needs at least one lottery',nueva_combinacion:'Already active · New combination',nueva_combinacion_desc:'Add a new combination from any lottery',
     flag:'EN'
   }
 };
