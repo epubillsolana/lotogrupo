@@ -1,4 +1,11 @@
-<!DOCTYPE html>
+<!DOCTYPE     <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div class="card-label" style="margin-bottom:0;" data-i18n="historial_sortejos">Historial de sorteos</div>
+        <button onclick="toggleDrawsHistory()" id="btn-toggle-draws" style="padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);" data-i18n="ver_historial">Ver</button>
+      </div>
+      <div id="draws-history-list" style="display:none;flex-direction:column;gap:6px;"></div>
+    </div>
+html>
 <html lang="es">
 <head>
 <meta charset="UTF-8">
@@ -1579,7 +1586,12 @@ async function renderHistory(){
   const activeLotteries=_currentPremiosLot==='all'?CFG.lotteries:CFG.lotteries.filter(l=>l.lottery===_currentPremiosLot);
 
   // Total premios (filtered)
-  const total=filteredHistory.reduce((s,e)=>s+parseFloat(e.amount||0),0);
+  // Exclude prizes from draws explicitly marked as "no jugado"
+  const total=filteredHistory.reduce((s,e)=>{
+    const ps=getPlayedState(e.lotKey||CFG.lotteries[0].lottery, e.fecha||'');
+    if(ps==='no') return s; // exclude if explicitly not played
+    return s+parseFloat(e.amount||0);
+  },0);
   const totalEl=document.getElementById('total-amount');
   if(totalEl) totalEl.textContent=formatEur(total);
 
@@ -1629,6 +1641,7 @@ async function renderHistory(){
 }
 
 
+// ── ADD PRIZE ────────────────────────────────────────────────────────────────
 function addManualPrize(){
   const input=document.getElementById('manual-amount');
   const amount=parseFloat(input.value);
@@ -2459,6 +2472,87 @@ async function saveGroupConfig(){
   }catch(e){console.error(e);}
 }
 
+// ── DRAWS HISTORY ────────────────────────────────────────────────────────────
+let _drawsHistoryOpen = false;
+
+function toggleDrawsHistory(){
+  _drawsHistoryOpen = !_drawsHistoryOpen;
+  const list = document.getElementById('draws-history-list');
+  const btn = document.getElementById('btn-toggle-draws');
+  if(list) list.style.display = _drawsHistoryOpen ? 'flex' : 'none';
+  if(btn) btn.textContent = _drawsHistoryOpen ? t('ocultar_historial') : t('ver_historial');
+  if(_drawsHistoryOpen) buildDrawsHistory();
+}
+
+function buildDrawsHistory(){
+  const list = document.getElementById('draws-history-list');
+  if(!list || !CFG) return;
+
+  // Generate all draw dates from epoch to today for all lotteries
+  const daysMap = {euromillones:[2,5], primitiva:[4,6], bonoloto:[1,2,3,4,5]};
+  const epoch = new Date(CFG.epoch || new Date());
+  const now = new Date();
+  const draws = [];
+
+  CFG.lotteries.forEach(l => {
+    const days = daysMap[l.lottery] || [2,5];
+    const lot = LOTTERIES[l.lottery];
+    const d = new Date(epoch);
+    d.setHours(0,0,0,0);
+    while(d <= now){
+      if(days.includes(d.getDay())){
+        const fecha = d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getFullYear();
+        const state = getPlayedState(l.lottery, fecha) || 'unknown';
+        draws.push({lottery:l.lottery, fecha, state, dateObj:new Date(d), lotName:lot?.name||l.lottery, lotEmoji:lot?.emoji||'🎰'});
+      }
+      d.setDate(d.getDate()+1);
+    }
+  });
+
+  // Sort newest first
+  draws.sort((a,b) => b.dateObj - a.dateObj);
+
+  if(!draws.length){
+    list.innerHTML = `<div style="font-size:13px;color:var(--text3);text-align:center;padding:8px;">${t('sin_premios')}</div>`;
+    return;
+  }
+
+  list.innerHTML = '';
+  draws.slice(0, 30).forEach(dr => {
+    const row = document.createElement('div');
+    row.style.cssText = 'display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:.5px solid var(--border);';
+
+    const stateColor = dr.state==='yes'?'#2E7D32':dr.state==='no'?'#C62828':'#9CA3AF';
+    const stateText = dr.state==='yes'?t('jugado_lbl'):dr.state==='no'?t('no_jugado_lbl'):t('sin_marcar_lbl');
+    const stateEmoji = dr.state==='yes'?'✅':dr.state==='no'?'❌':'⬜';
+
+    row.innerHTML = `
+      <span style="font-size:20px;">${dr.lotEmoji}</span>
+      <div style="flex:1;">
+        <div style="font-size:13px;font-weight:700;color:var(--text);">${dr.lotName}</div>
+        <div style="font-size:11px;color:var(--text3);">${dr.fecha}</div>
+      </div>
+      <button onclick="togglePlayedFromHistory('${dr.lottery}','${dr.fecha}',this)"
+        style="padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid ${stateColor};color:${stateColor};background:transparent;">
+        ${stateEmoji} ${stateText}
+      </button>`;
+    list.appendChild(row);
+  });
+}
+
+function togglePlayedFromHistory(lotKey, fecha, btn){
+  const current = getPlayedState(lotKey, fecha) || 'unknown';
+  // Cycle: unknown -> yes -> no -> unknown
+  const next = (!current||current==='unknown')?'yes':current==='yes'?'no':'unknown';
+  if(next==='unknown') localStorage.removeItem(getPlayedKey(lotKey,fecha));
+  else localStorage.setItem(getPlayedKey(lotKey,fecha), next);
+  // Rebuild draws history and re-render premios
+  buildDrawsHistory();
+  renderHistory();
+  // Also update comprobar if visible
+  buildComprobar();
+}
+
 // ── SHARE GROUP ──────────────────────────────────────────────────────────────
 function getGroupLink(){
   const slug=new URLSearchParams(window.location.search).get('g');
@@ -2667,7 +2761,8 @@ const T={
     splash_welcome:'BIENVENIDO A',
     share_grup_title:'Comparte con tu grupo',share_grup_sub:'Envía el enlace para que todos accedan',
     confirm_name_change:'¿Cambiar el nombre del grupo? El enlace permanece igual, no hace falta reenviarlo.',
-    name_updated:'✅ Nombre actualizado',    flag:'ES',
+    name_updated:'✅ Nombre actualizado',    historial_sortejos:'Historial de sorteos',ver_historial:'Ver',ocultar_historial:'Ocultar',jugado_lbl:'Jugado',no_jugado_lbl:'No jugado',sin_marcar_lbl:'Sin marcar',
+    flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
   },
@@ -2764,7 +2859,8 @@ const T={
     splash_welcome:'BENVINGUT A',
     share_grup_title:'Comparteix amb el teu grup',share_grup_sub:'Envia l\'enllaç perquè tothom hi accedeixi',
     confirm_name_change:'Canviar el nom del grup? L\'enllaç és el mateix, no cal tornar-lo a enviar.',
-    name_updated:'✅ Nom actualitzat',    flag:'CA'
+    name_updated:'✅ Nom actualitzat',    historial_sortejos:'Historial de sorteigs',ver_historial:'Veure',ocultar_historial:'Amagar',jugado_lbl:'Jugat',no_jugado_lbl:'No jugat',sin_marcar_lbl:'Sense marcar',
+    flag:'CA'
   },
   en:{
     tab_comprobar:'Check',tab_turnos:'Turns',tab_bizum:'Payment',tab_premios:'Prizes',
@@ -2858,7 +2954,8 @@ const T={
     gestionar_loterias_lbl:'🎰 Group lotteries',añadir_loteria_btn:'+ Add lottery',eliminar_loteria_btn:'Remove',loteria_activa:'Active',confirm_del_lot:'Remove this lottery?',loteria_added:'✅ Lottery added',loteria_removed:'✅ Lottery removed',min_one_lot:'The group needs at least one lottery',nueva_combinacion:'Already active · New combination',nueva_combinacion_desc:'Add a new combination from any lottery',
     share_grup_title:'Share with your group',share_grup_sub:'Send the link so everyone can access',
     confirm_name_change:'Change the group name? The link stays the same, no need to reshare it.',
-    name_updated:'✅ Name updated',    flag:'EN'
+    name_updated:'✅ Name updated',    historial_sortejos:'Draw history',ver_historial:'View',ocultar_historial:'Hide',jugado_lbl:'Played',no_jugado_lbl:'Not played',sin_marcar_lbl:'Not marked',
+    flag:'EN'
   }
 };
 
