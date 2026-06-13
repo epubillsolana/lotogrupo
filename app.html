@@ -830,7 +830,6 @@ async function loadConfig(){
     document.getElementById('setup-screen').style.display='none';
     document.getElementById('main-app').style.display='block';
     // Update splash with group name then hide after 1.5s
-    const splashWelcome=document.getElementById('splash-welcome');
     const splashGroup=document.getElementById('splash-group');
     if(splashGroup) splashGroup.textContent=CFG.displayName||CFG.name;
     const isFirstTime=!localStorage.getItem(`lg_ob_${CFG.name}`);
