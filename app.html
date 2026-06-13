@@ -906,15 +906,22 @@ async function fetchDraw(lotKey){
     const s=arr[0];
     const f=s.fecha_sorteo.replace(/\s.*/,'').replace(/-/g,'');
     const fecha=`${f.slice(6,8)}/${f.slice(4,6)}/${f.slice(0,4)}`;
-    const comb=s.combinacion.match(/\d+/g).map(Number).filter(n=>n>0);
-    const numeros=comb.slice(0,lot.mainCount).sort((a,b)=>a-b);
-    const estrellas=comb.slice(lot.mainCount,lot.mainCount+lot.starCount).sort((a,b)=>a-b);
-    // For Primitiva/Bonoloto complementario may be missing - accept if main numbers are correct
-    const mainOk=numeros.length===lot.mainCount;
-    const starOk=estrellas.length===lot.starCount||(lot.starCount===1&&estrellas.length===0);
-    if(mainOk&&starOk){
-      const result={fecha,numeros,estrellas:estrellas.length?estrellas:[0],bote:s.bote_ganado||'—'};
+    const allNums=s.combinacion.match(/\d+/g).map(Number).filter(n=>n>0);
+    // For Euromillones: 5 main + 2 stars. For Primitiva/Bonoloto: 6 main + 1 complementario
+    // The complementario is always the last number in combinacion
+    const numeros=allNums.slice(0,lot.mainCount).sort((a,b)=>a-b);
+    // For Primitiva/Bonoloto get complementario from reintegro or last number
+    let estrellas=allNums.slice(lot.mainCount,lot.mainCount+lot.starCount);
+    if(estrellas.length===0&&lot.starCount===1){
+      // Try reintegro field
+      if(s.reintegro) estrellas=[Number(s.reintegro)];
+      else if(allNums.length>lot.mainCount) estrellas=[allNums[lot.mainCount]];
+    }
+    estrellas=estrellas.sort((a,b)=>a-b);
+    if(numeros.length>=lot.mainCount){
+      const result={fecha,numeros,estrellas,bote:s.bote_ganado||s.premio_bote||'—'};
       localStorage.setItem('lg_draw_'+lotKey,JSON.stringify(result));
+      dbg(lotKey+' OK: '+numeros.join(',')+' comp:'+estrellas.join(','));
       return result;
     }
   }catch(e){dbg('ERROR: '+e.message);}
