@@ -217,6 +217,29 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 .boleto-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 6px;}
 .lang-opt{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border2);background:var(--surface2);font-size:16px;font-weight:700;cursor:pointer;text-align:left;}
 .lang-opt.active{border-color:var(--primary);background:var(--primary);color:#fff;}
+/* RESPONSIVE - pantalles petites */
+@media(max-width:360px){
+  .ball{width:34px;height:34px;font-size:12px;}
+  .tab-btn{min-width:50px;padding:11px 6px 9px;font-size:9px;}
+  .tab-btn i{font-size:18px;}
+  .card{padding:12px;}
+  .metric-val{font-size:22px;}
+  .header h1{font-size:18px;}
+  .btn{font-size:14px;padding:12px;}
+  .ball-row{gap:5px;}
+  .metrics{gap:8px;}
+  .balance-grid{gap:8px;}
+  .stats-grid{gap:8px;}
+  .stat-val{font-size:20px;}
+  .total-amount{font-size:38px;}
+  .section{padding:12px 12px;}
+}
+@media(max-width:320px){
+  .ball{width:30px;height:30px;font-size:11px;}
+  .tab-btn{min-width:44px;font-size:8px;}
+  .metric-val{font-size:18px;}
+  .card{padding:10px;}
+}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 </style>
@@ -534,6 +557,15 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
       <div style="font-size:11px;color:var(--text3);margin-top:4px;" data-i18n="actualiza_miembros">Se actualiza al añadir o eliminar miembros</div>
     </div>
+    <!-- Suggeriments -->
+    <div id="suggestions-box" style="display:none;" class="card">
+      <div class="card-label" data-i18n="sugg_title">💬 Suggeriments</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;" data-i18n="sugg_desc">Tens alguna idea per millorar l'app? Explica'ns-ho.</p>
+      <textarea id="sugg-text" rows="3" id="sugg-placeholder" placeholder="Escriu aquí el teu suggeriment..."
+        style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:none;"></textarea>
+      <button onclick="sendSuggestion()" class="btn btn-primary" style="margin-top:8px;" data-i18n="sugg_btn">Enviar suggeriment</button>
+    </div>
+    <button onclick="toggleSuggestions()" style="width:100%;padding:10px;border-radius:10px;background:transparent;border:.5px solid var(--border);color:var(--text3);font-size:12px;cursor:pointer;margin-top:4px;" data-i18n="sugg_open">💬 Enviar un suggeriment</button>
   </div>
 </div>
 
@@ -2057,6 +2089,32 @@ function openWATurn(){window.open('https://wa.me/?text='+encodeURIComponent(last
 function copyBizum(){navigator.clipboard.writeText(lastWABizum).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
 function openWABizum(){window.open('https://wa.me/?text='+encodeURIComponent(lastWABizum),'_blank');}
 
+// ── SUGGESTIONS ──────────────────────────────────────────────────────────────
+function toggleSuggestions(){
+  const box=document.getElementById('suggestions-box');
+  const btn=document.querySelector('[onclick="toggleSuggestions()"]');
+  const open=box.style.display!=='none';
+  box.style.display=open?'none':'block';
+  if(btn) btn.textContent=open?t('sugg_open'):'✕ '+t('sugg_open').replace('💬 ','');
+  if(!open) document.getElementById('sugg-text')?.focus();
+}
+
+async function sendSuggestion(){
+  const text=document.getElementById('sugg-text')?.value?.trim();
+  if(!text){showToast(t('sugg_empty'));return;}
+  const slug=new URLSearchParams(window.location.search).get('g')||'unknown';
+  try{
+    await fetch(SUPA_URL+'/rest/v1/eventos',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({grupo_slug:slug,tipo:'suggeriment',metadata:{text,lang:getLang()}})
+    });
+    showToast(t('sugg_ok'));
+    document.getElementById('sugg-text').value='';
+    toggleSuggestions();
+  }catch(e){showToast(t('sugg_error'));}
+}
+
 // ── ROTATION ─────────────────────────────────────────────────────────────────
 function saveRotationMode(){
   const mode=document.querySelector('input[name="rotation-mode"]:checked')?.value||'auto';
@@ -2182,7 +2240,11 @@ const T={
     tut5_title:'Añádela a tu inicio',tut5_desc:'iPhone: Safari → Compartir → Añadir a pantalla de inicio\nAndroid: Chrome → ⋮ → Añadir a pantalla de inicio',
     tut6_title:'¡Disfruta y suerte!',tut6_desc:'Que os toque el gordo... y si no, al menos sin líos 😄',
     tut_siguiente:'Siguiente →',tut_empezar:'¡Empezar! 🚀',
-    onboarding_btn:'¡ENTRAR A LA PEÑA! →',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
+    onboarding_btn:'¡ENTRAR A LA PEÑA! →',
+    sugg_title:'💬 Sugerencias',sugg_desc:'¿Tienes alguna idea para mejorar la app? Cuéntanos.',
+    sugg_btn:'Enviar sugerencia',sugg_open:'💬 Enviar una sugerencia',
+    sugg_ok:'✅ ¡Gracias! Sugerencia enviada.',sugg_error:'Error al enviar. Inténtalo de nuevo.',
+    sugg_empty:'Escribe tu sugerencia primero.',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
     onboarding_sub:'Se han terminado los líos\njugando a la lotería.',onboarding_mas:'...¡Y mucho más! 🚀',
     boleto_word:'boleto',boletos_word:'boletos',
     notif_toca:'¡Te toca jugar en',notif_todos_pagado:'¡Todos han pagado el Bizum! Recuerda comprar el boleto.',
@@ -2255,7 +2317,11 @@ const T={
     tut5_title:'Afegeix-la a l\'inici',tut5_desc:'iPhone: Safari → Compartir → Afegir a pantalla d\'inici\nAndroid: Chrome → ⋮ → Afegir a pantalla d\'inici',
     tut6_title:'Gaudeix i molta sort!',tut6_desc:'Que us toqui el gordo... i si no, almenys sense embolicaments 😄',
     tut_siguiente:'Següent →',tut_empezar:'Començar! 🚀',
-    onboarding_btn:'ENTRAR A LA PENYA! →',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
+    onboarding_btn:'ENTRAR A LA PENYA! →',
+    sugg_title:'💬 Suggeriments',sugg_desc:'Tens alguna idea per millorar l\'app? Explica\'ns-ho.',
+    sugg_btn:'Enviar suggeriment',sugg_open:'💬 Enviar un suggeriment',
+    sugg_ok:'✅ Gràcies! Suggeriment enviat.',sugg_error:'Error en enviar. Torna-ho a provar.',
+    sugg_empty:'Escriu el teu suggeriment primer.',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
     onboarding_sub:'S\'han acabat els embolicaments\njugant a la loteria.',onboarding_mas:'...I molt més! 🚀',
     boleto_word:'bitllet',boletos_word:'bitllets',
     notif_toca:'Et toca jugar a',notif_todos_pagado:'Tothom ha fet el Bizum! Recorda comprar el bitllet.',
@@ -2328,7 +2394,11 @@ const T={
     tut5_title:'Add it to your home screen',tut5_desc:'iPhone: Safari → Share → Add to Home Screen\nAndroid: Chrome → ⋮ → Add to Home Screen',
     tut6_title:'Enjoy and good luck!',tut6_desc:"May you win the jackpot... and if not, at least no hassle 😄",
     tut_siguiente:'Next →',tut_empezar:'Start! 🚀',
-    onboarding_btn:'ENTER THE GROUP! →',onboarding_title:'Your friends\nlove you! 🧡',
+    onboarding_btn:'ENTER THE GROUP! →',
+    sugg_title:'💬 Suggestions',sugg_desc:'Got an idea to improve the app? Let us know.',
+    sugg_btn:'Send suggestion',sugg_open:'💬 Send a suggestion',
+    sugg_ok:'✅ Thanks! Suggestion sent.',sugg_error:'Error sending. Please try again.',
+    sugg_empty:'Write your suggestion first.',onboarding_title:'Your friends\nlove you! 🧡',
     onboarding_sub:"No more hassle\nplaying the lottery.",onboarding_mas:'...And much more! 🚀',
     boleto_word:'ticket',boletos_word:'tickets',
     notif_toca:'It\'s your turn to play in',notif_todos_pagado:'Everyone has paid! Remember to buy the ticket.',

@@ -200,6 +200,29 @@ async function deleteGroup(slug, name){
     alert('Error al eliminar. Inténtalo de nuevo.');
   }
 }
+
+async function loadSuggestions(){
+  try{
+    const r=await api('/rest/v1/eventos?tipo=eq.suggeriment&order=created_at.desc&limit=50');
+    const data=await r.json();
+    const list=document.getElementById('suggestions-list');
+    if(!list) return;
+    if(!data||!data.length){list.innerHTML='<div style="color:#9CA3AF;font-size:14px;">Sense suggeriments encara.</div>';return;}
+    list.innerHTML=data.map(s=>{
+      const meta=s.metadata||{};
+      const date=new Date(s.created_at).toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit',year:'numeric',hour:'2-digit',minute:'2-digit'});
+      return `<div style="background:#fff;border-radius:12px;padding:14px 16px;border:.5px solid #E5E7EB;box-shadow:0 1px 4px rgba(0,0,0,0.06);"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;"><span style="font-size:12px;font-weight:700;color:#FF8C00;">${s.grupo_slug||'—'}</span><span style="font-size:11px;color:#9CA3AF;">${date} · ${(meta.lang||'es').toUpperCase()}</span></div><div style="font-size:14px;color:#111827;line-height:1.5;">${meta.text||'—'}</div></div>`;
+    }).join('');
+  }catch(e){console.error(e);}
+}
+setTimeout(loadSuggestions,1500);
 </script>
+  <!-- SUGGERIMENTS -->
+  <div style="max-width:900px;margin:0 auto;padding:20px 24px;">
+    <h2 style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:1px;color:#111827;margin-bottom:16px;">💬 Suggeriments</h2>
+    <div id="suggestions-list" style="display:flex;flex-direction:column;gap:10px;">
+      <div style="color:#9CA3AF;font-size:14px;">Carregant...</div>
+    </div>
+  </div>
 </body>
 </html>
