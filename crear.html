@@ -154,7 +154,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
     <span class="color-label" data-i18n="color_grupo">Color del grupo</span>
     <div class="palettes">
       <div class="palette-row">
-        <span class="palette-name">Azul</span>
+        <span class="palette-name" data-i18n="color_azul">Azul</span>
         <div class="swatches">
           <div class="swatch" style="background:#0C1F3A;" data-c="#0C1F3A" onclick="selColor(this)"></div>
           <div class="swatch" style="background:#0C447C;" data-c="#0C447C" onclick="selColor(this)"></div>
@@ -164,7 +164,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
         </div>
       </div>
       <div class="palette-row">
-        <span class="palette-name">Verde</span>
+        <span class="palette-name" data-i18n="color_verde">Verde</span>
         <div class="swatches">
           <div class="swatch selected" style="background:#0A1F0F;" data-c="#0A1F0F" onclick="selColor(this)"></div>
           <div class="swatch" style="background:#1B5E35;" data-c="#1B5E35" onclick="selColor(this)"></div>
@@ -174,7 +174,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
         </div>
       </div>
       <div class="palette-row">
-        <span class="palette-name">Naranja</span>
+        <span class="palette-name" data-i18n="color_naranja">Naranja</span>
         <div class="swatches">
           <div class="swatch" style="background:#7D3500;" data-c="#7D3500" onclick="selColor(this)"></div>
           <div class="swatch" style="background:#BA4A00;" data-c="#BA4A00" onclick="selColor(this)"></div>
@@ -222,16 +222,16 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
         <div class="num-label" style="margin-bottom:0;"><span id="lbl-main">Números principales</span><span class="num-count" id="cnt-main">0/5</span></div>
         <div style="display:flex;gap:6px;">
-          <button onclick="pickFrequent()" style="padding:5px 12px;border-radius:99px;background:#1565C0;color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;">📊 Frecuentes</button>
-          <button onclick="pickRandom()" style="padding:5px 12px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;">🎲 Aleatorio</button>
+          <button onclick="pickFrequent()" style="padding:5px 12px;border-radius:99px;background:#1565C0;color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;"><span data-i18n="btn_frecuentes">📊 Frecuentes</span></button>
+          <button onclick="pickRandom()" style="padding:5px 12px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;"><span data-i18n="btn_aleatorio">🎲 Aleatorio</span></button>
         </div>
       </div>
       <div style="display:flex;gap:8px;margin-bottom:10px;">
         <div style="flex:1;background:#E3F2FD;border-radius:8px;padding:6px 10px;font-size:11px;color:#1565C0;line-height:1.4;">
-          <strong>📊 Frecuentes</strong><br>Números que más han salido en los últimos 12 meses en cada lotería
+          <strong data-i18n="btn_frecuentes">📊 Frecuentes</strong><br><span data-i18n="desc_frecuentes">Números que más han salido en los últimos 12 meses en cada lotería</span>
         </div>
         <div style="flex:1;background:#F1F3F4;border-radius:8px;padding:6px 10px;font-size:11px;color:#5F6368;line-height:1.4;">
-          <strong>🎲 Aleatorio</strong><br>Selección completamente al azar dentro del rango válido
+          <strong data-i18n="btn_aleatorio">🎲 Aleatorio</strong><br><span data-i18n="desc_aleatorio">Selección completamente al azar dentro del rango válido</span>
         </div>
       </div>
       <div class="num-grid" id="grid-main"></div>
@@ -313,10 +313,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
           <label data-i18n="ya_jugado">¿Ya habéis jugado antes?</label>
           <div style="display:flex;gap:10px;align-items:center;margin-top:6px;">
             <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
-              <input type="radio" name="epoch-type" value="now" checked onchange="toggleEpochField(this)"> Empezamos ahora
+              <input type="radio" name="epoch-type" value="now" checked onchange="toggleEpochField(this)"> <span data-i18n="empezamos_now">Empezamos ahora</span>
             </label>
             <label style="display:flex;align-items:center;gap:6px;font-size:14px;cursor:pointer;">
-              <input type="radio" name="epoch-type" value="past" onchange="toggleEpochField(this)"> Ya hemos jugado
+              <input type="radio" name="epoch-type" value="past" onchange="toggleEpochField(this)"> <span data-i18n="ya_hemos">Ya hemos jugado</span>
             </label>
           </div>
           <div id="epoch-field" style="display:none;margin-top:10px;">
@@ -494,13 +494,13 @@ function toast(msg){const t=document.getElementById('toast');t.textContent=msg;t
 
 function updateUI(){
   const isResult=step==='result';
-  document.getElementById('top-step').textContent=isResult?'¡Lista!':`Paso ${typeof step==='number'?Math.min(step,3):2} de 3`;
+  document.getElementById('top-step').textContent=isResult?tc('lista'):`${tc('paso_de')} ${typeof step==='number'?Math.min(step,4):2} ${tc('de')} 4`;
   document.getElementById('progress-bar').style.width=(isResult?100:Math.min(step,4)*25)+'%';
   document.querySelectorAll('.config-step').forEach(s=>s.classList.remove('active'));
   document.getElementById(isResult?'cs-result':`cs-${step}`).classList.add('active');
   document.getElementById('btn-back').style.display=(step>1&&!isResult)?'block':'none';
   document.getElementById('bottom-bar').style.display=isResult?'none':'flex';
-  document.getElementById('btn-next').textContent=step===4?'🎰 CREAR MI PEÑA':'SIGUIENTE →';
+  document.getElementById('btn-next').textContent=step===4?tc('btn_crear'):tc('btn_siguiente');
 }
 
 // Color
@@ -521,7 +521,7 @@ function toggleLot(el){
   const idx=selLotteries.indexOf(l);
   const type=l==='euromillones'?'euro':l==='primitiva'?'prim':'bono';
   if(idx>-1){
-    if(selLotteries.length===1){toast('Elige al menos una lotería');return;}
+    if(selLotteries.length===1){toast(tc('elige_loteria'));return;}
     selLotteries.splice(idx,1);
     el.className=`lottery-badge-sel lb-${type}`;
     el.textContent=`${LOTS[l].emoji} ${LOTS[l].name}`;
@@ -577,7 +577,7 @@ function renderMembers(){
   const list=document.getElementById('member-list');list.innerHTML='';
   members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?'Primer pagador':'Miembro'}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
 }
-function addMember(){const inp=document.getElementById('new-member');const name=inp.value.trim();if(!name){toast('Escribe un nombre');return;}if(members.includes(name)){toast('Ese nombre ya existe');return;}if(members.length>=12){toast('Máximo 12 miembros');return;}members.push(name);inp.value='';renderMembers();}
+function addMember(){const inp=document.getElementById('new-member');const name=inp.value.trim();if(!name){toast(tc('escribe_nombre_m'));return;}if(members.includes(name)){toast(tc('nombre_existe'));return;}if(members.length>=12){toast(tc('max_miembros'));return;}members.push(name);inp.value='';renderMembers();}
 function removeMember(i){members.splice(i,1);renderMembers();}
 
 // Rotation
@@ -633,7 +633,7 @@ function addOtraLoteria(){
   picker.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:20px 16px 32px;width:100%;">
     <div style="font-size:14px;font-weight:700;margin-bottom:14px;color:#1A1A18;">¿Para qué lotería añades combinación?</div>
     ${opts}
-    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:12px;border-radius:10px;background:#F1F3F4;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;">Cancelar</button>
+    <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:12px;border-radius:10px;background:#F1F3F4;border:none;font-size:15px;font-weight:600;cursor:pointer;margin-top:4px;" data-i18n="cancelar_lbl">Cancelar</button>
   </div>`;
   document.body.appendChild(picker);
   window._lotPicker=picker;
@@ -702,12 +702,12 @@ function selectLotForAdd(idx){
 // Navigation
 function goNext(){
   if(step===1){
-    if(!document.getElementById('f-name').value.trim()){toast('Escribe el nombre del grupo');return;}
+    if(!document.getElementById('f-name').value.trim()){toast(tc('escribe_nombre'));return;}
     lotIdx=0;selMain=new Set();selStars=new Set();apuestaType='sencilla';
     buildGrids();step=2;
   }else if(step===2){
     const lot=LOTS[selLotteries[lotIdx]];
-    if(selMain.size<lot.mainCount){toast(`Elige al menos ${lot.mainCount} números`);return;}
+    if(selMain.size<lot.mainCount){toast(`${tc('elige_min')} ${lot.mainCount} ${tc('numeros_lbl')}`);return;}
     if(lot.starMax>0&&selStars.size<lot.starCount){toast(`Elige al menos ${lot.starCount} estrella${lot.starCount>1?'s':''}`);return;}
     saveLotConfig();
     // Show picker: add more or continue
@@ -745,7 +745,7 @@ async function createGroup(){
     const existing=await check.json();
     if(existing&&existing.length>0){
       clearTimeout(tid);
-      toast(`Ya existe un grupo llamado "${name}". Elige otro nombre.`);
+      toast(`${name}: ${tc('grupo_existe')}`);
       btn.textContent='🎰 CREAR MI PEÑA';btn.disabled=false;
       return;
     }
@@ -766,7 +766,7 @@ async function createGroup(){
     _link=`https://lotogrupo.es/app.html#${encoded}`;
   }
   btn.textContent='🎰 CREAR MI PEÑA';btn.disabled=false;
-  document.getElementById('res-title').textContent=`¡${name} lista!`;
+  document.getElementById('res-title').textContent=`¡${name} ${tc('lista')}`;
   const rb=document.getElementById('res-badges');
   rb.innerHTML=lotConfigs.map(c=>`<span style="background:#EAF3DE;color:#3B6D11;border-radius:99px;padding:5px 14px;font-size:13px;font-weight:700;">${LOTS[c.lottery].emoji} ${LOTS[c.lottery].name}</span>`).join('');
   document.getElementById('res-link').textContent=_link;
@@ -774,7 +774,7 @@ async function createGroup(){
   step='result';updateUI();window.scrollTo(0,0);
 }
 
-function copyLink(){navigator.clipboard.writeText(_link).then(()=>toast('✅ Enlace copiado')).catch(()=>toast('Copia el enlace manualmente'));}
+function copyLink(){navigator.clipboard.writeText(_link).then(()=>toast('✅ ' + tc('enlace_copiado'))).catch(()=>toast('Copia el enlace manualmente'));}
 function shareWA(){
   const name=document.getElementById('res-title').textContent.replace('¡','').replace(' lista!','');
   const lots=lotConfigs.map(c=>LOTS[c.lottery].name).join(' + ');
@@ -809,7 +809,17 @@ const TC={
     nombre_ph:'Ej: Los afortunados...',miembro_ph:'Nombre del miembro...',
     anadir:'+ Añadir',primer_payer:'Primer pagador',miembro:'Miembro',
     empezamos_now:'Empezamos ahora',ya_hemos:'Ya hemos jugado',
-    flag:'ES'
+    flag:'ES',
+    color_azul:'Azul',color_verde:'Verde',color_naranja:'Naranja',
+    btn_frecuentes:'📊 Frecuentes',btn_aleatorio:'🎲 Aleatorio',
+    desc_frecuentes:'Números que más han salido en los últimos 12 meses en cada lotería',
+    desc_aleatorio:'Selección completamente al azar dentro del rango válido',
+    cancelar_lbl:'Cancelar',
+    elige_loteria:'Elige al menos una lotería',escribe_nombre:'Escribe el nombre del grupo',
+    elige_min:'Elige al menos',numeros_lbl:'números',escribe_nombre_m:'Escribe un nombre',
+    nombre_existe:'Ese nombre ya existe',max_miembros:'Máximo 12 miembros',
+    enlace_copiado:'Enlace copiado',grupo_existe:'Ya existe. Elige otro nombre.',
+    creando:'Creando...',max_nums:'Máximo',
   },
   ca:{
     step1_eyebrow:'La teva penya',step1_title:'Com es diu<br>el vostre grup?',
@@ -835,7 +845,17 @@ const TC={
     nombre_ph:'Ex: Els afortunats...',miembro_ph:'Nom del membre...',
     anadir:'+ Afegir',primer_payer:'Primer pagador',miembro:'Membre',
     empezamos_now:'Comencem ara',ya_hemos:'Ja hem jugat',
-    flag:'CA'
+    flag:'CA',
+    color_azul:'Blau',color_verde:'Verd',color_naranja:'Taronja',
+    btn_frecuentes:'📊 Freqüents',btn_aleatorio:'🎲 Aleatori',
+    desc_frecuentes:'Números que han sortit més els últims 12 mesos a cada loteria',
+    desc_aleatorio:'Selecció completament a l\'atzar dins el rang vàlid',
+    cancelar_lbl:'Cancel·lar',
+    elige_loteria:'Tria almenys una loteria',escribe_nombre:'Escriu el nom del grup',
+    elige_min:'Tria almenys',numeros_lbl:'números',escribe_nombre_m:'Escriu un nom',
+    nombre_existe:'Aquest nom ja existeix',max_miembros:'Màxim 12 membres',
+    enlace_copiado:'Enllaç copiat',grupo_existe:'Ja existeix. Tria un altre nom.',
+    creando:'Creant...',max_nums:'Màxim',
   },
   en:{
     step1_eyebrow:'Your group',step1_title:'What\'s your<br>group called?',
@@ -861,11 +881,19 @@ const TC={
     nombre_ph:'E.g: The lucky ones...',miembro_ph:'Member name...',
     anadir:'+ Add',primer_payer:'First payer',miembro:'Member',
     empezamos_now:'Starting now',ya_hemos:'We\'ve played before',
-    flag:'EN'
+    flag:'EN',
+    color_azul:'Blue',color_verde:'Green',color_naranja:'Orange',
+    btn_frecuentes:'📊 Frequent',btn_aleatorio:'🎲 Random',
+    desc_frecuentes:'Numbers drawn most often in the last 12 months for each lottery',
+    desc_aleatorio:'Completely random selection within the valid range',
+    cancelar_lbl:'Cancel',
+    elige_loteria:'Choose at least one lottery',escribe_nombre:'Enter the group name',
+    elige_min:'Choose at least',numeros_lbl:'numbers',escribe_nombre_m:'Enter a name',
+    nombre_existe:'That name already exists',max_miembros:'Maximum 12 members',
+    enlace_copiado:'Link copied',grupo_existe:'Already exists. Choose another name.',
+    creando:'Creating...',max_nums:'Maximum',
   }
-};
-
-function getLang(){return localStorage.getItem('lg_lang')||'es';}
+};function getLang(){return localStorage.getItem('lg_lang')||'es';}
 function tc(key){return TC[getLang()]?.[key]||TC.es[key]||key;}
 
 function openLang(){

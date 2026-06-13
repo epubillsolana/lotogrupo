@@ -389,8 +389,10 @@ const TI={
 function getLang(){return localStorage.getItem('lg_lang')||'es';}
 function setLang(lang){
   localStorage.setItem('lg_lang',lang);
+  document.querySelectorAll('.lang-opt').forEach(b=>b.classList.toggle('active',b.dataset.lang===lang));
   closeLang();
   applyLang();
+  showToast(lang==='es'?'ES — Español':lang==='ca'?'CA — Català':'EN — English');
 }
 function openLang(){
   const lang=getLang();
@@ -417,6 +419,11 @@ function toggleAcc(id){document.getElementById('acc-'+id).classList.toggle('open
 
 // Init
 applyLang();
+function showToast(msg){
+  let t=document.getElementById('toast');
+  if(!t){t=document.createElement('div');t.id='toast';t.className='toast';document.body.appendChild(t);}
+  t.textContent=msg;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400);
+}
 </script>
 </body>
 </html>

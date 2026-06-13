@@ -228,16 +228,10 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <div style="font-size:13px;font-weight:700;color:#FF8C00;text-transform:uppercase;letter-spacing:.15em;margin-bottom:16px;">WELCOME!</div>
   <div style="font-size:32px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:16px;max-width:320px;" id="ob-group-name">Tu Peña</div>
   <div style="width:40px;height:3px;background:#FF8C00;border-radius:2px;margin:0 auto 24px;"></div>
-  <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:12px;max-width:300px;">
-    ¡Tus amigos y amigas<br>te quieren! 🧡
-  </div>
-  <div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);margin-bottom:8px;">
-    Se han terminado los líos<br>jugando a la lotería.
-  </div>
-  <div style="font-size:20px;font-weight:900;color:#FF8C00;margin-bottom:40px;">
-    ...¡Y mucho más! 🚀
-  </div>
-  <button onclick="finishOnboarding()" style="width:100%;max-width:320px;padding:18px;border-radius:99px;background:#FF8C00;color:#0A1F0F;border:none;font-size:18px;font-weight:900;cursor:pointer;letter-spacing:.5px;">¡ENTRAR A LA PEÑA! →</button>
+  <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:12px;max-width:300px;" id="ob-love"></div>
+  <div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);margin-bottom:8px;" id="ob-sub"></div>
+  <div style="font-size:20px;font-weight:900;color:#FF8C00;margin-bottom:40px;" id="ob-mas"></div>
+  <button onclick="finishOnboarding()" id="ob-btn" style="width:100%;max-width:320px;padding:18px;border-radius:99px;background:#FF8C00;color:#0A1F0F;border:none;font-size:18px;font-weight:900;cursor:pointer;letter-spacing:.5px;">¡ENTRAR A LA PEÑA! →</button>
 </div>
 
 <div id="setup-screen" style="display:flex;" class="setup">
@@ -626,15 +620,25 @@ function finishOnboarding(){
   document.getElementById('onboarding-screen').style.display='none';
   showTutorial();
 }
+function initOnboardingTexts(){
+  const love=document.getElementById('ob-love');
+  const sub=document.getElementById('ob-sub');
+  const mas=document.getElementById('ob-mas');
+  const btn=document.getElementById('ob-btn');
+  if(love) love.innerHTML=t('onboarding_title').replace('\n','<br>');
+  if(sub) sub.innerHTML=t('onboarding_sub').replace('\n','<br>');
+  if(mas) mas.textContent=t('onboarding_mas');
+  if(btn) btn.textContent=t('onboarding_btn');
+}
 
 function showTutorial(){
   const steps=[
-    {emoji:'🔍',color:'#1565C0',bg:'#E3F2FD',tab:'Comprobar',title:'Comprueba el sorteo',desc:'Entra después de cada sorteo para ver si ha tocado premio.'},
-    {emoji:'👥',color:'#2E7D32',bg:'#E8F5E9',tab:'Turnos & Bizum',title:'Gestiona los pagos',desc:'El sistema sabe quién paga. Confirma tu Bizum con un toque.'},
-    {emoji:'🏆',color:'#F57F17',bg:'#FFF9C4',tab:'Premios',title:'Historial de premios',desc:'Veis cuánto habéis gastado y ganado en todo momento.'},
+    {emoji:'🔍',color:'#1565C0',bg:'#E3F2FD',tab:t('tut1_tab'),title:t('tut1_title'),desc:t('tut1_desc')},
+    {emoji:'👥',color:'#2E7D32',bg:'#E8F5E9',tab:t('tut2_tab'),title:t('tut2_title'),desc:t('tut2_desc')},
+    {emoji:'🏆',color:'#F57F17',bg:'#FFF9C4',tab:t('tut3_tab'),title:t('tut3_title'),desc:t('tut3_desc')},
     {emoji:'📷',color:'#6A1B9A',bg:'#F3E5F5',tab:'Scanner',title:t('tutorial_boleto_title'),desc:t('tutorial_boleto_desc')},
-    {emoji:'📱',color:'#0A1F0F',bg:'#F1F3F4',tab:'',title:'Añádela a tu inicio',desc:'iPhone: Safari → Compartir → Añadir a pantalla de inicio\nAndroid: Chrome → ⋮ → Añadir a pantalla de inicio'},
-    {emoji:'🍀',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:'¡Disfruta y suerte!',desc:'Que os toque el gordo... y si no, al menos sin líos 😄'},
+    {emoji:'📱',color:'#0A1F0F',bg:'#F1F3F4',tab:'',title:t('tut5_title'),desc:t('tut5_desc')},
+    {emoji:'🍀',color:'#2E7D32',bg:'#E8F5E9',tab:'',title:t('tut6_title'),desc:t('tut6_desc')},
   ];
   let step=0;
   const overlay=document.createElement('div');
@@ -642,14 +646,13 @@ function showTutorial(){
   function render(){
     const s=steps[step];const isLast=step===steps.length-1;
     const dots=steps.map((_,i)=>`<div style="width:${i===step?22:7}px;height:7px;border-radius:4px;background:${i===step?s.color:'#E5E7EB'};transition:all .3s;"></div>`).join('');
-    overlay.innerHTML=`<div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;width:100%;max-width:480px;"><div style="text-align:center;font-size:12px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">¡Tutorial obligatorio! 🎉</div>
+    overlay.innerHTML=`<div style="background:#fff;border-radius:24px 24px 0 0;padding:32px 24px 44px;width:100%;max-width:480px;"><div style="text-align:center;font-size:12px;font-weight:700;color:#9CA3AF;text-transform:uppercase;letter-spacing:.1em;margin-bottom:16px;">${t('tut_header')}</div>
       <div style="display:flex;justify-content:center;gap:5px;margin-bottom:28px;">${dots}</div>
       <div style="width:80px;height:80px;border-radius:24px;background:${s.bg};display:flex;align-items:center;justify-content:center;font-size:40px;margin:0 auto 20px;">${s.emoji}</div>
       ${s.tab?`<div style="text-align:center;margin-bottom:8px;"><span style="background:${s.bg};color:${s.color};border-radius:99px;padding:4px 14px;font-size:12px;font-weight:700;">${s.tab}</span></div>`:''}
       <div style="text-align:center;font-size:22px;font-weight:900;color:#1A1A18;margin-bottom:10px;">${s.title}</div>
       <div style="text-align:center;font-size:15px;color:#6B7280;line-height:1.6;margin-bottom:32px;white-space:pre-line;">${s.desc}</div>
-      <button onclick="window._tNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;">${isLast?'¡Empezar! 🚀':'Siguiente →'}</button>
-
+      <button onclick="window._tNext()" style="width:100%;padding:16px;border-radius:99px;background:${s.color};color:#fff;border:none;font-size:16px;font-weight:800;cursor:pointer;">${isLast?t('tut_empezar'):t('tut_siguiente')}</button>
     </div>`;
   }
   window._tNext=()=>{if(step<steps.length-1){step++;render();}else window._tSkip();};
@@ -704,6 +707,7 @@ async function loadConfig(){
     const obKey=`lg_ob_${CFG.name}`;
     if(!localStorage.getItem(obKey)){
       document.getElementById('ob-group-name').textContent=CFG.name;
+      initOnboardingTexts();
       document.getElementById('onboarding-screen').style.display='flex';
     }
   }catch(e){
@@ -2170,6 +2174,15 @@ const T={
     tiene_boleto:'tiene el boleto',
     añadir_miembro:'Añadir miembro',nombre_ph:'Nombre...',
     tutorial_boleto_title:'Fotografía el boleto',tutorial_boleto_desc:'Foto del boleto como prueba. Queda registrado quién lo tiene.',
+    tut_header:'¡Tutorial obligatorio! 🎉',
+    tut1_tab:'Comprobar',tut1_title:'Comprueba el sorteo',tut1_desc:'Entra después de cada sorteo para ver si ha tocado premio.',
+    tut2_tab:'Turnos & Bizum',tut2_title:'Gestiona los pagos',tut2_desc:'El sistema sabe quién paga. Confirma tu Bizum con un toque.',
+    tut3_tab:'Premios',tut3_title:'Historial de premios',tut3_desc:'Veis cuánto habéis gastado y ganado en todo momento.',
+    tut5_title:'Añádela a tu inicio',tut5_desc:'iPhone: Safari → Compartir → Añadir a pantalla de inicio\nAndroid: Chrome → ⋮ → Añadir a pantalla de inicio',
+    tut6_title:'¡Disfruta y suerte!',tut6_desc:'Que os toque el gordo... y si no, al menos sin líos 😄',
+    tut_siguiente:'Siguiente →',tut_empezar:'¡Empezar! 🚀',
+    onboarding_btn:'¡ENTRAR A LA PEÑA! →',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
+    onboarding_sub:'Se han terminado los líos\njugando a la lotería.',onboarding_mas:'...¡Y mucho más! 🚀',
     boleto_word:'boleto',boletos_word:'boletos',
     notif_toca:'¡Te toca jugar en',notif_todos_pagado:'¡Todos han pagado el Bizum! Recuerda comprar el boleto.',
     notif_pendiente:'Pendiente de Bizum:',notif_ya_hecho:'Ya tienes el Bizum hecho a',notif_esperar:'¡A esperar el sorteo!',
@@ -2234,6 +2247,15 @@ const T={
     tiene_boleto:'té el bitllet',
     añadir_miembro:'Afegir membre',nombre_ph:'Nom...',
     tutorial_boleto_title:'Fotografía el bitllet',tutorial_boleto_desc:'Foto del bitllet com a prova. Queda registrat qui el té.',
+    tut_header:'Tutorial obligatori! 🎉',
+    tut1_tab:'Comprovar',tut1_title:'Comprova el sorteig',tut1_desc:'Entra després de cada sorteig per veure si ha tocat premi.',
+    tut2_tab:'Torns & Bizum',tut2_title:'Gestiona els pagaments',tut2_desc:'El sistema sap qui paga. Confirma el teu Bizum amb un toc.',
+    tut3_tab:'Premis',tut3_title:'Historial de premis',tut3_desc:'Veieu quant heu gastat i guanyat en tot moment.',
+    tut5_title:'Afegeix-la a l\'inici',tut5_desc:'iPhone: Safari → Compartir → Afegir a pantalla d\'inici\nAndroid: Chrome → ⋮ → Afegir a pantalla d\'inici',
+    tut6_title:'Gaudeix i molta sort!',tut6_desc:'Que us toqui el gordo... i si no, almenys sense embolicaments 😄',
+    tut_siguiente:'Següent →',tut_empezar:'Començar! 🚀',
+    onboarding_btn:'ENTRAR A LA PENYA! →',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
+    onboarding_sub:'S\'han acabat els embolicaments\njugant a la loteria.',onboarding_mas:'...I molt més! 🚀',
     boleto_word:'bitllet',boletos_word:'bitllets',
     notif_toca:'Et toca jugar a',notif_todos_pagado:'Tothom ha fet el Bizum! Recorda comprar el bitllet.',
     notif_pendiente:'Pendent de Bizum:',notif_ya_hecho:'Ja has fet el Bizum a',notif_esperar:'A esperar el sorteig!',
@@ -2298,6 +2320,15 @@ const T={
     tiene_boleto:'has the ticket',
     añadir_miembro:'Add member',nombre_ph:'Name...',
     tutorial_boleto_title:'Photograph the ticket',tutorial_boleto_desc:'Photo of the ticket as proof. Records who has it.',
+    tut_header:'Mandatory tutorial! 🎉',
+    tut1_tab:'Check',tut1_title:'Check the draw',tut1_desc:'Open after each draw to see if you won a prize.',
+    tut2_tab:'Turns & Payment',tut2_title:'Manage payments',tut2_desc:'The system knows who pays. Confirm your payment with one tap.',
+    tut3_tab:'Prizes',tut3_title:'Prize history',tut3_desc:'See how much your group has spent and won at any time.',
+    tut5_title:'Add it to your home screen',tut5_desc:'iPhone: Safari → Share → Add to Home Screen\nAndroid: Chrome → ⋮ → Add to Home Screen',
+    tut6_title:'Enjoy and good luck!',tut6_desc:"May you win the jackpot... and if not, at least no hassle 😄",
+    tut_siguiente:'Next →',tut_empezar:'Start! 🚀',
+    onboarding_btn:'ENTER THE GROUP! →',onboarding_title:'Your friends\nlove you! 🧡',
+    onboarding_sub:"No more hassle\nplaying the lottery.",onboarding_mas:'...And much more! 🚀',
     boleto_word:'ticket',boletos_word:'tickets',
     notif_toca:'It\'s your turn to play in',notif_todos_pagado:'Everyone has paid! Remember to buy the ticket.',
     notif_pendiente:'Payment pending:',notif_ya_hecho:'You already paid to',notif_esperar:'Now wait for the draw!',
