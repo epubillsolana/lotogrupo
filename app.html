@@ -639,19 +639,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
         <!-- Suggeriments -->
     <!-- Compartir grup -->
-    <div class="card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;">
-      <div style="display:flex;align-items:center;gap:12px;margin-bottom:12px;">
-        <div style="font-size:32px;">📲</div>
-        <div>
-          <div style="font-size:15px;font-weight:800;color:#fff;" data-i18n="share_grup_title">Invita a tu grupo</div>
-          <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:2px;" data-i18n="share_grup_sub">Comparte el enlace para que todos accedan</div>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;">
-        <button onclick="shareGroupWA()" style="flex:1;padding:12px;border-radius:10px;background:#25D366;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;">📲 WhatsApp</button>
-        <button onclick="copyGroupLink()" style="flex:1;padding:12px;border-radius:10px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);font-size:14px;font-weight:700;cursor:pointer;" data-i18n="copiar">📋 Copiar</button>
-      </div>
-    </div>
+    <div class="card" id="share-card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;"></div>
 
     <div id="suggestions-box" class="card" style="background:linear-gradient(135deg,#FFF5E6,#FFF9F0);border:1.5px solid #FF8C00;">
       <div style="font-size:32px;margin-bottom:6px;">💬</div>
@@ -1473,7 +1461,7 @@ function buildWABizum(stateParam){
 
 // ── PRIZES ────────────────────────────────────────────────────────────────────
 function getPrizeKey(lotKey){return `lg_prizes_${CFG.name}_${lotKey||'all'}`;}
-function loadHistory(lotKey){try{return JSON.parse(localStorage.getItem(getPrizeKey(lotKey))||'[]');}catch(e){return[];}}
+function loadHistoryLocal(lotKey){try{return JSON.parse(localStorage.getItem(getPrizeKey(lotKey))||'[]');}catch(e){return[];}}
 function saveHistory(h,lotKey){localStorage.setItem(getPrizeKey(lotKey),JSON.stringify(h));}
 async function loadHistory(lotKey){
   const slug=getSlug();
@@ -2355,6 +2343,23 @@ const ALL_LOTS = {
   bonoloto:{name:'Bonoloto',emoji:'🎱'},
 };
 
+function buildShareCard(){
+  const card=document.getElementById('share-card');
+  if(!card||!CFG) return;
+  card.innerHTML=`
+    <div style="display:flex;align-items:center;gap:12px;margin-bottom:14px;">
+      <div style="font-size:36px;">📲</div>
+      <div>
+        <div style="font-size:16px;font-weight:800;color:#fff;">${t('share_grup_title')}</div>
+        <div style="font-size:12px;color:rgba(255,255,255,0.5);margin-top:3px;">${t('share_grup_sub')}</div>
+      </div>
+    </div>
+    <div style="display:flex;gap:8px;">
+      <button onclick="shareGroupWA()" style="flex:1;padding:13px;border-radius:10px;background:#25D366;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;">📲 WhatsApp</button>
+      <button onclick="copyGroupLink()" style="flex:1;padding:13px;border-radius:10px;background:rgba(255,255,255,0.15);color:#fff;border:1px solid rgba(255,255,255,0.25);font-size:14px;font-weight:700;cursor:pointer;">📋 ${t('copiar')}</button>
+    </div>`;
+}
+
 function buildGrupLoterias(){
   const list=document.getElementById('grup-loterias-list');
   if(!list||!CFG) return;
@@ -2375,6 +2380,7 @@ function removeLoteria(idx){
   CFG.lotteries.splice(idx,1);
   saveGroupConfig();
   buildGrupLoterias();
+  buildShareCard();
   buildComprobar();
   showToast(t('loteria_removed'));
 }
@@ -2885,6 +2891,7 @@ function applyLang(){
     renderRotation();
     renderHistory();
     buildGrupLoterias();
+    buildShareCard();
   }
 }
 
