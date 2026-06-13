@@ -266,11 +266,25 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
+    <button onclick="openSuggestions()" style="position:absolute;top:52px;right:90px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:16px;cursor:pointer;" aria-label="Suggeriments">💬</button>
     <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:52px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;z-index:10;color:#fff;display:flex;align-items:center;gap:4px;">🌐 <span id="lang-label">ES</span></button>
     <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;"><svg width="44" height="44" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg><span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">Loto<span style="color:#FF8C00;">Grupo</span></span></div>
     <h1 id="header-title" style="font-size:20px;font-weight:900;letter-spacing:.5px;">Mi Peña</h1>
     <div class="header-loterias" id="header-loterias"></div>
   </div>
+  <!-- Suggestion popup -->
+  <div id="sugg-overlay" onclick="closeSuggestions()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;"></div>
+  <div id="sugg-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:301;box-shadow:0 -4px 24px rgba(0,0,0,0.15);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:800;color:#111827;" data-i18n="sugg_title">💬 Suggeriments</div>
+      <button onclick="closeSuggestions()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;padding:0 4px;">✕</button>
+    </div>
+    <p style="font-size:13px;color:#6B7280;margin-bottom:12px;" data-i18n="sugg_desc">Tens alguna idea per millorar l'app? Explica'ns-ho.</p>
+    <textarea id="sugg-text" rows="4" placeholder="Escriu aquí..."
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #E5E7EB;background:#F9FAFB;color:#111827;font-size:15px;font-family:inherit;outline:none;resize:none;margin-bottom:12px;"></textarea>
+    <button onclick="sendSuggestion()" style="width:100%;padding:14px;border-radius:12px;background:#FF8C00;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;" data-i18n="sugg_btn">Enviar suggeriment</button>
+  </div>
+
   <div id="lang-overlay" onclick="closeLangSelector()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;"></div>
   <div id="lang-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:301;box-shadow:0 -4px 24px rgba(0,0,0,0.15);">
     <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:20px;">🌐 Idioma / Language</div>
@@ -455,11 +469,53 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
     <div id="notif-preview" style="display:none;">
       <div class="card">
-        <div class="card-label">Tu próximo aviso (lunes 10:00h)</div>
+        <div class="card-label" data-i18n="proximo_aviso">Tu próximo aviso (lunes 10:00h)</div>
         <div id="preview-notif" class="info-box gold"></div>
       </div>
       <div class="card">
-        <div class="card-label">Próximos lunes</div>
+        <div class="card-label" data-i18n="notif_schedule_title">🔔 Horari d'avís del grup</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;" data-i18n="notif_schedule_desc">Tots els membres rebran l'avís el mateix dia i hora.</p>
+        <div style="display:flex;gap:12px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="notif_day_lbl">Dia</div>
+            <select id="notif-day-sel" onchange="saveGroupNotifSchedule()" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:14px;font-family:inherit;color:var(--text);">
+              <option value="1">Dilluns</option>
+              <option value="2">Dimarts</option>
+              <option value="3">Dimecres</option>
+              <option value="4">Dijous</option>
+              <option value="5">Divendres</option>
+              <option value="6">Dissabte</option>
+              <option value="0">Diumenge</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="notif_hour_lbl">Hora</div>
+            <select id="notif-hour-sel" onchange="saveGroupNotifSchedule()" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:14px;font-family:inherit;color:var(--text);">
+              <option value="7">07:00</option>
+              <option value="8">08:00</option>
+              <option value="9">09:00</option>
+              <option value="10">10:00</option>
+              <option value="11">11:00</option>
+              <option value="12">12:00</option>
+              <option value="13">13:00</option>
+              <option value="17">17:00</option>
+              <option value="18">18:00</option>
+              <option value="19">19:00</option>
+              <option value="20">20:00</option>
+              <option value="21">21:00</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:.5px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;" data-i18n="notif_pause_title">Silenciar aquesta setmana</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;" data-i18n="notif_pause_desc">Ja heu tirat la quiniela i no cal avís</div>
+          </div>
+          <button id="notif-pause-btn" onclick="togglePauseNotif()" style="padding:7px 16px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);" data-i18n="notif_pause_btn">Silenciar</button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="proximos_lunes">Próximos lunes</div>
         <div class="schedule-list" id="schedule-list"></div>
       </div>
       <div class="info-box blue" style="font-size:12px;">⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para recibir notificaciones.<br><br><strong>iPhone:</strong> Safari → Compartir → "Añadir a pantalla de inicio"<br><strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"</div>
@@ -565,7 +621,6 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:none;"></textarea>
       <button onclick="sendSuggestion()" class="btn btn-primary" style="margin-top:8px;" data-i18n="sugg_btn">Enviar suggeriment</button>
     </div>
-    <button onclick="toggleSuggestions()" style="width:100%;padding:10px;border-radius:10px;background:transparent;border:.5px solid var(--border);color:var(--text3);font-size:12px;cursor:pointer;margin-top:4px;" data-i18n="sugg_open">💬 Enviar un suggeriment</button>
   </div>
 </div>
 
@@ -1646,11 +1701,16 @@ function buildNotifPreview(myIdx){
   document.getElementById('preview-notif').innerHTML=`<strong>${msg.title}</strong><br>${msg.body}`;
   const list=document.getElementById('schedule-list');list.innerHTML='';
   const months=['ene','feb','mar','abr','may','jun','jul','ago','sep','oct','nov','dic'];
+  const sched=getNotifSchedule();
+  const targetDay=parseInt(sched.day||1);
+  const targetHour=parseInt(sched.hour||10);
   const dates=[],d=new Date();d.setHours(0,0,0,0);
-  while(dates.length<5){d.setDate(d.getDate()+1);if(d.getDay()===1)dates.push(new Date(d));}
+  while(dates.length<5){d.setDate(d.getDate()+1);if(d.getDay()===targetDay)dates.push(new Date(d));}
   dates.forEach(d=>{
     const item=document.createElement('div');item.className='schedule-item';
-    item.innerHTML=`<span>Lunes ${d.getDate()} ${months[d.getMonth()]}</span><strong>10:00h 🔔</strong>`;
+    const dayKeys=['day_sun','day_mon','day_tue','day_wed','day_thu','day_fri','day_sat'];
+    const dayName=t(dayKeys[d.getDay()]);
+    item.innerHTML=`<span>${dayName} ${d.getDate()} ${months[d.getMonth()]}</span><strong>${targetHour}:00h 🔔</strong>`;
     list.appendChild(item);
   });
 }
@@ -1658,6 +1718,9 @@ function buildNotifPreview(myIdx){
 function updateNotifStatusUI(){
   const box=document.getElementById('notif-status-box');
   box.style.display='block';
+  const schedBox=document.getElementById('notif-schedule-box');
+  if(schedBox) schedBox.style.display='block';
+  restoreNotifSchedule();
   const perm='Notification' in window?Notification.permission:'denied';
   const row=document.getElementById('notif-status-row');
   const dot=document.getElementById('notif-dot');
@@ -1684,7 +1747,8 @@ function testNotif(){
 }
 
 function saveNotifConfig(myIdx){
-  localStorage.setItem(`lg_notif_${CFG.name}`,JSON.stringify({myIdx,payerIdx:getCurrentPayerIdx()}));
+  const sched=getNotifSchedule();
+  localStorage.setItem(`lg_notif_${CFG.name}`,JSON.stringify({myIdx,payerIdx:getCurrentPayerIdx(),day:sched.day,hour:sched.hour}));
 }
 
 // ── MEMBERS MANAGEMENT ───────────────────────────────────────────────────────
@@ -2089,7 +2153,105 @@ function openWATurn(){window.open('https://wa.me/?text='+encodeURIComponent(last
 function copyBizum(){navigator.clipboard.writeText(lastWABizum).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
 function openWABizum(){window.open('https://wa.me/?text='+encodeURIComponent(lastWABizum),'_blank');}
 
+// ── NOTIF SCHEDULE (grup) ─────────────────────────────────────────────────────
+async function saveGroupNotifSchedule(){
+  const day=document.getElementById('notif-day-sel')?.value||'1';
+  const hour=document.getElementById('notif-hour-sel')?.value||'10';
+  // Save to Supabase so all members share same schedule
+  try{
+    const slug=getSlug();
+    await fetch(SUPA_URL+'/rest/v1/notif_config?grupo_slug=eq.'+encodeURIComponent(slug),{
+      method:'DELETE',headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    await fetch(SUPA_URL+'/rest/v1/notif_config',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({grupo_slug:slug,notif_day:parseInt(day),notif_hour:parseInt(hour)})
+    });
+  }catch(e){}
+  // Also save locally as cache
+  localStorage.setItem(`lg_notif_schedule_${CFG.name}`,JSON.stringify({day,hour}));
+  updateSchedulePreview();
+  showToast(t('notif_schedule_saved'));
+  if(Notification.permission==='granted'){const myIdx=getMyIdx();if(myIdx>=0)saveNotifConfig(myIdx);}
+}
+
+async function loadGroupNotifSchedule(){
+  // Try Supabase first
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/notif_config?grupo_slug=eq.'+encodeURIComponent(getSlug())+'&select=notif_day,notif_hour',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    const data=await r.json();
+    if(data&&data.length>0) return {day:String(data[0].notif_day||1),hour:String(data[0].notif_hour||10)};
+  }catch(e){}
+  // Fallback to localStorage
+  const saved=localStorage.getItem(`lg_notif_schedule_${CFG.name}`);
+  return saved?JSON.parse(saved):{day:'1',hour:'10'};
+}
+
+async function restoreNotifSchedule(){
+  const schedule=await loadGroupNotifSchedule();
+  const daySel=document.getElementById('notif-day-sel');
+  const hourSel=document.getElementById('notif-hour-sel');
+  if(daySel){
+    daySel.value=schedule.day;
+    const dayKeys=['day_sun','day_mon','day_tue','day_wed','day_thu','day_fri','day_sat'];
+    [...daySel.options].forEach(o=>{o.textContent=t(dayKeys[parseInt(o.value)])||o.textContent;});
+  }
+  if(hourSel) hourSel.value=schedule.hour;
+  updateSchedulePreview();
+  updatePauseBtn();
+}
+
+function updateSchedulePreview(){
+  const day=parseInt(document.getElementById('notif-day-sel')?.value||1);
+  const hour=parseInt(document.getElementById('notif-hour-sel')?.value||10);
+  const dayKeys=['day_sun','day_mon','day_tue','day_wed','day_thu','day_fri','day_sat'];
+  const dayName=t(dayKeys[day]);
+  const lbl=document.getElementById('proximo-aviso-label');
+  if(lbl) lbl.textContent=`${t('proximo_aviso').split('(')[0].trim()} (${dayName} ${hour}:00h)`;
+}
+
+function getNotifSchedule(){
+  const saved=localStorage.getItem(`lg_notif_schedule_${CFG?.name||'x'}`);
+  return saved?JSON.parse(saved):{day:'1',hour:'10'};
+}
+
+// Pause/unpause notifications for this week
+function getPauseKey(){
+  const now=new Date();
+  const week=`${now.getFullYear()}-W${Math.ceil(now.getDate()/7)}`;
+  return `lg_notif_paused_${CFG?.name||'x'}_${week}`;
+}
+function isPaused(){return localStorage.getItem(getPauseKey())==='1';}
+function togglePauseNotif(){
+  const paused=isPaused();
+  localStorage.setItem(getPauseKey(),paused?'0':'1');
+  updatePauseBtn();
+  showToast(paused?t('notif_active_ok'):t('notif_paused_ok'));
+}
+function updatePauseBtn(){
+  const btn=document.getElementById('notif-pause-btn');
+  const lbl=document.getElementById('notif-pause-label');
+  if(!btn||!lbl) return;
+  const paused=isPaused();
+  btn.style.background=paused?'var(--green-light)':'var(--surface2)';
+  btn.style.color=paused?'var(--green)':'var(--text2)';
+  btn.style.borderColor=paused?'#A5D6A7':'var(--border2)';
+  lbl.textContent=paused?t('notif_unsilence_btn'):t('notif_pause_btn');
+}
+
 // ── SUGGESTIONS ──────────────────────────────────────────────────────────────
+function openSuggestions(){
+  document.getElementById('sugg-overlay').style.display='block';
+  document.getElementById('sugg-popup').style.display='block';
+  setTimeout(()=>document.getElementById('sugg-text')?.focus(),300);
+}
+function closeSuggestions(){
+  document.getElementById('sugg-overlay').style.display='none';
+  document.getElementById('sugg-popup').style.display='none';
+}
 function toggleSuggestions(){
   const box=document.getElementById('suggestions-box');
   const btn=document.querySelector('[onclick="toggleSuggestions()"]');
@@ -2111,7 +2273,7 @@ async function sendSuggestion(){
     });
     showToast(t('sugg_ok'));
     document.getElementById('sugg-text').value='';
-    toggleSuggestions();
+    closeSuggestions();
   }catch(e){showToast(t('sugg_error'));}
 }
 
@@ -2207,7 +2369,19 @@ const T={
     activa_notif_txt:'⚠️ No activadas todavía.',activadas_txt:'✅ Activadas. Cada lunes a las 10:00h.',
     bloqueadas_txt:'❌ Bloqueadas. Actívalas en ajustes del móvil.',
     activar_notif:'🔔 Activar notificaciones',notif_prueba:'🧪 Notificación de prueba',
-    proximo_aviso:'Tu próximo aviso (lunes 10:00h)',proximos_lunes:'Próximos lunes',
+    proximo_aviso:'Tu próximo aviso (lunes 10:00h)',
+    notif_schedule_title:'🔔 ¿Cuándo quieres recibir el aviso?',
+    notif_day_lbl:'Día',notif_hour_lbl:'Hora',
+    day_mon:'Lunes',day_tue:'Martes',day_wed:'Miércoles',day_thu:'Jueves',
+    day_fri:'Viernes',day_sat:'Sábado',day_sun:'Domingo',
+    notif_schedule_saved:'✅ Horario guardado',
+    notif_next_lbl:'Próximo aviso:',
+    notif_schedule_title:'🔔 Horario de aviso del grupo',
+    notif_schedule_desc:'Todos los miembros recibirán el aviso el mismo día y hora.',
+    notif_pause_title:'Silenciar esta semana',
+    notif_pause_desc:'Ya habéis tirado la quiniela y no hace falta aviso',
+    notif_pause_btn:'Silenciar',notif_unsilence_btn:'Activar',
+    notif_paused_ok:'🔕 Avisos silenciados esta semana',notif_active_ok:'🔔 Avisos activados',proximos_lunes:'Próximos lunes',
     aviso_ios:'<strong>iPhone:</strong> Safari → Compartir → "Añadir a pantalla de inicio"',
     aviso_android:'<strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"',
     aviso_importante:'⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para recibir notificaciones.',
@@ -2242,7 +2416,7 @@ const T={
     tut_siguiente:'Siguiente →',tut_empezar:'¡Empezar! 🚀',
     onboarding_btn:'¡ENTRAR A LA PEÑA! →',
     sugg_title:'💬 Sugerencias',sugg_desc:'¿Tienes alguna idea para mejorar la app? Cuéntanos.',
-    sugg_btn:'Enviar sugerencia',sugg_open:'💬 Enviar una sugerencia',
+    sugg_btn:'Enviar sugerencia',sugg_open:'💬 Enviar una sugerencia',sugg_open_short:'💬 Sugerencias',
     sugg_ok:'✅ ¡Gracias! Sugerencia enviada.',sugg_error:'Error al enviar. Inténtalo de nuevo.',
     sugg_empty:'Escribe tu sugerencia primero.',onboarding_title:'¡Tus amigos y amigas\nte quieren! 🧡',
     onboarding_sub:'Se han terminado los líos\njugando a la lotería.',onboarding_mas:'...¡Y mucho más! 🚀',
@@ -2287,7 +2461,19 @@ const T={
     activa_notif_txt:'⚠️ Encara no activades.',activadas_txt:'✅ Activades. Cada dilluns a les 10:00h.',
     bloqueadas_txt:'❌ Bloquejades. Activa-les als ajustos del mòbil.',
     activar_notif:'🔔 Activar notificacions',notif_prueba:'🧪 Notificació de prova',
-    proximo_aviso:'El teu pròxim avís (dilluns 10:00h)',proximos_lunes:'Propers dilluns',
+    proximo_aviso:'El teu pròxim avís (dilluns 10:00h)',
+    notif_schedule_title:'🔔 Quan vols rebre l\'avís?',
+    notif_day_lbl:'Dia',notif_hour_lbl:'Hora',
+    day_mon:'Dilluns',day_tue:'Dimarts',day_wed:'Dimecres',day_thu:'Dijous',
+    day_fri:'Divendres',day_sat:'Dissabte',day_sun:'Diumenge',
+    notif_schedule_saved:'✅ Horari guardat',
+    notif_next_lbl:'Pròxim avís:',
+    notif_schedule_title:'🔔 Horari d\'avís del grup',
+    notif_schedule_desc:'Tots els membres rebran l\'avís el mateix dia i hora.',
+    notif_pause_title:'Silenciar aquesta setmana',
+    notif_pause_desc:'Ja heu tirat la quiniela i no cal avís',
+    notif_pause_btn:'Silenciar',notif_unsilence_btn:'Activar',
+    notif_paused_ok:'🔕 Avisos silenciats aquesta setmana',notif_active_ok:'🔔 Avisos activats',proximos_lunes:'Propers dilluns',
     aviso_ios:'<strong>iPhone:</strong> Safari → Compartir → "Afegir a pantalla d\'inici"',
     aviso_android:'<strong>Android:</strong> Chrome → Menú ⋮ → "Afegir a pantalla d\'inici"',
     aviso_importante:'⚠️ <strong>Important:</strong> Afegeix l\'app a la pantalla d\'inici per rebre notificacions.',
@@ -2319,7 +2505,7 @@ const T={
     tut_siguiente:'Següent →',tut_empezar:'Començar! 🚀',
     onboarding_btn:'ENTRAR A LA PENYA! →',
     sugg_title:'💬 Suggeriments',sugg_desc:'Tens alguna idea per millorar l\'app? Explica\'ns-ho.',
-    sugg_btn:'Enviar suggeriment',sugg_open:'💬 Enviar un suggeriment',
+    sugg_btn:'Enviar suggeriment',sugg_open:'💬 Enviar un suggeriment',sugg_open_short:'💬 Suggeriments',
     sugg_ok:'✅ Gràcies! Suggeriment enviat.',sugg_error:'Error en enviar. Torna-ho a provar.',
     sugg_empty:'Escriu el teu suggeriment primer.',onboarding_title:'Els teus amics i amigues\nus estimen! 🧡',
     onboarding_sub:'S\'han acabat els embolicaments\njugant a la loteria.',onboarding_mas:'...I molt més! 🚀',
@@ -2364,7 +2550,19 @@ const T={
     activa_notif_txt:'⚠️ Not activated yet.',activadas_txt:'✅ Active. Every Monday at 10:00.',
     bloqueadas_txt:'❌ Blocked. Enable them in your phone settings.',
     activar_notif:'🔔 Enable notifications',notif_prueba:'🧪 Test notification',
-    proximo_aviso:'Your next alert (Monday 10:00)',proximos_lunes:'Upcoming Mondays',
+    proximo_aviso:'Your next alert (Monday 10:00)',
+    notif_schedule_title:'🔔 When do you want to receive the alert?',
+    notif_day_lbl:'Day',notif_hour_lbl:'Time',
+    day_mon:'Monday',day_tue:'Tuesday',day_wed:'Wednesday',day_thu:'Thursday',
+    day_fri:'Friday',day_sat:'Saturday',day_sun:'Sunday',
+    notif_schedule_saved:'✅ Schedule saved',
+    notif_next_lbl:'Next alert:',
+    notif_schedule_title:'🔔 Group alert schedule',
+    notif_schedule_desc:'All members will receive the alert on the same day and time.',
+    notif_pause_title:'Silence this week',
+    notif_pause_desc:'You already bought the ticket and don\'t need an alert',
+    notif_pause_btn:'Silence',notif_unsilence_btn:'Activate',
+    notif_paused_ok:'🔕 Alerts silenced this week',notif_active_ok:'🔔 Alerts activated',proximos_lunes:'Upcoming Mondays',
     aviso_ios:'<strong>iPhone:</strong> Safari → Share → "Add to Home Screen"',
     aviso_android:'<strong>Android:</strong> Chrome → Menu ⋮ → "Add to Home Screen"',
     aviso_importante:'⚠️ <strong>Important:</strong> Add the app to your home screen to receive notifications.',
@@ -2396,7 +2594,7 @@ const T={
     tut_siguiente:'Next →',tut_empezar:'Start! 🚀',
     onboarding_btn:'ENTER THE GROUP! →',
     sugg_title:'💬 Suggestions',sugg_desc:'Got an idea to improve the app? Let us know.',
-    sugg_btn:'Send suggestion',sugg_open:'💬 Send a suggestion',
+    sugg_btn:'Send suggestion',sugg_open:'💬 Send a suggestion',sugg_open_short:'💬 Suggestions',
     sugg_ok:'✅ Thanks! Suggestion sent.',sugg_error:'Error sending. Please try again.',
     sugg_empty:'Write your suggestion first.',onboarding_title:'Your friends\nlove you! 🧡',
     onboarding_sub:"No more hassle\nplaying the lottery.",onboarding_mas:'...And much more! 🚀',
