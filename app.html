@@ -281,16 +281,12 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
-    <!-- Top bar: LotoGrupo + Lang -->
-    <div style="display:flex;align-items:center;justify-content:space-between;padding:44px 16px 8px;">
-      <div style="display:flex;align-items:center;gap:6px;">
-        <svg width="24" height="24" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
-        <span style="font-family:'Bebas Neue',sans-serif;font-size:16px;letter-spacing:2px;color:#fff;">Loto<span id="grupo-text-color" style="color:#FF8C00;">Grupo</span></span>
-      </div>
-      <button id="lang-btn" onclick="openLangSelector()" style="background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;z-index:10;">🌐 <span id="lang-label">ES</span></button>
+    <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:44px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;z-index:10;">🌐 <span id="lang-label">ES</span></button>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;">
+      <svg width="28" height="28" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">Loto<span id="grupo-text-color" style="color:#FF8C00;">Grupo</span></span>
     </div>
-    <!-- Group name - centered, flexible size -->
-    <h1 id="header-title" style="font-size:clamp(16px,5vw,22px);font-weight:900;letter-spacing:.5px;padding:0 80px;line-height:1.2;">Mi Peña</h1>
+    <h1 id="header-title" style="font-size:clamp(15px,5vw,22px);font-weight:900;letter-spacing:.5px;padding:0 60px;line-height:1.2;">Mi Peña</h1>
     <div class="header-loterias" id="header-loterias"></div>
   </div>
   <!-- Suggestion popup -->
@@ -1960,19 +1956,15 @@ function cancelEditName(){
 function saveName(){
   const val=document.getElementById('name-input').value.trim();
   if(!val){showToast(t('escribe_nombre'));return;}
-  const oldName=CFG.name;
-  if(val===oldName){cancelEditName();return;}
-  // Warn: link stays the same, need to reshare
-  if(!confirm(t('confirm_name_change'))){return;}
-  localStorage.setItem(`lg_name_${CFG.name._orig||CFG.name}`,val);
+  if(val===CFG.displayName||val===CFG.name){cancelEditName();return;}
   CFG.displayName=val;
+  saveGroupConfig();
   cancelEditName();
   renderGroupName();
   buildTurns();
   buildWABizum();
+  buildHeader();
   showToast(t('name_updated'));
-  // Remind to reshare
-  setTimeout(()=>showToast(t('reshare_reminder')),2500);
 }
 
 // ── SCANNER ───────────────────────────────────────────────────────────────────
@@ -2663,9 +2655,8 @@ const T={
     notif_esta_semana:'esta semana',notif_recuerda:'Recuerda el Bizum.',
     splash_welcome:'BIENVENIDO A',
     share_grup_title:'Comparte con tu grupo',share_grup_sub:'Envía el enlace para que todos accedan',
-    confirm_name_change:'¿Cambiar el nombre? El enlace no cambia — deberás compartirlo de nuevo.',
-    name_updated:'✅ Nombre actualizado',reshare_reminder:'📲 Recuerda compartir el enlace de nuevo',
-    flag:'ES',
+    confirm_name_change:'¿Cambiar el nombre del grupo? El enlace permanece igual, no hace falta reenviarlo.',
+    name_updated:'✅ Nombre actualizado',    flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
   },
@@ -2761,9 +2752,8 @@ const T={
     gestionar_loterias_lbl:'🎰 Loteríes del grup',añadir_loteria_btn:'+ Afegir loteria',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'Eliminar aquesta loteria?',loteria_added:'✅ Loteria afegida',loteria_removed:'✅ Loteria eliminada',min_one_lot:'El grup necessita almenys una loteria',nueva_combinacion:'Ja activa · Nova combinació',nueva_combinacion_desc:'Afegeix una nova combinació de qualsevol loteria',
     splash_welcome:'BENVINGUT A',
     share_grup_title:'Comparteix amb el teu grup',share_grup_sub:'Envia l\'enllaç perquè tothom hi accedeixi',
-    confirm_name_change:'Canviar el nom? L\'enllaç no canvia — hauràs de compartir-lo de nou.',
-    name_updated:'✅ Nom actualitzat',reshare_reminder:'📲 Recorda compartir l\'enllaç de nou',
-    flag:'CA'
+    confirm_name_change:'Canviar el nom del grup? L\'enllaç és el mateix, no cal tornar-lo a enviar.',
+    name_updated:'✅ Nom actualitzat',    flag:'CA'
   },
   en:{
     tab_comprobar:'Check',tab_turnos:'Turns',tab_bizum:'Payment',tab_premios:'Prizes',
@@ -2856,9 +2846,8 @@ const T={
     notif_prompt_title:'Enable reminders?',notif_prompt_desc:'We\'ll remind you each week who buys the ticket and who needs to pay.',notif_prompt_yes:'🔔 Yes, enable alerts',notif_prompt_later:'Not now',notif_prompt_goto:'Go to Alerts to complete setup',
     gestionar_loterias_lbl:'🎰 Group lotteries',añadir_loteria_btn:'+ Add lottery',eliminar_loteria_btn:'Remove',loteria_activa:'Active',confirm_del_lot:'Remove this lottery?',loteria_added:'✅ Lottery added',loteria_removed:'✅ Lottery removed',min_one_lot:'The group needs at least one lottery',nueva_combinacion:'Already active · New combination',nueva_combinacion_desc:'Add a new combination from any lottery',
     share_grup_title:'Share with your group',share_grup_sub:'Send the link so everyone can access',
-    confirm_name_change:'Change the name? The link stays the same — you\'ll need to reshare it.',
-    name_updated:'✅ Name updated',reshare_reminder:'📲 Remember to reshare the link',
-    flag:'EN'
+    confirm_name_change:'Change the group name? The link stays the same, no need to reshare it.',
+    name_updated:'✅ Name updated',    flag:'EN'
   }
 };
 
