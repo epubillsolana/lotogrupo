@@ -258,12 +258,12 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 </div>
 
 <div id="splash-screen" style="display:flex;position:fixed;inset:0;background:#0A1F0F;z-index:500;flex-direction:column;align-items:center;justify-content:space-between;padding:60px 32px 50px;text-align:center;">
-  <div><svg width="100" height="100" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
+  <div><svg width="110" height="110" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
     <div style="font-family:'Bebas Neue',sans-serif;font-size:28px;letter-spacing:4px;color:#fff;margin-top:12px;">Loto<span style="color:#FF8C00;">Grupo</span></div>
   </div>
   <div style="display:flex;flex-direction:column;align-items:center;">
-    <div style="font-family:'Raleway',sans-serif;font-size:13px;font-weight:300;letter-spacing:.5em;color:rgba(255,255,255,0.5);text-transform:uppercase;margin-bottom:20px;">WELCOME</div>
-    <div id="splash-group" style="font-family:'Raleway',sans-serif;font-size:32px;font-weight:200;letter-spacing:.2em;color:#fff;text-transform:uppercase;line-height:1.3;word-break:break-word;max-width:280px;"></div>
+  style="font-family:'Raleway',sans-serif;font-size:56px;font-weight:700;letter-spacing:.15em;color:#FF8C00;line-height:1;margin-bottom:24px;text-transform:uppercase;">WELCOME</div>:20px;">WELCOME</div>
+    <div id="splash-group" style="font-family:'Raleway',sans-serif;font-size:36px;font-weight:400;letter-spacing:.1em;color:#fff;text-transform:uppercase;line-height:1.3;word-break:break-word;max-width:300px;">></div>
   </div>
   <div style="display:flex;gap:10px;">
     <div style="width:10px;height:10px;border-radius:50%;background:#FF8C00;animation:splashDot .8s ease-in-out infinite;"></div>
@@ -449,17 +449,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
   <!-- PREMIOS -->
   <div class="section" id="tab-premios">
-    <div class="card">
-      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
-        <div class="card-label" style="margin-bottom:0;" data-i18n="historial_sortejos">Historial de juego</div>
-        <button onclick="toggleDrawsHistory()" id="btn-toggle-draws" style="padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);" data-i18n="ver_historial">Ver</button>
-      </div>
-      <div id="draws-history-list" style="display:none;flex-direction:column;gap:6px;"></div>
-    </div>
-emios">
-    <!-- Lot tabs for multiple lotteries -->
     <div class="lot-tabs" id="premios-lot-tabs" style="display:none;"></div>
-
     <div class="balance-grid">
       <div class="balance-card" style="background:var(--red-light);border-color:#FFCDD2;">
         <div class="balance-val" id="bal-gastado" style="color:var(--red);">0,00 €</div>
@@ -488,12 +478,20 @@ emios">
         </div>
       </div>
     </div>
+    <!-- Historial de joc: data + loteria + premi + jugat -->
     <div class="card">
-      <div class="card-label" data-i18n="historial_premios">Historial de premios</div>
-      <div id="history-list"></div>
-      <div class="add-prize-row" style="margin-top:10px;">
-        <input type="number" id="manual-amount" placeholder="€ premios anteriores a la app" min="0" step="0.01">
-        <button onclick="addManualPrize()" style="background:var(--green);">+ Añadir</button>
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-label" style="margin-bottom:0;" data-i18n="historial_sortejos">Historial de joc</div>
+        <button onclick="toggleDrawsHistory()" id="btn-toggle-draws" style="padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);" data-i18n="ver_historial">Ver</button>
+      </div>
+      <div id="draws-history-list" style="display:none;flex-direction:column;gap:6px;"></div>
+      <!-- Add manual prize (hidden inside draws) -->
+      <div id="add-prize-manual" style="display:none;margin-top:10px;border-top:.5px solid var(--border);padding-top:10px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;" data-i18n="add_prize_hint">Añade premios anteriores a la app</div>
+        <div class="add-prize-row">
+          <input type="number" id="manual-amount" placeholder="€" min="0" step="0.01">
+          <button onclick="addManualPrize()" style="background:var(--green);">+ Añadir</button>
+        </div>
       </div>
     </div>
     <div id="reset-box" style="display:none;">
@@ -2471,7 +2469,9 @@ function toggleDrawsHistory(){
   _drawsHistoryOpen = !_drawsHistoryOpen;
   const list = document.getElementById('draws-history-list');
   const btn = document.getElementById('btn-toggle-draws');
+  const manual = document.getElementById('add-prize-manual');
   if(list) list.style.display = _drawsHistoryOpen ? 'flex' : 'none';
+  if(manual) manual.style.display = _drawsHistoryOpen ? 'block' : 'none';
   if(btn) btn.textContent = _drawsHistoryOpen ? t('ocultar_historial') : t('ver_historial');
   if(_drawsHistoryOpen) buildDrawsHistory();
 }
@@ -2495,7 +2495,9 @@ function buildDrawsHistory(){
       if(days.includes(d.getDay())){
         const fecha = d.getDate().toString().padStart(2,'0') + '/' + (d.getMonth()+1).toString().padStart(2,'0') + '/' + d.getFullYear();
         const state = getPlayedState(l.lottery, fecha) || 'unknown';
-        draws.push({lottery:l.lottery, fecha, state, dateObj:new Date(d), lotName:lot?.name||l.lottery, lotEmoji:lot?.emoji||'🎰'});
+        // Find prize for this date
+        const prizeEntry = (loadHistoryLocal(l.lottery)||[]).find(p=>p.fecha===fecha);
+        draws.push({lottery:l.lottery, fecha, state, dateObj:new Date(d), lotName:lot?.name||l.lottery, lotEmoji:lot?.emoji||'🎰', prize:prizeEntry?parseFloat(prizeEntry.amount||0):0});
       }
       d.setDate(d.getDate()+1);
     }
@@ -2521,11 +2523,11 @@ function buildDrawsHistory(){
     row.innerHTML = `
       <span style="font-size:20px;">${dr.lotEmoji}</span>
       <div style="flex:1;">
-        <div style="font-size:13px;font-weight:700;color:var(--text);">${dr.lotName}</div>
-        <div style="font-size:11px;color:var(--text3);">${dr.fecha}</div>
+        <div style="font-size:13px;font-weight:700;color:var(--text);">${dr.lotName} · ${dr.fecha}</div>
+        ${dr.prize?`<div style="font-size:12px;color:var(--green);font-weight:700;">+${formatEur(dr.prize)}</div>`:''}
       </div>
       <button onclick="togglePlayedFromHistory('${dr.lottery}','${dr.fecha}',this)"
-        style="padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid ${stateColor};color:${stateColor};background:transparent;">
+        style="padding:5px 10px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1.5px solid ${stateColor};color:${stateColor};background:transparent;">
         ${stateEmoji} ${stateText}
       </button>`;
     list.appendChild(row);
