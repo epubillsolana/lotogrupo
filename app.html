@@ -32,13 +32,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .setup-btn{display:inline-block;padding:14px 28px;background:#FF8C00;color:#fff;border-radius:99px;font-size:16px;font-weight:700;text-decoration:none;}
 
 /* HEADER */
-.header{padding:52px 20px 18px;text-align:center;position:relative;overflow:hidden;}
+.header{padding:58px 20px 22px;text-align:center;position:relative;overflow:hidden;}
 .header::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.07);}
 .header::after{content:'';position:absolute;bottom:-40px;left:-20px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.05);}
 .header-badge{background:#fff;border-radius:10px;padding:5px 14px;display:inline-block;margin-bottom:6px;}
 .header-badge span{font-size:16px;font-weight:900;letter-spacing:1px;}
 .header-divider{width:40px;height:2px;background:rgba(255,255,255,0.3);margin:8px auto 6px;border-radius:2px;}
-.header h1{font-size:19px;font-weight:700;letter-spacing:.5px;text-transform:uppercase;color:#fff;}
+.header h1{font-size:22px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.2);}
 .header-loterias{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
 .header-lot-badge{background:rgba(255,255,255,0.15);border:0.5px solid rgba(255,255,255,0.2);border-radius:99px;padding:3px 10px;font-size:11px;color:rgba(255,255,255,0.85);font-weight:600;}
 
@@ -62,8 +62,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .ball{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;}
 .ball.our-main{background:linear-gradient(135deg,#1976D2,#42A5F5);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,.3);}
 .ball.our-star{background:linear-gradient(135deg,#F57F17,#FFD54F);color:#fff;box-shadow:0 2px 8px rgba(245,127,23,.3);}
-.ball.draw-main{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border2);}
-.ball.draw-star{background:var(--surface2);color:var(--text2);border:1.5px solid var(--border2);}
+.ball.draw-main{background:#E8EAED;color:#3C4043;border:2px solid #BDBDBD;font-weight:800;}
+.ball.draw-star{background:#E8EAED;color:#3C4043;border:2px solid #BDBDBD;font-weight:800;}
 .ball.hit{background:linear-gradient(135deg,#2E7D32,#66BB6A);color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.4);}
 .ball.no-hit{background:var(--surface2);color:var(--text3);opacity:.35;}
 .star-sep{font-size:14px;color:var(--gold);}
@@ -102,9 +102,9 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .person-name{font-size:14px;font-weight:600;}
 .person-sub{font-size:11px;color:var(--text3);margin-top:1px;}
 .badge{font-size:11px;font-weight:700;padding:4px 11px;border-radius:99px;}
-.badge-active{background:var(--green-light);color:var(--green);}
-.badge-next{background:var(--gold-light);color:var(--gold);}
-.badge-wait{background:var(--surface2);color:var(--text3);}
+.badge-active{background:#2E7D32;color:#fff;}
+.badge-next{background:#F57F17;color:#fff;}
+.badge-wait{background:#ECEFF1;color:#78909C;}
 
 /* BIZUM */
 .bizum-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);}
@@ -137,8 +137,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;backgrou
 .balance-val{font-size:20px;font-weight:800;margin-bottom:3px;}
 .balance-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
 .stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
-.stat-card{background:var(--surface);border-radius:var(--radius);padding:14px;border:.5px solid var(--border);text-align:center;box-shadow:var(--shadow);}
-.stat-val{font-size:22px;font-weight:800;margin-bottom:2px;}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:16px 14px;border:.5px solid var(--border);text-align:center;box-shadow:var(--shadow);}
+.stat-val{font-size:24px;font-weight:800;margin-bottom:4px;color:var(--primary);}
 .stat-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
 .add-prize-row{display:flex;gap:8px;margin-top:8px;}
 .add-prize-row input{flex:1;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;}
@@ -354,10 +354,10 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div class="card">
       <div class="card-label">Estadísticas</div>
       <div class="stats-grid">
-        <div class="stat-card"><div class="stat-val" id="stat-peor-racha">—</div><div class="stat-lbl">Peor racha sin premio</div></div>
-        <div class="stat-card"><div class="stat-val" id="stat-mejor-racha">—</div><div class="stat-lbl">Mejor racha con premio</div></div>
-        <div class="stat-card"><div class="stat-val" id="stat-mejor">—</div><div class="stat-lbl">Mejor premio</div></div>
-        <div class="stat-card">
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">😬</div><div class="stat-val" id="stat-peor-racha">—</div><div class="stat-lbl">Peor racha sin premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🔥</div><div class="stat-val" id="stat-mejor-racha">—</div><div class="stat-lbl">Mejor racha con premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🏆</div><div class="stat-val" id="stat-mejor">—</div><div class="stat-lbl">Mejor premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🍀</div>
           <div class="stat-val" id="stat-premiados">—</div>
           <div id="stat-premiados-pct" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
           <div class="stat-lbl">Sorteos premiados</div>
@@ -569,8 +569,8 @@ const LOTTERIES={
     ]},
 };
 const AVATARS=['😀','😎','🤩','🥳','🤠','🧐','🥸','😏','🤑','😈','👽','🤖','🦸','🦹','🧙','🧛','🧟','🧜','🧝','🥷','👩‍🚀','👨‍🚀','🧑‍💼','👩‍💼','🧑‍🎨','👩‍🎨','🧑‍🍳','👩‍🔬','🦊','🐯','🦁','🐻','🐼','🐨','🦝','🦋','🐙','🦄','🐲','🦅','🎭','🎪','🎯','🔥','💎','🚀','⚡','🌈','🍀','⭐','🏆','💫','🎸','🎮','🏄','🧗','🤺','🏋️'];
-const AVG_BG=['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];
-const AVG_FG=['#0C447C','#3B6D11','#854F0B','#7A2443','#534AB7','#1B6B4E','#A0430A','#6B2E90'];
+const AVG_BG=['#1565C0','#2E7D32','#E65100','#AD1457','#4527A0','#00695C','#BF360C','#4A148C'];
+const AVG_FG=['#fff','#fff','#fff','#fff','#fff','#fff','#fff','#fff'];
 
 let drawDataMap={}, lastWAMsg='', lastWATurn='', lastWABizum='', lastPrizeResult=null, swReg=null;
 let _avPopupName='';
