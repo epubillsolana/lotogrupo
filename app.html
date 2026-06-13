@@ -2197,7 +2197,7 @@ const T={
     copiar_turno:'📋 Copiar',wa_turno:'📲 WhatsApp',
     has_hecho_bizum:'Has fet el Bizum?',pulsa_confirmar:'Prem per confirmar. Qualsevol pot actualitzar.',
     compartir_bizum:'Compartir estat per WhatsApp',bizum_hecho:'✅ Bizum fet',pendiente:'⏳ Pendent',
-    paga_boleto:'Paga el boleto',copiar_bizum:'📋 Copiar',wa_bizum:'📲 WhatsApp',
+    paga_boleto:'Paga el bitllet',copiar_bizum:'📋 Copiar',wa_bizum:'📲 WhatsApp',
     total_gastado:'TOTAL GASTAT',balance_neto:'BALANÇ NET',total_ganado:'Total guanyat pel grup',
     estadisticas:'Estadístiques',peor_racha:'Pitjor ratxa sense premi',mejor_racha:'Millor ratxa amb premi',
     mejor_premio:'Millor premi',sorteos_premiados:'Sorteigs premiats',historial_premios:'Historial de premis',
@@ -2215,11 +2215,11 @@ const T={
     aviso_ios:'<strong>iPhone:</strong> Safari → Compartir → "Afegir a pantalla d\'inici"',
     aviso_android:'<strong>Android:</strong> Chrome → Menú ⋮ → "Afegir a pantalla d\'inici"',
     aviso_importante:'⚠️ <strong>Important:</strong> Afegeix l\'app a la pantalla d\'inici per rebre notificacions.',
-    fotografiar:'📷 Fotografiar boleto',foto_desc:'Fes una foto al boleto com a prova de compra. Queda registrat qui juga i quan es va comprar.',
-    loteria_lbl:'Loteria',quien_boleto:'Qui té el boleto físicament?',
-    hacer_foto:'📷 Fer foto al boleto',elegir_galeria:'🖼️ Triar de galeria',
-    vista_previa:'Previsualització del boleto',boletos_registrados:'Boletos registrats',
-    scanner_empty:'Sense boletos registrats encara 🎟️<br><span style="font-size:11px;">Fotografia el boleto cada cop que el compreu</span>',
+    fotografiar:'📷 Fotografiar bitllet',foto_desc:'Fes una foto al bitllet com a prova de compra. Queda registrat qui juga i quan es va comprar.',
+    loteria_lbl:'Loteria',quien_boleto:'Qui té el bitllet físicament?',
+    hacer_foto:'📷 Fer foto al bitllet',elegir_galeria:'🖼️ Triar de galeria',
+    vista_previa:'Previsualització del bitllet',boletos_registrados:'Bitllets registrats',
+    scanner_empty:'Sense bitllets registrats encara 🎟️<br><span style="font-size:11px;">Fotografia el bitllet cada cop que el compreu</span>',
     confirmar_guardar:'💾 Confirmar i desar',
     nombre_grupo:'Nom del grup',miembros_grupo:'Membres del grup',importes:'Imports',
     coste_boleto:'Cost del boleto',bizum_persona_lbl:'Bizum per persona',
@@ -2338,7 +2338,6 @@ function setWALang(lang){
 function applyLang(){
   const lang=getLang();
   // Update lang button
-  const langBtn=document.getElementById('lang-btn');
   const langLabel=document.getElementById('lang-label');
   if(langLabel) langLabel.textContent=T[lang].flag;
   // Apply all data-i18n elements
@@ -2347,6 +2346,16 @@ function applyLang(){
     const val=t(key);
     if(val) el.innerHTML=val;
   });
+  // Rebuild all dynamic content so language takes effect immediately
+  if(CFG){
+    buildComprobar();
+    buildTurns();
+    buildBizumConfirm();
+    buildWABizum();
+    buildMembers();
+    renderRotation();
+    renderHistory();
+  }
 }
 
 // ── START ─────────────────────────────────────────────────────────────────────
