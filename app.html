@@ -215,6 +215,8 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 .boleto-name{font-size:13px;font-weight:700;}
 .boleto-date{font-size:11px;color:var(--text3);}
 .boleto-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 6px;}
+.lang-opt{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border2);background:var(--surface2);font-size:16px;font-weight:700;cursor:pointer;text-align:left;}
+.lang-opt.active{border-color:var(--primary);background:var(--primary);color:#fff;}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 </style>
@@ -247,8 +249,18 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
 <div id="main-app" style="display:none;">
   <div class="header" id="app-header">
+    <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:52px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:13px;cursor:pointer;z-index:10;">🇪🇸</button>
     <h1 id="header-title" style="font-size:20px;font-weight:900;letter-spacing:.5px;">Mi Peña</h1>
     <div class="header-loterias" id="header-loterias"></div>
+  </div>
+  <div id="lang-overlay" onclick="closeLangSelector()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;"></div>
+  <div id="lang-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:301;box-shadow:0 -4px 24px rgba(0,0,0,0.15);">
+    <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:20px;">🌐 Idioma / Language</div>
+    <div style="display:flex;flex-direction:column;gap:10px;">
+      <button onclick="setLang('es')" class="lang-opt" data-lang="es">🇪🇸 Español</button>
+      <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">🏴󠁥󠁳󠁣󠁴󠁿 Català</button>
+      <button onclick="setLang('en')" class="lang-opt" data-lang="en">🇬🇧 English</button>
+    </div>
   </div>
 
   <div class="tabbar">
@@ -303,6 +315,29 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div class="card">
       <div class="card-label">Rotación del grupo</div>
       <div id="turns-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-label">Rotación de pagos</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1.5px solid var(--border2);cursor:pointer;" id="rot-auto-label">
+          <input type="radio" name="rotation-mode" id="rot-auto" value="auto" onchange="saveRotationMode()" style="width:18px;height:18px;accent-color:var(--primary);">
+          <div>
+            <div style="font-size:14px;font-weight:700;">🔄 Rotación automática</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Cada X sorteos cambia quien paga</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1.5px solid var(--border2);cursor:pointer;" id="rot-fixed-label">
+          <input type="radio" name="rotation-mode" id="rot-fixed" value="fixed" onchange="saveRotationMode()" style="width:18px;height:18px;accent-color:var(--primary);">
+          <div>
+            <div style="font-size:14px;font-weight:700;">📌 Siempre la misma persona</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;">Una persona paga siempre</div>
+          </div>
+        </label>
+      </div>
+      <div id="fixed-payer-selector" style="display:none;margin-top:4px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;">¿Quién paga siempre?</div>
+        <div id="fixed-payer-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
     </div>
     <div class="card">
       <div class="card-label">Aviso cambio de turno</div>
@@ -725,6 +760,8 @@ function initApp(){
   renderGroupName();
   renderImportes();
   restoreWho();
+  renderRotation();
+  applyLang();
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()=>{});
   track('apertura',{members:CFG.members.length,lotteries:CFG.lotteries.map(l=>l.lottery)});
 }
@@ -739,7 +776,10 @@ function hexToRgba(hex,a){
 }
 
 // ── PAYER ─────────────────────────────────────────────────────────────────────
+function getRotationMode(){return localStorage.getItem(`lg_rotation_${CFG.name}`)||'auto';}
+function getFixedPayerIdx(){return parseInt(localStorage.getItem(`lg_fixed_payer_${CFG.name}`))||0;}
 function getCurrentPayerIdx(){
+  if(getRotationMode()==='fixed') return getFixedPayerIdx()%(getSavedMembers().length||CFG.members.length);
   const epoch=new Date(CFG.epoch||new Date());
   const ms=Math.max(0,new Date()-epoch);
   const draws=Math.floor(ms/(3.5*24*3600*1000));
@@ -1992,7 +2032,7 @@ function switchTab(id,el){
   el.classList.add('active');document.getElementById('tab-'+id).classList.add('active');
   el.scrollIntoView({behavior:'smooth',block:'nearest',inline:'center'});
   if(id==='premios') renderHistory();
-  if(id==='turnos') buildTurns();
+  if(id==='turnos'){buildTurns();renderRotation();}
   if(id==='bizum'){buildBizumConfirm();}
   if(id==='grupo'){buildMembers();renderGroupName();renderImportes();}
   if(id==='scanner'){buildScannerLotSelector();buildScannerWhoSelect();renderBoletos();}
@@ -2004,6 +2044,149 @@ function copyTurn(){navigator.clipboard.writeText(lastWATurn).then(()=>showToast
 function openWATurn(){window.open('https://wa.me/?text='+encodeURIComponent(lastWATurn),'_blank');}
 function copyBizum(){navigator.clipboard.writeText(lastWABizum).then(()=>showToast('✅ Copiado')).catch(()=>showToast('Copia manualmente'));}
 function openWABizum(){window.open('https://wa.me/?text='+encodeURIComponent(lastWABizum),'_blank');}
+
+// ── ROTATION ─────────────────────────────────────────────────────────────────
+function saveRotationMode(){
+  const mode=document.querySelector('input[name="rotation-mode"]:checked')?.value||'auto';
+  localStorage.setItem(`lg_rotation_${CFG.name}`,mode);
+  const fixedSel=document.getElementById('fixed-payer-selector');
+  const autoLabel=document.getElementById('rot-auto-label');
+  const fixedLabel=document.getElementById('rot-fixed-label');
+  if(fixedSel) fixedSel.style.display=mode==='fixed'?'block':'none';
+  if(autoLabel) autoLabel.style.borderColor=mode==='auto'?'var(--primary)':'var(--border2)';
+  if(fixedLabel) fixedLabel.style.borderColor=mode==='fixed'?'var(--primary)':'var(--border2)';
+  buildTurns();buildBizumConfirm();buildWABizum();
+  showToast(mode==='fixed'?'📌 Pagador fijo activado':'🔄 Rotación automática activada');
+}
+
+function renderRotation(){
+  const mode=getRotationMode();
+  const autoRadio=document.getElementById('rot-auto');
+  const fixedRadio=document.getElementById('rot-fixed');
+  const fixedSel=document.getElementById('fixed-payer-selector');
+  const autoLabel=document.getElementById('rot-auto-label');
+  const fixedLabel=document.getElementById('rot-fixed-label');
+  if(autoRadio) autoRadio.checked=mode==='auto';
+  if(fixedRadio) fixedRadio.checked=mode==='fixed';
+  if(fixedSel) fixedSel.style.display=mode==='fixed'?'block':'none';
+  if(autoLabel) autoLabel.style.borderColor=mode==='auto'?'var(--primary)':'var(--border2)';
+  if(fixedLabel) fixedLabel.style.borderColor=mode==='fixed'?'var(--primary)':'var(--border2)';
+  // Build fixed payer list
+  const list=document.getElementById('fixed-payer-list');
+  if(!list) return;
+  list.innerHTML='';
+  const members=getSavedMembers();
+  const fixedIdx=getFixedPayerIdx();
+  members.forEach((m,i)=>{
+    const btn=document.createElement('button');
+    const isSelected=i===fixedIdx&&mode==='fixed';
+    btn.style.cssText=`padding:8px 16px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:1.5px solid ${isSelected?'var(--primary)':'var(--border2)'};background:${isSelected?'var(--primary)':'var(--surface2)'};color:${isSelected?'#fff':'var(--text2)'};`;
+    btn.textContent=(getAvatar(m)||'😀')+' '+m;
+    btn.onclick=()=>{
+      localStorage.setItem(`lg_fixed_payer_${CFG.name}`,i);
+      renderRotation();
+      buildTurns();buildBizumConfirm();buildWABizum();
+      showToast(`📌 ${m} pagará siempre`);
+    };
+    list.appendChild(btn);
+  });
+}
+
+// ── I18N ─────────────────────────────────────────────────────────────────────
+const T={
+  es:{
+    comprobar:'Comprobar',turnos:'Turnos',bizum:'Bizum',premios:'Premios',avisos:'Avisos',grupo:'Grupo',scanner:'Scanner',
+    nuestros_numeros:'Nuestros números',ultimo_sorteo:'Último sorteo oficial',comprobar_premio:'Comprobar premio',
+    paga_ronda:'Paga esta ronda',bizum_persona:'Bizum por persona',rotacion:'Rotación del grupo',
+    aviso_turno:'Aviso cambio de turno',bizum_hecho:'✅ Bizum hecho',pendiente:'⏳ Pendiente',
+    total_ganado:'Total ganado por el grupo',total_gastado:'TOTAL GASTADO',balance_neto:'BALANCE NETO',
+    estadisticas:'Estadísticas',historial:'Historial de premios',nombre_grupo:'Nombre del grupo',
+    miembros:'Miembros del grupo',importes:'Importes',coste_boleto:'Coste del boleto',
+    rotacion_pagos:'Rotación de pagos',rotacion_auto:'🔄 Rotación automática',rotacion_fija:'📌 Siempre la misma persona',
+    quien_paga:'¿Quién paga siempre?',fotografiar:'📷 Fotografiar boleto',hacer_foto:'📷 Hacer foto al boleto',
+    elegir_galeria:'🖼️ Elegir de galería',sin_premio:'Sin premio esta vez',enhorabuena:'¡Enhorabuena! 🎊',
+    jugado:'✅ Jugado',no_jugado:'❌ No jugado',sin_marcar:'Sin marcar',editar:'✏️ Editar',
+    flag:'🇪🇸'
+  },
+  ca:{
+    comprobar:'Comprovar',turnos:'Torns',bizum:'Bizum',premios:'Premis',avisos:'Avisos',grupo:'Grup',scanner:'Scanner',
+    nuestros_numeros:'Els nostres números',ultimo_sorteo:'Últim sorteig oficial',comprobar_premio:'Comprovar premi',
+    paga_ronda:'Paga aquesta ronda',bizum_persona:'Bizum per persona',rotacion:'Rotació del grup',
+    aviso_turno:'Avís canvi de torn',bizum_hecho:'✅ Bizum fet',pendiente:'⏳ Pendent',
+    total_ganado:'Total guanyat pel grup',total_gastado:'TOTAL GASTAT',balance_neto:'BALANÇ NET',
+    estadisticas:'Estadístiques',historial:'Historial de premis',nombre_grupo:'Nom del grup',
+    miembros:'Membres del grup',importes:'Imports',coste_boleto:'Cost del boleto',
+    rotacion_pagos:'Rotació de pagaments',rotacion_auto:'🔄 Rotació automàtica',rotacion_fija:'📌 Sempre la mateixa persona',
+    quien_paga:'Qui paga sempre?',fotografiar:'📷 Fotografiar boleto',hacer_foto:'📷 Fer foto al boleto',
+    elegir_galeria:'🖼️ Triar de galeria',sin_premio:'Sense premi aquesta vegada',enhorabuena:'Enhorabona! 🎊',
+    jugado:'✅ Jugat',no_jugado:'❌ No jugat',sin_marcar:'Sense marcar',editar:'✏️ Editar',
+    flag:'🏴󠁥󠁳󠁣󠁴󠁿'
+  },
+  en:{
+    comprobar:'Check',turnos:'Turns',bizum:'Payment',premios:'Prizes',avisos:'Alerts',grupo:'Group',scanner:'Scanner',
+    nuestros_numeros:'Our numbers',ultimo_sorteo:'Last official draw',comprobar_premio:'Check prize',
+    paga_ronda:'Pays this round',bizum_persona:'Payment per person',rotacion:'Group rotation',
+    aviso_turno:'Turn change alert',bizum_hecho:'✅ Paid',pendiente:'⏳ Pending',
+    total_ganado:'Total won by the group',total_gastado:'TOTAL SPENT',balance_neto:'NET BALANCE',
+    estadisticas:'Statistics',historial:'Prize history',nombre_grupo:'Group name',
+    miembros:'Group members',importes:'Amounts',coste_boleto:'Ticket cost',
+    rotacion_pagos:'Payment rotation',rotacion_auto:'🔄 Automatic rotation',rotacion_fija:'📌 Always the same person',
+    quien_paga:'Who always pays?',fotografiar:'📷 Photograph ticket',hacer_foto:'📷 Take photo',
+    elegir_galeria:'🖼️ Choose from gallery',sin_premio:'No prize this time',enhorabuena:'Congratulations! 🎊',
+    jugado:'✅ Played',no_jugado:'❌ Not played',sin_marcar:'Not marked',editar:'✏️ Edit',
+    flag:'🇬🇧'
+  }
+};
+
+function getLang(){return localStorage.getItem('lg_lang')||'es';}
+function t(key){return T[getLang()]?.[key]||T.es[key]||key;}
+
+function openLangSelector(){
+  const lang=getLang();
+  document.querySelectorAll('.lang-opt').forEach(b=>{
+    b.classList.toggle('active',b.dataset.lang===lang);
+  });
+  document.getElementById('lang-overlay').style.display='block';
+  document.getElementById('lang-popup').style.display='block';
+}
+function closeLangSelector(){
+  document.getElementById('lang-overlay').style.display='none';
+  document.getElementById('lang-popup').style.display='none';
+}
+function setLang(lang){
+  localStorage.setItem('lg_lang',lang);
+  document.getElementById('lang-btn').textContent=T[lang].flag;
+  closeLangSelector();
+  applyLang();
+  showToast(lang==='es'?'🇪🇸 Español':lang==='ca'?'🏴󠁥󠁳󠁣󠁴󠁿 Català':'🇬🇧 English');
+}
+function applyLang(){
+  // Tab buttons
+  const tabs=['comprobar','turnos','bizum','premios','avisos','grupo','scanner'];
+  document.querySelectorAll('.tab-btn').forEach((btn,i)=>{
+    const key=tabs[i];
+    if(key) btn.lastChild.textContent=t(key);
+  });
+  // Check button
+  const checkBtn=document.getElementById('btn-check');
+  if(checkBtn) checkBtn.textContent=t('comprobar_premio');
+  // Lang flag
+  const langBtn=document.getElementById('lang-btn');
+  if(langBtn) langBtn.textContent=T[getLang()].flag;
+  // Metric labels
+  const mPayerLbl=document.querySelector('#m-payer')?.nextElementSibling;
+  const mBizumLbl=document.querySelector('#m-bizum')?.nextElementSibling;
+  if(mPayerLbl) mPayerLbl.textContent=t('paga_ronda');
+  if(mBizumLbl) mBizumLbl.textContent=t('bizum_persona');
+  // Balance labels
+  const gastadoLbl=document.querySelector('#bal-gastado')?.nextElementSibling;
+  const balanceLbl=document.querySelector('#bal-balance')?.nextElementSibling;
+  if(gastadoLbl) gastadoLbl.textContent=t('total_gastado');
+  if(balanceLbl) balanceLbl.textContent=t('balance_neto');
+  // Total label
+  const totalLbl=document.querySelector('.total-label');
+  if(totalLbl) totalLbl.textContent=t('total_ganado');
+}
 
 // ── START ─────────────────────────────────────────────────────────────────────
 loadConfig();
