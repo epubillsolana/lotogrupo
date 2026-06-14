@@ -579,6 +579,21 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         <div class="schedule-list" id="schedule-list"></div>
       </div>
       <div class="info-box blue" style="font-size:12px;">⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para recibir notificaciones.<br><br><strong>iPhone:</strong> Safari → Compartir → "Añadir a pantalla de inicio"<br><strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"</div>
+      <div class="card" style="margin-top:12px;">
+        <div class="card-label" data-i18n="auto_snapshot_title">📸 Captura automàtica del Bizum</div>
+        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" data-i18n="auto_snapshot_desc">La app fa la captura X hores abans de cada sorteig</div>
+        <div style="display:flex;align-items:center;gap:10px;">
+          <label style="font-size:13px;color:var(--text2);" data-i18n="auto_snapshot_hours">Hores abans:</label>
+          <select id="snapshot-hours-sel" onchange="saveSnapshotConfig()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);font-size:14px;color:var(--text);">
+            <option value="1">1h</option>
+            <option value="2">2h</option>
+            <option value="4" selected>4h</option>
+            <option value="12">12h</option>
+            <option value="24">24h</option>
+          </select>
+        </div>
+        <div id="auto-snapshot-status" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
+      </div>
       <button class="btn btn-gray" onclick="testNotif()" style="margin-bottom:12px;" data-i18n="notif_prueba">🧪 Notificación de prueba</button>
     </div>
   </div>
@@ -2518,6 +2533,7 @@ async function loadGroupNotifSchedule(){
 }
 
 async function restoreNotifSchedule(){
+  restoreSnapshotConfig();
   const schedule=await loadGroupNotifSchedule();
   const daySel=document.getElementById('notif-day-sel');
   const hourSel=document.getElementById('notif-hour-sel');
@@ -2692,6 +2708,54 @@ async function saveGroupConfig(){
     });
     localStorage.setItem('lg_config_'+slug,JSON.stringify(CFG));
   }catch(e){console.error(e);}
+}
+
+// ── AUTO SNAPSHOT CONFIG ─────────────────────────────────────────────────────
+function saveSnapshotConfig(){
+  const hours = document.getElementById('snapshot-hours-sel')?.value||'4';
+  localStorage.setItem(`lg_snapshot_hours_${CFG.name}`, hours);
+  showToast(`📸 ${hours}h`);
+}
+
+function restoreSnapshotConfig(){
+  const saved = localStorage.getItem(`lg_snapshot_hours_${CFG.name}`)||'4';
+  const sel = document.getElementById('snapshot-hours-sel');
+  if(sel) sel.value = saved;
+}
+
+function getSnapshotHours(){
+  return parseInt(localStorage.getItem(`lg_snapshot_hours_${CFG.name}`)||'4');
+}
+
+function checkAutoSnapshot(){
+  if(!CFG||!CFG.lotteries) return;
+  const hoursMs = getSnapshotHours()*60*60*1000;
+  const now = new Date();
+  const daysMap = {euromillones:[2,5], primitiva:[4,6], bonoloto:[1,2,3,4,5]};
+
+  CFG.lotteries.forEach(l=>{
+    const days = daysMap[l.lottery]||[2,5];
+    // Find next draw within 7 days
+    for(let i=0;i<7;i++){
+      const d = new Date(now);
+      d.setDate(now.getDate()+i);
+      d.setHours(21,30,0,0);
+      if(days.includes(d.getDay()) && d > now){
+        const diff = d - now;
+        if(diff <= hoursMs){
+          const key = `lg_snap_done_${CFG.name}_${l.lottery}_${d.toDateString()}`;
+          if(!localStorage.getItem(key)){
+            localStorage.setItem(key,'1');
+            takeSnapshot(l.lottery, d.toISOString().slice(0,10), true);
+            showToast(`📸 ${l.lottery}`);
+          }
+          const statusEl = document.getElementById('auto-snapshot-status');
+          if(statusEl) statusEl.textContent = `✅ Captura feta: ${l.lottery} ${d.toLocaleDateString()}`;
+        }
+        break;
+      }
+    }
+  });
 }
 
 // ── BIZUM SNAPSHOT ────────────────────────────────────────────────────────────
@@ -3050,6 +3114,7 @@ const T={
     identity_dni_verify:'Introduce los 4 últimos dígitos de tu DNI para verificar:',identity_dni_optional:'DNI opcional (3 números + letra). Puedes dejarlo en blanco.',
     identity_dni_registered:'✅ DNI ya registrado. Pulsa Confirmar para entrar.',
     tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprende a usar LotoGrupo',tutorial_card_btn:'Ver',
+    auto_snapshot_title:'📸 Captura automática del Bizum',auto_snapshot_desc:'La app hace la captura X horas antes de cada sorteo',auto_snapshot_hours:'Horas antes:',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3160,6 +3225,7 @@ const T={
     identity_dni_verify:'Introdueix els 4 últims dígits del DNI per verificar:',identity_dni_optional:'DNI opcional (3 números + lletra). Pots deixar-ho en blanc.',
     identity_dni_registered:'✅ DNI ja registrat. Prem Confirmar per entrar.',
     tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprèn a usar LotoGrupo',tutorial_card_btn:'Veure',
+    auto_snapshot_title:'📸 Captura automàtica del Bizum',auto_snapshot_desc:'La app fa la captura X hores abans de cada sorteig',auto_snapshot_hours:'Hores abans:',
     flag:'CA'
   },
   en:{
@@ -3332,6 +3398,8 @@ function applyLang(){
 
 // ── START ─────────────────────────────────────────────────────────────────────
 loadConfig();
+// Check auto snapshot every 30 minutes
+setInterval(checkAutoSnapshot, 30*60*1000);
 async function addPrize(amount,label,fecha){
   if(!amount||amount<=0){showToast('Introduce un importe válido');return false;}
   const lotKey=CFG.lotteries.find(l=>label.includes(LOTTERIES[l.lottery]?.name||''))?.lottery||CFG.lotteries[0].lottery;
