@@ -1146,14 +1146,52 @@ async function buildInici(){
       <div style="font-size:11px;font-weight:700;color:#E65100;text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">⚠️ ${t('inici_pendents')} (${pendingBizums.length}/${others.length})</div>
       <div style="display:flex;flex-wrap:wrap;gap:6px;">${pendingBizums.map(m=>`<span style="padding:4px 10px;border-radius:99px;background:#FFEBEE;color:#C62828;font-size:12px;font-weight:600;">❌ ${m}</span>`).join('')}</div>
     </div>`:''}
-    <div style="margin-top:24px;padding-top:20px;border-top:.5px solid var(--border);">
-      <div style="font-size:12px;font-weight:900;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px;" data-i18n="inici_com_funciona">Com funciona</div>
-      <div style="display:flex;flex-direction:column;gap:12px;">
-        ${[['🔍','tab_comprobar','inici_desc_comprobar'],['🔄','tab_turnos','inici_desc_tornos'],['💸','tab_bizum','inici_desc_bizum'],['🏆','tab_premios','inici_desc_premios'],['👥','tab_grupo','inici_desc_grupo']].map(([emoji,tab,desc])=>`
-        <div style="display:flex;gap:12px;align-items:flex-start;">
-          <span style="font-size:22px;flex-shrink:0;">${emoji}</span>
-          <div><div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px;">${t(tab)}</div><div style="font-size:12px;color:var(--text3);line-height:1.5;">${t(desc)}</div></div>
-        </div>`).join('')}
+    <div style="margin-top:28px;padding-top:24px;border-top:.5px solid var(--border);">
+      <div style="font-size:13px;font-weight:900;color:var(--text);text-transform:uppercase;letter-spacing:.12em;margin-bottom:4px;" data-i18n="inici_com_funciona">Com funciona LotoGrupo</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:20px;" data-i18n="inici_com_funciona_sub">Tot el que necessites per gestionar la teva penya, en un sol lloc.</div>
+
+      <div style="display:flex;flex-direction:column;gap:10px;">
+
+        <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;border-left:4px solid #1565C0;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:20px;">🔍</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text);">${t('tab_comprobar')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;">${t('inici_desc_comprobar')}</div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;border-left:4px solid #FF8C00;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:20px;">🔄</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text);">${t('tab_turnos')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;">${t('inici_desc_tornos')}</div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;border-left:4px solid #2E7D32;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:20px;">💸</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text);">${t('tab_bizum')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;">${t('inici_desc_bizum')}</div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;border-left:4px solid #F57F17;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:20px;">🏆</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text);">${t('tab_premios')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;">${t('inici_desc_premios')}</div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;border-left:4px solid #6A1B9A;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:20px;">👥</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text);">${t('tab_grupo')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;">${t('inici_desc_grupo')}</div>
+        </div>
+
       </div>
     </div>`;
 }
@@ -3351,7 +3389,8 @@ const T={
     tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprende a usar LotoGrupo',tutorial_card_btn:'Ver',
     auto_snapshot_title:'📸 Captura automática del Bizum',auto_snapshot_desc:'La app hace la captura X horas antes de cada sorteo',auto_snapshot_hours:'Horas antes:',
     snapshot_history_title:'📋 Historial de capturas',
-    tab_inici:'Inicio',inici_hola:'Hola',inici_benvingut:'Bienvenido',inici_proper_sorteig:'Próximo sorteo',inici_el_teu_bizum:'Tu Bizum',inici_bizum_fet:'Bizum hecho ✅',inici_bizum_pendent:'Pendiente de pago',inici_fer_bizum:'Ir a Bizum',inici_torn:'Quién compra el boleto',inici_ets_tu_pagador:'Eres tú — toca comprar',inici_compra_bitllet:'Compra el boleto',inici_pendents:'Bizums pendientes',inici_manana:'mañana',inici_pasado:'pasado mañana',inici_com_funciona:'Cómo funciona',inici_desc_comprobar:'Ve tus números y compáralos con el sorteo. Marca si habéis jugado.',inici_desc_tornos:'Ve quién paga en cada turno y envía aviso por WhatsApp.',inici_desc_bizum:'Confirma que has hecho el Bizum. El pagador ve quién falta.',inici_desc_premios:'Registra premios y ve estadísticas del grupo.',inici_desc_grupo:'Gestiona miembros, tu identidad y comparte el enlace.',
+    tab_inici:'Inicio',inici_hola:'Hola',inici_benvingut:'Bienvenido',inici_proper_sorteig:'Próximo sorteo',inici_el_teu_bizum:'Tu Bizum',inici_bizum_fet:'Bizum hecho ✅',inici_bizum_pendent:'Pendiente de pago',inici_fer_bizum:'Ir a Bizum',inici_torn:'Quién compra el boleto',inici_ets_tu_pagador:'Eres tú — toca comprar',inici_compra_bitllet:'Compra el boleto',inici_pendents:'Bizums pendientes',inici_manana:'mañana',inici_pasado:'pasado mañana',inici_com_funciona:'Cómo funciona',inici_desc_comprobar:'Aquí puedes ver qué números habéis apostado y si han salido en el sorteo. Cuando salgan los resultados, comprueba si habéis ganado.',inici_desc_tornos:'¿Quién le toca comprar el boleto esta semana? Aquí lo ves claro. Puedes avisar al que toca con un mensaje directo a WhatsApp.',inici_desc_bizum:'Cuando hagas el Bizum al que compra, márcalo aquí. Así el pagador sabe quién ha pagado y quién todavía no, sin tener que preguntar a nadie.',inici_desc_premios:'¿Os ha tocado algo? Apuntadlo aquí. Veréis cuánto lleváis gastado, cuánto habéis ganado y cómo va el balance del grupo.',inici_desc_grupo:'Aquí está todo lo del grupo: los miembros, las loterías que jugáis y el enlace para invitar a quien falte.',
+    inici_com_funciona_sub:'Todo lo que necesitas para gestionar vuestra peña, en un solo lugar.',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3464,7 +3503,8 @@ const T={
     tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprèn a usar LotoGrupo',tutorial_card_btn:'Veure',
     auto_snapshot_title:'📸 Captura automàtica del Bizum',auto_snapshot_desc:'La app fa la captura X hores abans de cada sorteig',auto_snapshot_hours:'Hores abans:',
     snapshot_history_title:'📋 Historial de captures',
-    tab_inici:'Inici',inici_hola:'Hola',inici_benvingut:'Benvingut',inici_proper_sorteig:'Proper sorteig',inici_el_teu_bizum:'El teu Bizum',inici_bizum_fet:'Bizum fet ✅',inici_bizum_pendent:'Pendent de pagament',inici_fer_bizum:'Anar a Bizum',inici_torn:'Qui compra el bitllet',inici_ets_tu_pagador:'Ets tu — toca comprar',inici_compra_bitllet:'Compra el bitllet',inici_pendents:'Bizums pendents',inici_manana:'demà',inici_pasado:'demà passat',inici_com_funciona:'Com funciona',inici_desc_comprobar:'Veus els teus números i els compares amb el sorteig. Marca si heu jugat.',inici_desc_tornos:'Veus qui paga en cada torn i envies avís per WhatsApp.',inici_desc_bizum:'Confirmes que has fet el Bizum. El pagador veu qui falta.',inici_desc_premios:'Registra premis i veu estadístiques del grup.',inici_desc_grupo:'Gestiona membres, la teva identitat i comparteix el link.',
+    tab_inici:'Inici',inici_hola:'Hola',inici_benvingut:'Benvingut',inici_proper_sorteig:'Proper sorteig',inici_el_teu_bizum:'El teu Bizum',inici_bizum_fet:'Bizum fet ✅',inici_bizum_pendent:'Pendent de pagament',inici_fer_bizum:'Anar a Bizum',inici_torn:'Qui compra el bitllet',inici_ets_tu_pagador:'Ets tu — toca comprar',inici_compra_bitllet:'Compra el bitllet',inici_pendents:'Bizums pendents',inici_manana:'demà',inici_pasado:'demà passat',inici_com_funciona:'Com funciona',inici_desc_comprobar:'Aquí pots veure quins números heu apostat i si han sortit al sorteig. Quan surti el resultat, comprova si heu guanyat.',inici_desc_tornos:'A qui li toca comprar el bitllet aquesta setmana? Aquí ho veus clar. Pots avisar-lo directament per WhatsApp amb un sol clic.',inici_desc_bizum:'Quan facis el Bizum al que compra, marca-ho aquí. Així el pagador sap qui ha pagat i qui encara no, sense haver de preguntar a ningú.',inici_desc_premios:'Us ha tocat alguna cosa? Apunteu-ho aquí. Veureu quant porteu gastat, quant heu guanyat i com va el balanç del grup.',inici_desc_grupo:'Aquí tens tot el del grup: els membres, les loteries que jugueu i l\'enllaç per convidar qui falti.',
+    inici_com_funciona_sub:'Tot el que necessites per gestionar la teva penya, en un sol lloc.',
     flag:'CA'
   },
   en:{
