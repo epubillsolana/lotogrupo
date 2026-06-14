@@ -219,10 +219,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       </div>
     </div>
     <div class="num-section">
-      <div style="display:flex;gap:6px;margin-bottom:6px;">
-        <button onclick="pickFrequent()" style="flex:1;padding:8px;border-radius:10px;background:#1565C0;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_frecuentes">📊 Frecuentes</button>
-        <button onclick="pickRandom()" style="flex:1;padding:8px;border-radius:10px;background:#0A1F0F;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_aleatorio">🎲 Aleatorio</button>
-        <button onclick="clearSelection()" style="flex:1;padding:8px;border-radius:10px;background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_manual">✏️ Manual</button>
+      <div style="display:flex;gap:6px;margin-bottom:6px;" id="num-mode-btns">
+        <button id="btn-frecuentes" onclick="pickFrequentMode()" style="flex:1;padding:8px;border-radius:10px;background:#E8EAF6;color:#5C6BC0;border:2px solid transparent;font-size:12px;font-weight:700;cursor:pointer;opacity:.6;transition:all .2s;" data-i18n="btn_frecuentes">📊 Frecuentes</button>
+        <button id="btn-aleatorio" onclick="pickRandomMode()" style="flex:1;padding:8px;border-radius:10px;background:#E8EAF6;color:#374151;border:2px solid transparent;font-size:12px;font-weight:700;cursor:pointer;opacity:.6;transition:all .2s;" data-i18n="btn_aleatorio">🎲 Aleatorio</button>
+        <button id="btn-manual" onclick="setManualMode()" style="flex:1;padding:8px;border-radius:10px;background:#0A1F0F;color:#fff;border:2px solid #0A1F0F;font-size:12px;font-weight:700;cursor:pointer;opacity:1;transition:all .2s;" data-i18n="btn_manual">✏️ Manual</button>
       </div>
       <div style="display:flex;gap:6px;margin-bottom:12px;">
         <div style="flex:1;background:#E3F2FD;border-radius:8px;padding:5px 6px;font-size:10px;color:#1565C0;line-height:1.4;text-align:center;" data-i18n="desc_frecuentes">Números que más han salido históricamente</div>
@@ -613,6 +613,33 @@ function pickRandom(){
   applySelection(main,stars);
   toast('🎲 Números aleatorios seleccionados');
 }
+
+function setNumMode(active){
+  const btns = {
+    'frecuentes': {el:'btn-frecuentes', bg:'#1565C0', color:'#fff', border:'#1565C0'},
+    'aleatorio':  {el:'btn-aleatorio',  bg:'#0A1F0F', color:'#fff', border:'#0A1F0F'},
+    'manual':     {el:'btn-manual',     bg:'#0A1F0F', color:'#fff', border:'#0A1F0F'},
+  };
+  Object.entries(btns).forEach(([key, s])=>{
+    const btn = document.getElementById(s.el);
+    if(!btn) return;
+    if(key === active){
+      btn.style.background = s.bg;
+      btn.style.color = s.color;
+      btn.style.borderColor = s.border;
+      btn.style.opacity = '1';
+    } else {
+      btn.style.background = '#F3F4F6';
+      btn.style.color = '#9CA3AF';
+      btn.style.borderColor = 'transparent';
+      btn.style.opacity = '.55';
+    }
+  });
+}
+
+function pickFrequentMode(){ setNumMode('frecuentes'); pickFrequent(); }
+function pickRandomMode(){ setNumMode('aleatorio'); pickRandom(); }
+function setManualMode(){ setNumMode('manual'); clearSelection(); }
 
 function clearSelection(){
   selMain.clear(); selStars.clear();
