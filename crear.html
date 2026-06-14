@@ -17,7 +17,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 .top-step{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:rgba(255,255,255,0.4);}
 .progress{height:3px;background:#0F2E18;}
 .progress-bar{height:3px;background:#FF8C00;transition:width .4s ease;}
-.content{max-width:480px;margin:0 auto;padding:28px 24px 40px;}
+.content{max-width:480px;margin:0 auto;padding:28px 20px 40px;}
 .step-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.15em;color:#FF8C00;margin-bottom:4px;}
 .step-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;color:#111827;line-height:1.1;margin-bottom:24px;}
 .field{margin-bottom:18px;}
@@ -112,7 +112,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 .btn-wa-big{width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 16px rgba(37,211,102,0.3);}
 .btn-copy-big{width:100%;padding:14px;background:#0A1F0F;color:#FF8C00;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;cursor:pointer;}
 .config-step{display:none;}
-.config-step.active{display:block;}
+.config-step.active{display:block;padding:0 16px;overflow:hidden;}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 .lang-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;}
@@ -366,8 +366,8 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 <script>
 const LOTS={
   euromillones:{emoji:'🌟',name:'Euromillones',mainCount:5,mainMax:50,starCount:2,starMax:12,mainLabel:'Números principales',starLabel:'Estrellas',maxMain:10,maxStar:5},
-  primitiva:{emoji:'🍀',name:'Primitiva',mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
-  bonoloto:{emoji:'🎱',name:'Bonoloto',mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
+  primitiva:{emoji:'🍀',name:'Primitiva',mainCount:6,mainMax:49,starCount:1,starMax:49,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
+  bonoloto:{emoji:'🎱',name:'Bonoloto',mainCount:6,mainMax:49,starCount:1,starMax:49,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
 };
 // ── I18N ─────────────────────────────────────────────────────────────────────
 const TC={
@@ -934,9 +934,9 @@ function goNext(){
   }else if(step===4){
     createGroup();return;
   }
-  updateUI();window.scrollTo(0,0);
+  updateUI();window.scrollTo({top:0,behavior:'instant'});
 }
-function goBack(){if(typeof step==='number'&&step>1)step--;updateUI();window.scrollTo(0,0);}
+function goBack(){if(typeof step==='number'&&step>1)step--;updateUI();document.querySelector('.config-step.active')?.scrollIntoView({behavior:'instant',block:'start'});window.scrollTo({top:0,behavior:'instant'});}
 
 async function createGroup(){
   const name=document.getElementById('f-name').value.trim();
