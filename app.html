@@ -1384,7 +1384,7 @@ async function loadBizumState(){
 function showBizumConfirmPopup(name, payer, amount, btn){
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:flex;align-items:flex-end;';
-  overlay.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;text-align:center;"><div style="font-size:40px;margin-bottom:12px;">💸</div><div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:10px;">${t('bizum_confirm_title')||'Confirmar Bizum'}</div><div style="font-size:14px;color:#6B7280;margin-bottom:6px;">${name}</div><div style="font-size:28px;font-weight:900;color:#2E7D32;margin-bottom:8px;">€${amount}</div><div style="font-size:13px;color:#6B7280;margin-bottom:20px;">→ ${payer}</div><div style="font-size:12px;color:#9CA3AF;margin-bottom:20px;padding:10px;background:#F9FAFB;border-radius:10px;">${t('bizum_confirm_note')||'Quedarà registrat amb data i hora exacta'}</div><button id="biz-ok" style="width:100%;padding:15px;border-radius:12px;background:#2E7D32;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;">${t('bizum_hecho')||'He fet el Bizum'}</button><button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;background:transparent;border:none;font-size:14px;color:#9CA3AF;cursor:pointer;">${t('cancelar')||'Cancel·lar'}</button></div>`;
+  overlay.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 24px 40px;width:100%;max-width:480px;text-align:center;box-sizing:border-box;"><div style="font-size:40px;margin-bottom:12px;">💸</div><div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:10px;">${t('bizum_confirm_title')||'Confirmar Bizum'}</div><div style="font-size:14px;color:#6B7280;margin-bottom:6px;">${name}</div><div style="font-size:28px;font-weight:900;color:#2E7D32;margin-bottom:8px;">€${amount}</div><div style="font-size:13px;color:#6B7280;margin-bottom:20px;">→ ${payer}</div><div style="font-size:12px;color:#9CA3AF;margin-bottom:20px;padding:10px;background:#F9FAFB;border-radius:10px;">${t('bizum_confirm_note')||'Quedarà registrat amb data i hora exacta'}</div><button id="biz-ok" style="width:100%;padding:15px;border-radius:12px;background:#2E7D32;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;">${t('bizum_hecho')||'He fet el Bizum'}</button><button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;background:transparent;border:none;font-size:14px;color:#9CA3AF;cursor:pointer;">${t('cancelar')||'Cancel·lar'}</button></div>`;
   document.body.appendChild(overlay);
   document.getElementById('biz-ok').onclick=async()=>{
     overlay.remove();
@@ -1451,8 +1451,25 @@ async function buildBizumConfirm(){
 async function toggleBizum(name,btn){
   const current=btn.classList.contains('done');
   if(current){
-    // Already confirmed - can't unmark yourself
-    showToast(t('bizum_already_done'));
+    // Only payer can unmark
+    const myName=localStorage.getItem(`lg_who_${CFG.name}`)||'';
+    const payerName=CFG.members[getCurrentPayerIdx()]||'';
+    const isPayer=myName&&myName===payerName;
+    if(!isPayer){
+      const ov=document.createElement('div');
+      ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:flex;align-items:flex-end;';
+      ov.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 24px 40px;width:100%;text-align:center;box-sizing:border-box;"><div style="font-size:32px;margin-bottom:12px;">🔒</div><div style="font-size:15px;color:#374151;margin-bottom:20px;line-height:1.5;">${t('bizum_already_done')}</div><button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:14px;border-radius:12px;background:#F3F4F6;border:none;font-size:15px;font-weight:600;cursor:pointer;">OK</button></div>`;
+      document.body.appendChild(ov);
+      return;
+    }
+    if(!confirm(t('bizum_unmark_confirm'))) return;
+    btn.className='bizum-btn pending';
+    btn.textContent=t('pendiente');
+    btn.disabled=true;
+    await saveBizumState(name,false,null);
+    btn.disabled=false;
+    buildBizumConfirm();
+    buildWABizum();
     return;
   }
   // Confirmation dialog
@@ -2265,7 +2282,7 @@ function showNotifPrompt(){
 
   const overlay=document.createElement('div');
   overlay.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:500;display:flex;align-items:flex-end;';
-  overlay.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;text-align:center;">
+  overlay.innerHTML=`<div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 24px 40px;width:100%;max-width:480px;text-align:center;box-sizing:border-box;">
     <div style="font-size:48px;margin-bottom:12px;">🔔</div>
     <div style="font-size:18px;font-weight:800;color:#111827;margin-bottom:8px;">${t('notif_prompt_title')}</div>
     <div style="font-size:14px;color:#6B7280;margin-bottom:24px;line-height:1.6;">${t('notif_prompt_desc')}</div>
@@ -2830,6 +2847,7 @@ const T={
     snapshot_info:'Snapshot: {date}',
     bizum_timestamp:'Confirmado el {date} a las {time}',
     bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedará registrado con fecha y hora exacta',
+    bizum_unmark_confirm:'Seguro que quieres desmarcar este Bizum?',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -2934,6 +2952,7 @@ const T={
     snapshot_btn:'Fer snapshot ara',snapshot_done:'✅ Snapshot registrat',
     snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmat el {date} a les {time}',
     bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedarà registrat amb data i hora exacta',
+    bizum_unmark_confirm:'Segur que vols desmarcar aquest Bizum?',
     flag:'CA'
   },
   en:{
@@ -3035,6 +3054,7 @@ const T={
     snapshot_btn:'Take snapshot now',snapshot_done:'✅ Snapshot recorded',
     snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmed on {date} at {time}',
     bizum_confirm_title:'Confirm Bizum',bizum_confirm_note:'It will be recorded with exact date and time',
+    bizum_unmark_confirm:'Are you sure you want to unmark this Bizum?',
     flag:'EN'
   }
 };
