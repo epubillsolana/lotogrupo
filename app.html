@@ -472,6 +472,16 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
       <div id="auto-snapshot-status" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
     </div>
+    <div class="card" style="margin-top:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="card-label" style="margin-bottom:0;" data-i18n="snapshot_history_title">📋 Historial de captures</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="loadSnapshotHistory()" style="padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);" data-i18n="ver_historial">Veure</button>
+          <button onclick="exportSnapshotsExcel()" style="padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #2E7D32;background:#E8F5E9;color:#2E7D32;">📊 Excel</button>
+        </div>
+      </div>
+      <div id="snapshot-history-list" style="display:none;flex-direction:column;gap:8px;"></div>
+    </div>
   </div>
 
   <!-- PREMIOS -->
@@ -2762,6 +2772,105 @@ function checkAutoSnapshot(){
   });
 }
 
+// ── SNAPSHOT HISTORY & EXPORT ────────────────────────────────────────────────
+async function loadSnapshotHistory(){
+  const list = document.getElementById('snapshot-history-list');
+  if(!list) return;
+  const isOpen = list.style.display !== 'none';
+  if(isOpen){ list.style.display='none'; return; }
+  list.style.display = 'flex';
+  list.innerHTML = '<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Carregant...</div>';
+
+  const snapshots = await loadSnapshots();
+  if(!snapshots.length){
+    list.innerHTML = '<div style="font-size:13px;color:var(--text3);text-align:center;padding:8px;">Sense captures registrades</div>';
+    return;
+  }
+
+  list.innerHTML = '';
+  snapshots.slice(0,20).forEach(s => {
+    const meta = s.metadata || {};
+    const dt = new Date(meta.snapshot_at||s.created_at);
+    const dateStr = dt.toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+    const timeStr = dt.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'});
+    const members = meta.members||[];
+    const paid = members.filter(m=>m.confirmado).length;
+    const total = members.length;
+    const origen = meta.origen==='auto'?'🤖 Auto':'👆 Manual';
+
+    const card = document.createElement('div');
+    card.style.cssText = 'background:var(--surface2);border-radius:12px;padding:12px;border:.5px solid var(--border);';
+    card.innerHTML = `
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+        <div>
+          <div style="font-size:13px;font-weight:700;color:var(--text);">${meta.loteria||'—'} · ${meta.sorteo_fecha||'—'}</div>
+          <div style="font-size:11px;color:var(--text3);">${origen} · ${dateStr} ${timeStr}</div>
+        </div>
+        <div style="text-align:right;">
+          <div style="font-size:20px;font-weight:900;color:${paid===total?'#2E7D32':'#E65100'};">${paid}/${total}</div>
+          <div style="font-size:10px;color:var(--text3);">pagat</div>
+        </div>
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:4px;">
+        ${members.map(m=>`
+          <span style="padding:3px 8px;border-radius:99px;font-size:11px;font-weight:600;
+            background:${m.confirmado?'#E8F5E9':'#FFEBEE'};
+            color:${m.confirmado?'#2E7D32':'#C62828'};">
+            ${m.confirmado?'✅':'❌'} ${m.name}
+          </span>`).join('')}
+      </div>`;
+    list.appendChild(card);
+  });
+}
+
+async function exportSnapshotsExcel(){
+  showToast('📊 Preparant Excel...');
+  const snapshots = await loadSnapshots();
+  if(!snapshots.length){ showToast('Sense captures per exportar'); return; }
+
+  // Build CSV content
+  const rows = [['Loteria','Data Sorteig','Data Captura','Hora Captura','Origen','Pagador','Membre','Estat','Hora Confirmació']];
+
+  snapshots.forEach(s => {
+    const meta = s.metadata||{};
+    const dt = new Date(meta.snapshot_at||s.created_at);
+    const dateStr = dt.toLocaleDateString('ca-ES');
+    const timeStr = dt.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'});
+    const origen = meta.origen==='auto'?'Automàtic':'Manual';
+    const payer = meta.payer||'—';
+    const members = meta.members||[];
+
+    members.forEach(m => {
+      const confDt = m.confirmado_at ? new Date(m.confirmado_at) : null;
+      const confTime = confDt ? confDt.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'}) : '—';
+      const beforeSnap = confDt && confDt < dt ? 'Abans' : confDt ? 'Després' : '—';
+      rows.push([
+        meta.loteria||'—',
+        meta.sorteo_fecha||'—',
+        dateStr,
+        timeStr,
+        origen,
+        payer,
+        m.name,
+        m.confirmado ? 'Pagat' : 'Pendent',
+        confDt ? confDt.toLocaleString('ca-ES') : '—'
+      ]);
+    });
+  });
+
+  // Convert to CSV
+  const csv = rows.map(r => r.map(c => { const v = String(c).replace(/"/g, '""'); return '"' + v + '"'; }).join(',')).join('\n');
+  const bom = '﻿'; // UTF-8 BOM for Excel
+  const blob = new Blob([bom + csv], {type:'text/csv;charset=utf-8;'});
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `lotogrupo_captures_${CFG.name}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.click();
+  URL.revokeObjectURL(url);
+  showToast('✅ Excel descarregat!');
+}
+
 // ── BIZUM SNAPSHOT ────────────────────────────────────────────────────────────
 async function takeSnapshot(lotKey, sorteoFecha, auto=false){
   const slug=getSlug();
@@ -3119,6 +3228,7 @@ const T={
     identity_dni_registered:'✅ DNI ya registrado. Pulsa Confirmar para entrar.',
     tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprende a usar LotoGrupo',tutorial_card_btn:'Ver',
     auto_snapshot_title:'📸 Captura automática del Bizum',auto_snapshot_desc:'La app hace la captura X horas antes de cada sorteo',auto_snapshot_hours:'Horas antes:',
+    snapshot_history_title:'📋 Historial de capturas',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3230,6 +3340,7 @@ const T={
     identity_dni_registered:'✅ DNI ja registrat. Prem Confirmar per entrar.',
     tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprèn a usar LotoGrupo',tutorial_card_btn:'Veure',
     auto_snapshot_title:'📸 Captura automàtica del Bizum',auto_snapshot_desc:'La app fa la captura X hores abans de cada sorteig',auto_snapshot_hours:'Hores abans:',
+    snapshot_history_title:'📋 Historial de captures',
     flag:'CA'
   },
   en:{
@@ -3336,6 +3447,7 @@ const T={
     identity_dni_verify:'Enter the last 4 digits of your ID to verify:',identity_dni_optional:'Optional ID (3 digits + letter). You can leave it blank.',
     identity_dni_registered:'✅ ID already registered. Press Confirm to continue.',
     tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Learn how to use LotoGrupo',tutorial_card_btn:'View',
+    snapshot_history_title:'📋 Snapshot history',
     flag:'EN'
   }
 };
