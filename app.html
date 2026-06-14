@@ -434,9 +434,9 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
     <div class="card" style="border:.5px dashed var(--border2);">
-      <div class="card-label" data-i18n="snapshot_title">📸 Snapshot del Bizum</div>
+      <div class="card-label" data-i18n="snapshot_title">📸 Captura del Bizum</div>
       <p style="font-size:12px;color:var(--text3);margin-bottom:12px;" data-i18n="snapshot_desc">Registra l'estat actual del Bizum per a aquest sorteig.</p>
-      <button onclick="takeSnapshot()" class="btn btn-primary" data-i18n="snapshot_btn">Fer snapshot ara</button>
+      <button onclick="takeSnapshot()" class="btn btn-primary" data-i18n="snapshot_btn">Fer captura ara</button>
       <div id="last-snapshot-info" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
     </div>
   </div>
@@ -1890,10 +1890,6 @@ async function loadGroupNotifSchedule(){
   return saved?JSON.parse(saved):{day:'1',hour:'10'};
 }
 
-async function restoreSnapshotConfigOnLoad(){
-  restoreSnapshotConfig();
-}
-
 async function restoreNotifSchedule(){
   const schedule=await loadGroupNotifSchedule();
   const daySel=document.getElementById('notif-day-sel');
@@ -2062,17 +2058,15 @@ function showBizumConfirmPopup(name, payer, amount, btn){
   overlay.innerHTML=`
     <div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 20px 40px;width:100%;text-align:center;">
       <div style="font-size:40px;margin-bottom:12px;">💸</div>
-      <div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:10px;">${t('bizum_confirm_title')||'Confirmar Bizum'}</div>
+      <div style="font-size:17px;font-weight:800;color:#111827;margin-bottom:10px;">${t('bizum_confirm_title')}</div>
       <div style="font-size:14px;color:#6B7280;margin-bottom:6px;">${name}</div>
       <div style="font-size:28px;font-weight:900;color:#2E7D32;margin-bottom:8px;">€${amount}</div>
       <div style="font-size:13px;color:#6B7280;margin-bottom:24px;">→ ${payer}</div>
-      <div style="font-size:12px;color:#9CA3AF;margin-bottom:24px;padding:10px;background:#F9FAFB;border-radius:10px;">${t('bizum_confirm_note')||'Quedarà registrat amb data i hora exacta'}</div>
-      <button id="bizum-confirm-yes" style="width:100%;padding:15px;border-radius:12px;background:#2E7D32;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;">${t('bizum_hecho')||'✅ Sí, he fet el Bizum'}</button>
-      <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;background:transparent;border:none;font-size:14px;color:#9CA3AF;cursor:pointer;">${t('cancelar')||'Cancel·lar'}</button>
+      <div style="font-size:12px;color:#9CA3AF;margin-bottom:24px;padding:10px;background:#F9FAFB;border-radius:10px;">${t('bizum_confirm_note')}</div>
+      <button id="bizum-confirm-yes" style="width:100%;padding:15px;border-radius:12px;background:#2E7D32;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;margin-bottom:10px;">${t('bizum_hecho')}</button>
+      <button onclick="this.closest('[style*=fixed]').remove()" style="width:100%;padding:13px;border-radius:12px;background:transparent;border:none;font-size:14px;color:#9CA3AF;cursor:pointer;">${t('cancelar')}</button>
     </div>`;
-
   document.body.appendChild(overlay);
-
   document.getElementById('bizum-confirm-yes').onclick=async()=>{
     overlay.remove();
     const now=new Date();
@@ -2088,56 +2082,6 @@ function showBizumConfirmPopup(name, payer, amount, btn){
     buildBizumConfirm();
     buildWABizum();
   };
-}
-
-// ── SNAPSHOT CONFIG ──────────────────────────────────────────────────────────
-function saveSnapshotConfig(){
-  const hours=document.getElementById('snapshot-hours-sel')?.value||'4';
-  localStorage.setItem(`lg_snapshot_hours_${CFG.name}`,hours);
-  saveGroupConfig();
-  showToast('✅ ' + hours + 'h');
-}
-
-function restoreSnapshotConfig(){
-  const saved=localStorage.getItem(`lg_snapshot_hours_${CFG.name}`)||CFG.snapshotHours||'4';
-  const sel=document.getElementById('snapshot-hours-sel');
-  if(sel) sel.value=saved;
-}
-
-function getSnapshotHours(){
-  return parseInt(localStorage.getItem(`lg_snapshot_hours_${CFG.name}`)||CFG.snapshotHours||4);
-}
-
-function checkAutoSnapshot(){
-  if(!CFG) return;
-  const daysMap={euromillones:[2,5],primitiva:[4,6],bonoloto:[1,2,3,4,5]};
-  const hoursBeforeMs=getSnapshotHours()*60*60*1000;
-  const now=new Date();
-
-  CFG.lotteries.forEach(l=>{
-    const days=daysMap[l.lottery]||[2,5];
-    // Find next draw
-    const d=new Date(now);
-    for(let i=0;i<7;i++){
-      d.setDate(now.getDate()+i);
-      if(days.includes(d.getDay())){
-        // Set draw time (approx 21:30)
-        const drawTime=new Date(d);
-        drawTime.setHours(21,30,0,0);
-        const diff=drawTime-now;
-        // If within snapshot window and not yet done
-        if(diff>0 && diff<=hoursBeforeMs){
-          const snapshotKey=`lg_snapshot_done_${CFG.name}_${l.lottery}_${d.toDateString()}`;
-          if(!localStorage.getItem(snapshotKey)){
-            localStorage.setItem(snapshotKey,'1');
-            takeSnapshot(l.lottery, d.toISOString().slice(0,10), true);
-            showToast(`📸 Snapshot automàtic: ${l.lottery}`);
-          }
-        }
-        break;
-      }
-    }
-  });
 }
 
 // ── BIZUM SNAPSHOT ────────────────────────────────────────────────────────────
@@ -2483,14 +2427,13 @@ const T={
     name_updated:'✅ Nombre actualizado',    historial_sortejos:'Historial de juego',ver_historial:'Ver',ocultar_historial:'Ocultar',jugado_lbl:'Jugado',no_jugado_lbl:'No jugado',sin_marcar_lbl:'Sin marcar',
     bizum_confirm_msg:'¿Confirmas que has hecho el Bizum de {amount}€ a {payer}? Quedará registrado con fecha y hora.',
     bizum_already_done:'Este Bizum ya está confirmado. Contacta con el pagador si hay un error.',
-    snapshot_title:'📸 Snapshot del Bizum',
+    snapshot_title:'📸 Captura del Bizum',
     snapshot_desc:'Registra el estado actual del Bizum para este sorteo.',
-    snapshot_btn:'Hacer snapshot ahora',
-    snapshot_done:'✅ Snapshot registrado',
-    snapshot_info:'Snapshot: {date}',
+    snapshot_btn:'Fer captura ara',
+    snapshot_done:'✅ Captura registrada',
+    snapshot_info:'Captura: {date}',
     bizum_timestamp:'Confirmado el {date} a las {time}',
     bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedará registrado con fecha y hora exacta',
-    auto_snapshot_title:'📸 Snapshot automático del Bizum',auto_snapshot_desc:'La app hace el snapshot automáticamente antes de cada sorteo',auto_snapshot_hours:'Horas antes:',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -2591,9 +2534,10 @@ const T={
     name_updated:'✅ Nom actualitzat',    historial_sortejos:'Historial de joc',ver_historial:'Veure',ocultar_historial:'Amagar',jugado_lbl:'Jugat',no_jugado_lbl:'No jugat',sin_marcar_lbl:'Sense marcar',
     bizum_confirm_msg:'Confirmes que has fet el Bizum de {amount}€ a {payer}? Quedarà registrat amb data i hora.',
     bizum_already_done:'Aquest Bizum ja està confirmat. Contacta amb el pagador si hi ha un error.',
-    snapshot_title:'📸 Snapshot del Bizum',snapshot_desc:'Registra l\'estat actual del Bizum per a aquest sorteig.',
+    snapshot_title:'📸 Captura del Bizum',snapshot_desc:'Registra l\'estat actual del Bizum per a aquest sorteig.',
     snapshot_btn:'Fer snapshot ara',snapshot_done:'✅ Snapshot registrat',
-    snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmat el {date} a les {time}',
+    snapshot_info:'Captura: {date}',bizum_timestamp:'Confirmat el {date} a les {time}',
+    bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedarà registrat amb data i hora exacta',
     flag:'CA'
   },
   en:{
@@ -2693,7 +2637,8 @@ const T={
     bizum_already_done:'This Bizum is already confirmed. Contact the payer if there is an error.',
     snapshot_title:'📸 Bizum Snapshot',snapshot_desc:'Record the current Bizum status for this draw.',
     snapshot_btn:'Take snapshot now',snapshot_done:'✅ Snapshot recorded',
-    snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmed on {date} at {time}',
+    snapshot_info:'Captura: {date}',bizum_timestamp:'Confirmed on {date} at {time}',
+    bizum_confirm_title:'Confirm Bizum',bizum_confirm_note:'It will be recorded with exact date and time',
     flag:'EN'
   }
 };
@@ -2759,8 +2704,6 @@ function applyLang(){
 
 // ── START ─────────────────────────────────────────────────────────────────────
 loadConfig();
-// Check auto snapshot every 30 minutes
-setInterval(checkAutoSnapshot, 30*60*1000);
 async function addPrize(amount,label,fecha){
   if(!amount||amount<=0){showToast('Introduce un importe válido');return false;}
   const lotKey=CFG.lotteries.find(l=>label.includes(LOTTERIES[l.lottery]?.name||''))?.lottery||CFG.lotteries[0].lottery;
