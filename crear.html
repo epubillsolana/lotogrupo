@@ -398,7 +398,7 @@ const TC={
     desc_frecuentes:'Números que más han salido en los últimos 12 meses en cada lotería',
     desc_aleatorio:'Selección completamente al azar dentro del rango válido',
     cancelar_lbl:'Cancelar',
-    dni_hint:'4 últimos dígitos DNI (opcional):',
+    dni_hint:'3 números + letra DNI (opcional):',
     no_mas_loterias:'✅ No, avanzar al siguiente paso',
     elige_loteria:'Elige al menos una lotería',escribe_nombre:'Escribe el nombre del grupo',
     elige_min:'Elige al menos',numeros_lbl:'números',escribe_nombre_m:'Escribe un nombre',
@@ -436,7 +436,7 @@ const TC={
     desc_frecuentes:'Números que han sortit més els últims 12 mesos a cada loteria',
     desc_aleatorio:'Selecció completament a l\'atzar dins el rang vàlid',
     cancelar_lbl:'Cancel·lar',
-    dni_hint:'4 últims dígits DNI (opcional):',
+    dni_hint:'3 números + lletra DNI (opcional):',
     no_mas_loterias:'✅ No, avançar al següent pas',
     elige_loteria:'Tria almenys una loteria',escribe_nombre:'Escriu el nom del grup',
     elige_min:'Tria almenys',numeros_lbl:'números',escribe_nombre_m:'Escriu un nom',
@@ -474,7 +474,7 @@ const TC={
     desc_frecuentes:'Numbers drawn most often in the last 12 months for each lottery',
     desc_aleatorio:'Completely random selection within the valid range',
     cancelar_lbl:'Cancel',
-    dni_hint:'Last 4 digits of ID (optional):',
+    dni_hint:'Last 3 digits + letter of ID (optional):',
     no_mas_loterias:'✅ No, go to next step',
     elige_loteria:'Choose at least one lottery',escribe_nombre:'Enter the group name',
     elige_min:'Choose at least',numeros_lbl:'numbers',escribe_nombre_m:'Enter a name',
@@ -525,35 +525,7 @@ function applyLangCrear(){
   }
 }
 
-// Override renderMembers to use tc()
-const _origRenderMembers=renderMembers;
-function renderMembers(){
-  const list=document.getElementById('member-list');if(!list)return;
-  list.innerHTML='';
-  members.forEach((m,i)=>{
-    const name=typeof m==='object'?m.name:m;
-    const dni=typeof m==='object'?m.dni||'':'';
-    const row=document.createElement('div');
-    row.className='member-row';
-    row.style.cssText='display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:.5px solid var(--border, #E5E7EB);';
-    row.innerHTML=`
-      <div style="display:flex;align-items:center;gap:10px;">
-        <div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${name.slice(0,2).toUpperCase()}</div>
-        <div class="member-info" style="flex:1;">
-          <div class="member-name">${name}</div>
-          <div class="member-role">${i===0?tc('primer_payer'):tc('miembro')}</div>
-        </div>
-        <button class="member-del" onclick="removeMember(${i})">✕</button>
-      </div>
-      <div style="display:flex;align-items:center;gap:8px;padding-left:46px;">
-        <span style="font-size:11px;color:#9CA3AF;">${tc('dni_hint')||'4 últims dígits DNI (opcional):'}</span>
-        <input type="number" maxlength="4" value="${dni}" placeholder="1234"
-          oninput="this.value=this.value.slice(0,4);members[${i}].dni=this.value;"
-          style="width:60px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;font-size:13px;text-align:center;">
-      </div>`;
-    list.appendChild(row);
-  });
-}
+
 
 
 const AVG_BG=['#BBCFE8','#B8D89A','#F0C880','#F0B8CE','#C5C2EE','#B8E0D4','#F5C6A0','#D4B8E0'];

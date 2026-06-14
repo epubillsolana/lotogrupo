@@ -254,13 +254,13 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div id="identity-member-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:300px;overflow-y:auto;"></div>
     <div id="identity-dni-box" style="display:none;margin-bottom:16px;">
       <div style="font-size:13px;color:#374151;margin-bottom:8px;" data-i18n="identity_dni_prompt">Introdueix els 4 últims dígits del teu DNI per verificar:</div>
-      <input type="number" id="identity-dni-input" maxlength="4" placeholder="1234"
+      <input type="text" id="identity-dni-input" maxlength="4" placeholder="456K"
         style="width:100%;padding:12px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:18px;text-align:center;letter-spacing:4px;"
-        oninput="this.value=this.value.slice(0,4)">
+        oninput="this.value=this.value.slice(0,4).toUpperCase()" style="text-transform:uppercase;">
       <div id="identity-dni-error" style="color:#DC2626;font-size:12px;margin-top:6px;display:none;" data-i18n="identity_dni_error">DNI incorrecte. Torna-ho a intentar.</div>
     </div>
     <button id="identity-confirm-btn" onclick="confirmIdentity()" style="width:100%;padding:15px;border-radius:12px;background:#0A1F0F;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;display:none;" data-i18n="identity_confirm">Confirmar</button>
-    <div style="font-size:11px;color:#9CA3AF;text-align:center;margin-top:12px;" data-i18n="identity_note">Podràs canviar-ho des de la pestanya Avisos</div>
+    
   </div>
 </div>
 
@@ -659,6 +659,17 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
         <!-- Suggeriments -->
+    <!-- Identitat -->
+    <div class="card" id="identity-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="card-label" style="margin-bottom:2px;" data-i18n="identity_card_title">👤 La teva identitat</div>
+          <div id="identity-card-name" style="font-size:15px;font-weight:700;color:var(--text);"></div>
+        </div>
+        <button onclick="showIdentityPopup()" id="identity-card-btn" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);"></button>
+      </div>
+    </div>
+
     <!-- Compartir grup -->
     <div class="card" id="share-card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;"></div>
 
@@ -1498,6 +1509,7 @@ async function confirmIdentity(){
   showToast(`✅ ${name}`);
   buildBizumConfirm();
   buildTurns();
+  buildIdentityCard();
 }
 
 function checkIdentityOnLoad(){
@@ -2522,6 +2534,22 @@ function buildShareCard(){
     </div>`;
 }
 
+function buildIdentityCard(){
+  const myIdx = getMyIdx();
+  const nameEl = document.getElementById('identity-card-name');
+  const btn = document.getElementById('identity-card-btn');
+  if(!nameEl || !btn) return;
+  if(myIdx >= 0 && CFG.members[myIdx]){
+    nameEl.textContent = CFG.members[myIdx];
+    btn.textContent = t('identity_change');
+    nameEl.style.color = 'var(--green)';
+  } else {
+    nameEl.textContent = t('identity_not_set');
+    btn.textContent = t('identity_set');
+    nameEl.style.color = 'var(--text3)';
+  }
+}
+
 function buildGrupLoterias(){
   const list=document.getElementById('grup-loterias-list');
   if(!list||!CFG) return;
@@ -2953,6 +2981,7 @@ const T={
     bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedará registrado con fecha y hora exacta',
     bizum_unmark_confirm:'Seguro que quieres desmarcar este Bizum?',
     identity_title:'👤 ¿Quién eres tú?',identity_desc:'Selecciona tu nombre para personalizar la app',identity_dni_prompt:'Introduce los 4 últimos dígitos de tu DNI para verificar:',identity_dni_error:'DNI incorrecto. Inténtalo de nuevo.',identity_confirm:'Confirmar',identity_note:'Podrás cambiarlo desde la pestaña Avisos',
+    identity_card_title:'👤 Tu identidad',identity_not_set:'No identificado',identity_set:'Identificarme',identity_change:'No soy yo / Cambiar',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3059,6 +3088,7 @@ const T={
     bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedarà registrat amb data i hora exacta',
     bizum_unmark_confirm:'Segur que vols desmarcar aquest Bizum?',
     identity_title:'👤 Qui ets tu?',identity_desc:'Selecciona el teu nom per personalitzar l\'app',identity_dni_prompt:'Introdueix els 4 últims dígits del DNI:',identity_dni_error:'DNI incorrecte.',identity_confirm:'Confirmar',identity_note:'Podràs canviar-ho des d\'Avisos',
+    identity_card_title:'👤 La teva identitat',identity_not_set:'No identificat',identity_set:'Identificar-me',identity_change:'No sóc jo / Canviar',
     flag:'CA'
   },
   en:{
@@ -3161,6 +3191,7 @@ const T={
     snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmed on {date} at {time}',
     bizum_confirm_title:'Confirm Bizum',bizum_confirm_note:'It will be recorded with exact date and time',
     bizum_unmark_confirm:'Are you sure you want to unmark this Bizum?',
+    identity_card_title:'👤 Your identity',identity_not_set:'Not identified',identity_set:'Identify me',identity_change:'Not me / Change',
     flag:'EN'
   }
 };
@@ -3221,6 +3252,7 @@ function applyLang(){
     renderHistory();
     buildGrupLoterias();
     buildShareCard();
+    buildIdentityCard();
   }
 }
 
