@@ -520,6 +520,15 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
           <div id="stat-premiados-pct" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
           <div class="stat-lbl" data-i18n="sorteos_premiados">Sorteos premiados</div>
         </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:.5px solid var(--border);">
+          <span style="font-size:13px;color:var(--text2);" data-i18n="sortejos_per_bizum">Sortejos per Bizum</span>
+          <div style="display:flex;align-items:center;gap:6px;">
+            <input type="number" id="grupo-draws-per-turn" min="1" max="20" step="1"
+              style="width:60px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
+              onchange="saveDrawsPerTurn()">
+            <span style="font-size:13px;color:var(--text3);" data-i18n="sortejos_lbl">sortejos</span>
+          </div>
+        </div>
       </div>
     </div>
     <!-- Historial de joc: data + loteria + premi + jugat -->
@@ -1646,11 +1655,8 @@ async function confirmIdentity(){
   buildBizumConfirm();
   buildTurns();
   buildIdentityCard();
-  // Show tutorial only first time, after identity
-  if(window._isFirstTime){
-    window._isFirstTime = false;
-    setTimeout(showTutorial, 500);
-  }
+  // Tutorial disabled - Inici tab explains everything
+  window._isFirstTime = false;
 }
 
 function checkIdentityOnLoad(){
@@ -1659,10 +1665,8 @@ function checkIdentityOnLoad(){
     // Already identified - sync who-select and show tutorial if first time
     const whoSel=document.getElementById('who-select');
     if(whoSel&&whoSel.value===''){whoSel.value=myIdx;onPersonChange();}
-    if(window._isFirstTime){
-      window._isFirstTime = false;
-      setTimeout(showTutorial, 600);
-    }
+    // Tutorial disabled - Inici tab explains everything
+    window._isFirstTime = false;
   } else {
     // Not identified yet - show identity popup after splash
     setTimeout(showIdentityPopup, 2400);
@@ -2176,6 +2180,15 @@ function saveMembers(arr){localStorage.setItem(`lg_members_${CFG.name}`,JSON.str
 function getTicketCost(){return parseFloat(localStorage.getItem(`lg_cost_${CFG.name}`))||CFG.ticketCost||20;}
 function getBizumAmount(){return parseFloat(localStorage.getItem(`lg_bizum_${CFG.name}`))||CFG.bizum||4;}
 
+function saveDrawsPerTurn(){
+  const val=parseInt(document.getElementById('grupo-draws-per-turn')?.value)||CFG.drawsPerTurn||4;
+  CFG.drawsPerTurn=val;
+  saveGroupConfig();
+  buildTurns();
+  buildWABizum();
+  showToast('✅ '+val+' sortejos/Bizum');
+}
+
 function saveImportes(){
   const cost=parseFloat(document.getElementById('grupo-ticket-cost')?.value)||20;
   const bizum=parseFloat(document.getElementById('grupo-bizum')?.value)||4;
@@ -2199,8 +2212,10 @@ function recalcFromCost(){
 function renderImportes(){
   const ci=document.getElementById('grupo-ticket-cost');
   const bi=document.getElementById('grupo-bizum');
+  const di=document.getElementById('grupo-draws-per-turn');
   if(ci) ci.value=getTicketCost();
   if(bi) bi.value=getBizumAmount();
+  if(di) di.value=CFG.drawsPerTurn||4;
 }
 
 function toggleEditMember(i){
@@ -3337,6 +3352,7 @@ const T={
     auto_snapshot_title:'📸 Captura automática del Bizum',auto_snapshot_desc:'La app hace la captura X horas antes de cada sorteo',auto_snapshot_hours:'Horas antes:',
     snapshot_history_title:'📋 Historial de capturas',
     tab_inici:'Inicio',inici_hola:'Hola',inici_benvingut:'Bienvenido',inici_proper_sorteig:'Próximo sorteo',inici_el_teu_bizum:'Tu Bizum',inici_bizum_fet:'Bizum hecho ✅',inici_bizum_pendent:'Pendiente de pago',inici_fer_bizum:'Ir a Bizum',inici_torn:'Quién compra el boleto',inici_ets_tu_pagador:'Eres tú — toca comprar',inici_compra_bitllet:'Compra el boleto',inici_pendents:'Bizums pendientes',inici_manana:'mañana',inici_pasado:'pasado mañana',inici_com_funciona:'Cómo funciona LotoGrupo',inici_com_funciona_sub:'Todo lo que necesitas para gestionar vuestra peña, en un solo lugar.',inici_desc_comprobar:'Aquí puedes ver <strong>qué números habéis apostado</strong> y si han salido. Cuando salgan los resultados, comprueba si habéis ganado.',inici_desc_tornos:'<strong>¿Quién le toca comprar el boleto esta semana?</strong> Aquí lo ves claro. Puedes avisar al que toca con un mensaje directo a WhatsApp.',inici_desc_bizum:'Cuando hagas el Bizum al que compra, <strong>márcalo aquí</strong>. Así el pagador sabe quién ha pagado y quién no, sin preguntar.',inici_desc_premios:'<strong>¿Os ha tocado algo? Apuntadlo aquí.</strong> Veréis cuánto lleváis gastado, cuánto habéis ganado y cómo va el balance.',inici_desc_grupo:'Aquí está todo lo del grupo: <strong>los miembros y las loterías que jugáis</strong> y el enlace para invitar a quien falte.',inici_desc_scanner:'Escanea el boleto físico con la cámara para guardar vuestros números <strong>automáticamente</strong>. Sin teclear nada.',coste_boleto:'Cost total sortejos a jugar',
+    sortejos_per_bizum:'Sorteos por Bizum',sortejos_lbl:'sorteos',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',

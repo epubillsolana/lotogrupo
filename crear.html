@@ -17,7 +17,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 .top-step{font-family:'Bebas Neue',sans-serif;font-size:14px;letter-spacing:1px;color:rgba(255,255,255,0.4);}
 .progress{height:3px;background:#0F2E18;}
 .progress-bar{height:3px;background:#FF8C00;transition:width .4s ease;}
-.content{max-width:480px;margin:0 auto;padding:28px 20px 40px;}
+.content{max-width:480px;margin:0 auto;padding:28px 24px 40px;}
 .step-eyebrow{font-family:'Bebas Neue',sans-serif;font-size:12px;letter-spacing:.15em;color:#FF8C00;margin-bottom:4px;}
 .step-title{font-family:'Bebas Neue',sans-serif;font-size:30px;letter-spacing:1px;color:#111827;line-height:1.1;margin-bottom:24px;}
 .field{margin-bottom:18px;}
@@ -112,7 +112,7 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 .btn-wa-big{width:100%;padding:16px;background:#25D366;color:#fff;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:22px;letter-spacing:1px;cursor:pointer;margin-bottom:10px;box-shadow:0 4px 16px rgba(37,211,102,0.3);}
 .btn-copy-big{width:100%;padding:14px;background:#0A1F0F;color:#FF8C00;border:none;border-radius:12px;font-family:'Bebas Neue',sans-serif;font-size:18px;letter-spacing:1px;cursor:pointer;}
 .config-step{display:none;}
-.config-step.active{display:block;padding:0 16px;overflow:hidden;}
+.config-step.active{display:block;}
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 .lang-popup-overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:400;}
@@ -219,10 +219,10 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       </div>
     </div>
     <div class="num-section">
-      <div style="display:flex;gap:6px;margin-bottom:6px;" id="num-mode-btns">
-        <button id="btn-frecuentes" onclick="pickFrequentMode()" style="flex:1;padding:8px;border-radius:10px;background:#E8EAF6;color:#5C6BC0;border:2px solid transparent;font-size:12px;font-weight:700;cursor:pointer;opacity:.6;transition:all .2s;" data-i18n="btn_frecuentes">📊 Frecuentes</button>
-        <button id="btn-aleatorio" onclick="pickRandomMode()" style="flex:1;padding:8px;border-radius:10px;background:#E8EAF6;color:#374151;border:2px solid transparent;font-size:12px;font-weight:700;cursor:pointer;opacity:.6;transition:all .2s;" data-i18n="btn_aleatorio">🎲 Aleatorio</button>
-        <button id="btn-manual" onclick="setManualMode()" style="flex:1;padding:8px;border-radius:10px;background:#0A1F0F;color:#fff;border:2px solid #0A1F0F;font-size:12px;font-weight:700;cursor:pointer;opacity:1;transition:all .2s;" data-i18n="btn_manual">✏️ Manual</button>
+      <div style="display:flex;gap:6px;margin-bottom:6px;">
+        <button onclick="pickFrequent()" style="flex:1;padding:8px;border-radius:10px;background:#1565C0;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_frecuentes">📊 Frecuentes</button>
+        <button onclick="pickRandom()" style="flex:1;padding:8px;border-radius:10px;background:#0A1F0F;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_aleatorio">🎲 Aleatorio</button>
+        <button onclick="clearSelection()" style="flex:1;padding:8px;border-radius:10px;background:#F3F4F6;color:#374151;border:1px solid #E5E7EB;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_manual">✏️ Manual</button>
       </div>
       <div style="display:flex;gap:6px;margin-bottom:12px;">
         <div style="flex:1;background:#E3F2FD;border-radius:8px;padding:5px 6px;font-size:10px;color:#1565C0;line-height:1.4;text-align:center;" data-i18n="desc_frecuentes">Números que más han salido históricamente</div>
@@ -231,7 +231,6 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       </div>
       <div class="num-label"><span id="lbl-main">Números principales</span><span class="num-count" id="cnt-main">0/5</span></div>
       <div class="num-grid" id="grid-main"></div>
-    </div>
     </div>
     <div class="num-section" id="star-section">
       <div class="num-label"><span id="lbl-star">Estrellas</span><span class="num-count" id="cnt-star">0/2</span></div>
@@ -366,8 +365,8 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
 <script>
 const LOTS={
   euromillones:{emoji:'🌟',name:'Euromillones',mainCount:5,mainMax:50,starCount:2,starMax:12,mainLabel:'Números principales',starLabel:'Estrellas',maxMain:10,maxStar:5},
-  primitiva:{emoji:'🍀',name:'Primitiva',mainCount:6,mainMax:49,starCount:1,starMax:49,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
-  bonoloto:{emoji:'🎱',name:'Bonoloto',mainCount:6,mainMax:49,starCount:1,starMax:49,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
+  primitiva:{emoji:'🍀',name:'Primitiva',mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
+  bonoloto:{emoji:'🎱',name:'Bonoloto',mainCount:6,mainMax:49,starCount:1,starMax:9,mainLabel:'Números principales',starLabel:'Complementario',maxMain:11,maxStar:1},
 };
 // ── I18N ─────────────────────────────────────────────────────────────────────
 const TC={
@@ -614,33 +613,6 @@ function pickRandom(){
   toast('🎲 Números aleatorios seleccionados');
 }
 
-function setNumMode(active){
-  const btns = {
-    'frecuentes': {el:'btn-frecuentes', bg:'#1565C0', color:'#fff', border:'#1565C0'},
-    'aleatorio':  {el:'btn-aleatorio',  bg:'#0A1F0F', color:'#fff', border:'#0A1F0F'},
-    'manual':     {el:'btn-manual',     bg:'#0A1F0F', color:'#fff', border:'#0A1F0F'},
-  };
-  Object.entries(btns).forEach(([key, s])=>{
-    const btn = document.getElementById(s.el);
-    if(!btn) return;
-    if(key === active){
-      btn.style.background = s.bg;
-      btn.style.color = s.color;
-      btn.style.borderColor = s.border;
-      btn.style.opacity = '1';
-    } else {
-      btn.style.background = '#F3F4F6';
-      btn.style.color = '#9CA3AF';
-      btn.style.borderColor = 'transparent';
-      btn.style.opacity = '.55';
-    }
-  });
-}
-
-function pickFrequentMode(){ setNumMode('frecuentes'); pickFrequent(); }
-function pickRandomMode(){ setNumMode('aleatorio'); pickRandom(); }
-function setManualMode(){ setNumMode('manual'); clearSelection(); }
-
 function clearSelection(){
   selMain.clear(); selStars.clear();
   document.querySelectorAll('#grid-main button,#grid-star button').forEach(b=>b.className='num-btn');
@@ -748,15 +720,7 @@ function buildGrids(){
   if(lot.starMax>0){
     ss.style.display='block';
     const sg=document.getElementById('grid-star');sg.innerHTML='';
-    if(lot.starMax>=49&&lot.starCount===1){
-    const inp=document.createElement('input');
-    inp.type='number';inp.min=1;inp.max=49;inp.placeholder='Complementari (1-49)';
-    inp.id='star-input';
-    inp.style.cssText='width:100%;padding:10px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:16px;text-align:center;';
-    if(selStars.size>0) inp.value=[...selStars][0];
-    inp.oninput=()=>{const v=parseInt(inp.value);selStars.clear();if(v>=1&&v<=49)selStars.add(v);updCounts();};
-    sg.appendChild(inp);
-  }else{for(let i=1;i<=lot.starMax;i++){const b=document.createElement('button');b.className='num-btn'+(selStars.has(i)?' sel-star':'');b.textContent=i;b.onclick=()=>toggleNum(i,'star',lot.starCount,maxS,b);sg.appendChild(b);}}
+    for(let i=1;i<=lot.starMax;i++){const b=document.createElement('button');b.className='num-btn'+(selStars.has(i)?' sel-star':'');b.textContent=i;b.onclick=()=>toggleNum(i,'star',lot.starCount,maxS,b);sg.appendChild(b);}
   }else ss.style.display='none';
   updCounts();
 }
@@ -942,9 +906,9 @@ function goNext(){
   }else if(step===4){
     createGroup();return;
   }
-  updateUI();window.scrollTo({top:0,behavior:'instant'});
+  updateUI();window.scrollTo(0,0);
 }
-function goBack(){if(typeof step==='number'&&step>1)step--;updateUI();document.querySelector('.config-step.active')?.scrollIntoView({behavior:'instant',block:'start'});window.scrollTo({top:0,behavior:'instant'});}
+function goBack(){if(typeof step==='number'&&step>1)step--;updateUI();window.scrollTo(0,0);}
 
 async function createGroup(){
   const name=document.getElementById('f-name').value.trim();
