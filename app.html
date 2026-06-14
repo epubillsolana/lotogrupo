@@ -2863,51 +2863,30 @@ async function exportSnapshotsExcel(){
   const snapshots = await loadSnapshots();
   if(!snapshots.length){ showToast('Sense captures per exportar'); return; }
 
-  // Build CSV content
-  const rows = [['Loteria','Data Sorteig','Data Captura','Hora Captura','Origen','Pagador','Membre','Estat','Hora Confirmació']];
+  const rows = [['Sorteig','Data','Jugador','Bizum']];
 
   snapshots.forEach(s => {
     const meta = s.metadata||{};
-    const dt = new Date(meta.snapshot_at||s.created_at);
-    const dateStr = dt.toLocaleDateString('ca-ES');
-    const timeStr = dt.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'});
-    const origen = meta.origen==='auto'?'Automàtic':'Manual';
-    const payer = meta.payer||'—';
+    const sorteig = (meta.loteria||'—')+(meta.sorteo_fecha?' ('+meta.sorteo_fecha+')':'');
+    const data = meta.sorteo_fecha||new Date(meta.snapshot_at||s.created_at).toLocaleDateString('ca-ES');
     const members = meta.members||[];
-
-    members.forEach(m => {
-      const confDt = m.confirmado_at ? new Date(m.confirmado_at) : null;
-      const confTime = confDt ? confDt.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'}) : '—';
-      const beforeSnap = confDt && confDt < dt ? 'Abans' : confDt ? 'Després' : '—';
-      rows.push([
-        meta.loteria||'—',
-        meta.sorteo_fecha||'—',
-        dateStr,
-        timeStr,
-        origen,
-        payer,
-        m.name,
-        m.confirmado ? 'Pagat' : 'Pendent',
-        confDt ? confDt.toLocaleString('ca-ES') : '—'
-      ]);
+    const payer = meta.payer||'';
+    if(payer) rows.push([sorteig, data, payer+' (pagador)', 'Pagat']);
+    members.filter(m=>m.name!==payer).forEach(m=>{
+      rows.push([sorteig, data, m.name, m.confirmado?'Pagat':'Pendent']);
     });
+    rows.push(['','','','']);
   });
 
-  // Convert to CSV
-  const csv = rows.map(r => r.map(c => { const v = String(c).replace(/"/g, '""'); return '"' + v + '"'; }).join(',')).join('\n');
-  const bom = '﻿'; // UTF-8 BOM for Excel
-  const blob = new Blob([bom + csv], {type:'text/csv;charset=utf-8;'});
+  const csv = rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
-  const filename = 'lotogrupo_captures_'+CFG.name.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.csv';
-  // Try download link
+  const filename = 'lotogrupo_'+CFG.name.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.csv';
   const a = document.createElement('a');
-  a.href = url;
-  a.download = filename;
-  document.body.appendChild(a);
-  a.click();
-  document.body.removeChild(a);
-  setTimeout(()=>URL.revokeObjectURL(url), 1000);
-  showToast('✅ '+filename+' descarregat!');
+  a.href=url; a.download=filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url),1000);
+  showToast('✅ Excel descarregat!');
 }
 
 // ── BIZUM SNAPSHOT ────────────────────────────────────────────────────────────
@@ -2958,15 +2937,17 @@ async function takeSnapshot(lotKey, sorteoFecha, auto=false){
 
 async function deleteSnapshot(id, btn){
   if(!confirm('Eliminar aquesta captura manual?')) return;
+  // Remove from DOM immediately
+  const card = btn.closest('div[style*="border-radius:12px"]');
+  if(card) card.remove();
+  showToast('✅ Captura eliminada');
+  // Then delete from Supabase in background
   try{
     await fetch(SUPA_URL+'/rest/v1/eventos?id=eq.'+encodeURIComponent(id),{
       method:'DELETE',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
     });
-    showToast('✅ Captura eliminada');
-    // Remove card from DOM
-    btn.closest('div[style*="border-radius:12px"]').remove();
-  }catch(e){showToast('Error eliminant');}
+  }catch(e){console.error('Delete snapshot error',e);}
 }
 
 async function loadSnapshots(){
