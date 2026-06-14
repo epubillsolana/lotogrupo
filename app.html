@@ -2075,9 +2075,15 @@ function addMemberFromGrupo(){
 }
 
 // ── DNI ───────────────────────────────────────────────────────────────────────
-function getDNI(name){return localStorage.getItem(`lg_dni_${CFG.name}_${name}`)||'';}
+function getDNI(name){return CFG.memberDNIs?.[name]||localStorage.getItem(`lg_dni_${CFG.name}_${name}`)||'';}
 function saveDNI(name,val){
-  if(val) localStorage.setItem(`lg_dni_${CFG.name}_${name}`,val.toUpperCase());
+  // Save to Supabase via CFG (persists) AND localStorage (cache)
+  const v=val?val.toUpperCase():'';
+  if(!CFG.memberDNIs) CFG.memberDNIs={};
+  if(v) CFG.memberDNIs[name]=v;
+  else delete CFG.memberDNIs[name];
+  saveGroupConfig(); // saves to Supabase
+  if(v) localStorage.setItem(`lg_dni_${CFG.name}_${name}`,v);
   else localStorage.removeItem(`lg_dni_${CFG.name}_${name}`);
 }
 function getMemberID(name){

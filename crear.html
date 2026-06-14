@@ -247,9 +247,15 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
     <div class="step-eyebrow" data-i18n="step3_eyebrow">El equipo</div>
     <div class="step-title" data-i18n="step3_title">¿Quiénes jugáis<br>en el grupo?</div>
     <div class="member-list" id="member-list"></div>
-    <div class="add-row">
-      <input type="text" id="new-member" placeholder="Nombre del jugador/a..." maxlength="20" onkeydown="if(event.key==='Enter')addMember()">
-      <button onclick="addMember()">+ Añadir</button>
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
+      <input type="text" id="new-member" placeholder="Nombre..." maxlength="20" onkeydown="if(event.key==='Enter')addMember()" style="flex:2;padding:10px 12px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:14px;">
+      <input type="text" id="new-member-dni" placeholder="DNI" maxlength="4" onkeydown="if(event.key==='Enter')addMember()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:14px;text-align:center;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+      <button onclick="addMember()" style="padding:10px 14px;border-radius:10px;background:var(--green,#2E7D32);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;">+</button>
+    </div>
+    <div style="display:flex;gap:6px;padding:0 4px;margin-bottom:12px;">
+      <div style="flex:2;font-size:10px;color:#9CA3AF;">Nom</div>
+      <div style="flex:1;font-size:10px;color:#9CA3AF;text-align:center;">DNI (opcional)</div>
+      <div style="width:42px;"></div>
     </div>
     <div class="field-hint" style="margin-top:10px;" data-i18n="primer_pagador">El primero de la lista será el primer pagador.</div>
   </div>
@@ -740,7 +746,7 @@ function renderMembers(){
   const list=document.getElementById('member-list');list.innerHTML='';
   members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?'Primer pagador':'Miembro'}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
 }
-function addMember(){const inp=document.getElementById('new-member');const name=inp.value.trim();if(!name){toast(tc('escribe_nombre_m'));return;}if(members.some(m=>(typeof m==='object'?m.name:m)===name)){toast(tc('nombre_existe'));return;}if(members.length>=12){toast(tc('max_miembros'));return;}members.push({name,dni:''});inp.value='';renderMembers();}
+function addMember(){const inp=document.getElementById('new-member');const dniInp=document.getElementById('new-member-dni');const name=inp.value.trim();const dni=(dniInp?dniInp.value.trim().toUpperCase():'');if(!name){toast(tc('escribe_nombre_m'));return;}if(members.some(m=>(typeof m==='object'?m.name:m)===name)){toast(tc('nombre_existe'));return;}if(members.length>=12){toast(tc('max_miembros'));return;}members.push({name,dni});inp.value='';if(dniInp)dniInp.value='';renderMembers();}
 function removeMember(i){members.splice(i,1);renderMembers();}
 
 // Rotation
