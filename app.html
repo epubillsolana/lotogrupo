@@ -991,6 +991,7 @@ function initApp(){
   applyLang();
   if('serviceWorker' in navigator) navigator.serviceWorker.register('./sw.js',{scope:'./'}).then(r=>swReg=r).catch(()=>{});
   track('apertura',{members:CFG.members.length,lotteries:CFG.lotteries.map(l=>l.lottery)});
+  setTimeout(buildInici, 200);
 }
 
 function adjustColor(hex,amt){
