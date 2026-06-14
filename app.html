@@ -379,15 +379,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <!-- TURNOS -->
   <div class="section" id="tab-turnos">
    
-        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:.5px solid var(--border);">
-          <span style="font-size:13px;color:var(--text2);" data-i18n="sortejos_per_bizum">Sortejos per Bizum</span>
-          <div style="display:flex;align-items:center;gap:6px;">
-            <input type="number" id="grupo-draws-per-turn" min="1" max="20" step="1"
-              style="width:60px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
-              onchange="saveDrawsPerTurn()">
-            <span style="font-size:13px;color:var(--text3);" data-i18n="sortejos_lbl">sortejos</span>
-          </div>
-        </div> <div class="metrics">
+    <div class="metrics">
       <div class="metric"><div class="metric-val" id="m-payer">—</div><div class="metric-lbl" data-i18n="paga_ronda">Paga esta ronda</div></div>
       <div class="metric"><div class="metric-val" id="m-bizum">—</div><div class="metric-lbl" data-i18n="bizum_persona">Bizum por persona</div></div>
     </div>
@@ -410,6 +402,15 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
           <input type="number" id="grupo-bizum" min="0.5" max="100" step="0.5"
             style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
             onchange="saveImportes()">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:.5px solid var(--border);">
+        <span style="font-size:13px;color:var(--text2);" data-i18n="sortejos_per_bizum">Sortejos per Bizum</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <input type="number" id="grupo-draws-per-turn" min="1" max="20" step="1"
+            style="width:60px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
+            onchange="saveDrawsPerTurn()">
+          <span style="font-size:13px;color:var(--text3);" data-i18n="sortejos_lbl">sortejos</span>
         </div>
       </div>
       <div style="font-size:11px;color:var(--text3);margin-top:4px;" data-i18n="actualiza_miembros">Se actualiza al añadir o eliminar miembros</div>
