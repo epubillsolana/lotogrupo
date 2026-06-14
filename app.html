@@ -253,8 +253,8 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <div style="font-size:13px;color:#6B7280;margin-bottom:20px;text-align:center;" data-i18n="identity_desc">Selecciona el teu nom per personalitzar l'app</div>
     <div id="identity-member-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:300px;overflow-y:auto;"></div>
     <div id="identity-dni-box" style="display:none;margin-bottom:16px;">
-      <div style="font-size:13px;color:#374151;margin-bottom:8px;" data-i18n="identity_dni_prompt">Introdueix els 4 últims dígits del teu DNI per verificar:</div>
-      <input type="text" id="identity-dni-input" maxlength="4" placeholder="456K"
+      <div id="identity-dni-prompt" style="font-size:13px;color:#374151;margin-bottom:8px;" data-i18n="identity_dni_prompt">Introdueix els 4 últims dígits del teu DNI per verificar:</div>
+      <input type="text" id="identity-dni-input" maxlength="4" placeholder="ex: 456K"
         style="width:100%;padding:12px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:18px;text-align:center;letter-spacing:4px;"
         oninput="this.value=this.value.slice(0,4).toUpperCase()" style="text-transform:uppercase;">
       <div id="identity-dni-error" style="color:#DC2626;font-size:12px;margin-top:6px;display:none;" data-i18n="identity_dni_error">DNI incorrecte. Torna-ho a intentar.</div>
@@ -1479,29 +1479,53 @@ function selectIdentityMember(idx, name, dni){
     b.style.background = i===idx ? '#F0FDF4' : '#F9FAFB';
   });
   const dniBox = document.getElementById('identity-dni-box');
+  const dniPrompt = document.getElementById('identity-dni-prompt');
+  const dniInput = document.getElementById('identity-dni-input');
   const confirmBtn = document.getElementById('identity-confirm-btn');
   const dniError = document.getElementById('identity-dni-error');
   if(dniError) dniError.style.display = 'none';
-  if(dniBox) { dniBox.style.display = 'block'; const inp=document.getElementById('identity-dni-input'); if(inp) inp.value=''; }
+  if(dniInput) dniInput.value = '';
+
+  if(dni){
+    // Has DNI configured - must verify
+    if(dniBox) dniBox.style.display = 'block';
+    if(dniPrompt) dniPrompt.setAttribute('data-i18n','identity_dni_verify');
+    if(dniPrompt) dniPrompt.textContent = t('identity_dni_verify');
+    if(dniInput) dniInput.placeholder = '···';
+  } else {
+    // No DNI - show optional field
+    if(dniBox) dniBox.style.display = 'block';
+    if(dniPrompt) dniPrompt.setAttribute('data-i18n','identity_dni_optional');
+    if(dniPrompt) dniPrompt.textContent = t('identity_dni_optional');
+    if(dniInput) dniInput.placeholder = 'ex: 456K';
+  }
   if(confirmBtn) confirmBtn.style.display = 'block';
 }
 
 async function confirmIdentity(){
   if(_selectedMemberIdx < 0) return;
   const name = CFG.members[_selectedMemberIdx];
-  const configuredDNI = CFG.memberDNIs?.[name]||'';
-  const inputDNI = document.getElementById('identity-dni-input')?.value||'';
+  const configuredDNI = (CFG.memberDNIs?.[name]||'').toUpperCase();
+  const inputDNI = (document.getElementById('identity-dni-input')?.value||'').toUpperCase().trim();
   const dniError = document.getElementById('identity-dni-error');
-  if(configuredDNI && inputDNI !== configuredDNI){
-    if(dniError) dniError.style.display = 'block';
-    return;
+
+  if(configuredDNI){
+    // Has configured DNI - must match
+    if(!inputDNI || inputDNI !== configuredDNI){
+      if(dniError) dniError.style.display = 'block';
+      return;
+    }
   }
+
   localStorage.setItem(getIdentityKey(), _selectedMemberIdx);
+
+  // If user entered a new DNI and member didn't have one, save to Supabase
   if(inputDNI && !configuredDNI){
     if(!CFG.memberDNIs) CFG.memberDNIs = {};
     CFG.memberDNIs[name] = inputDNI;
     await saveGroupConfig();
   }
+
   const overlay = document.getElementById('identity-overlay');
   if(overlay) overlay.style.display = 'none';
   const whoSel = document.getElementById('who-select');
@@ -2988,6 +3012,7 @@ const T={
     bizum_unmark_confirm:'Seguro que quieres desmarcar este Bizum?',
     identity_title:'👤 ¿Quién eres tú?',identity_desc:'Selecciona tu nombre para personalizar la app',identity_dni_prompt:'Introduce los 4 últimos dígitos de tu DNI para verificar:',identity_dni_error:'DNI incorrecto. Inténtalo de nuevo.',identity_confirm:'Confirmar',identity_note:'Podrás cambiarlo desde la pestaña Avisos',
     identity_card_title:'👤 Tu identidad',identity_not_set:'No identificado',identity_set:'Identificarme',identity_change:'No soy yo / Cambiar',
+    identity_dni_verify:'Introduce los 4 últimos dígitos de tu DNI para verificar:',identity_dni_optional:'DNI opcional (3 números + letra). Puedes dejarlo en blanco.',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3095,6 +3120,7 @@ const T={
     bizum_unmark_confirm:'Segur que vols desmarcar aquest Bizum?',
     identity_title:'👤 Qui ets tu?',identity_desc:'Selecciona el teu nom per personalitzar l\'app',identity_dni_prompt:'Introdueix els 4 últims dígits del DNI:',identity_dni_error:'DNI incorrecte.',identity_confirm:'Confirmar',identity_note:'Podràs canviar-ho des d\'Avisos',
     identity_card_title:'👤 La teva identitat',identity_not_set:'No identificat',identity_set:'Identificar-me',identity_change:'No sóc jo / Canviar',
+    identity_dni_verify:'Introdueix els 4 últims dígits del DNI per verificar:',identity_dni_optional:'DNI opcional (3 números + lletra). Pots deixar-ho en blanc.',
     flag:'CA'
   },
   en:{
@@ -3198,6 +3224,7 @@ const T={
     bizum_confirm_title:'Confirm Bizum',bizum_confirm_note:'It will be recorded with exact date and time',
     bizum_unmark_confirm:'Are you sure you want to unmark this Bizum?',
     identity_card_title:'👤 Your identity',identity_not_set:'Not identified',identity_set:'Identify me',identity_change:'Not me / Change',
+    identity_dni_verify:'Enter the last 4 digits of your ID to verify:',identity_dni_optional:'Optional ID (3 digits + letter). You can leave it blank.',
     flag:'EN'
   }
 };
