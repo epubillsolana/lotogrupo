@@ -310,6 +310,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     </div>
   </div>
 
+  <div id="debug-box" style="display:block;background:#000;color:#0f0;font-size:11px;font-family:monospace;padding:8px;max-height:100px;overflow-y:auto;"></div>
   <div class="tabbar">
     <button class="tab-btn active" onclick="switchTab('comprobar',this)"><i class="ti ti-search"></i><span data-i18n="tab_comprobar">Comprobar</span></button>
     <button class="tab-btn" onclick="switchTab('turnos',this)"><i class="ti ti-users"></i><span data-i18n="tab_turnos">Turnos</span></button>
@@ -845,6 +846,13 @@ async function loadConfig(){
 function initApp(){
   if(window._appInited) return;
   window._appInited=true;
+  // Debug payer info on load
+  setTimeout(()=>{
+    const myIdx=parseInt(localStorage.getItem(`lg_who_${CFG.name}`)??'-1');
+    const payerIdx=getCurrentPayerIdx();
+    dbg(`WHO: myIdx=${myIdx} payerIdx=${payerIdx} name=${CFG.name}`);
+    dbg(`isPayer=${myIdx>=0&&myIdx===payerIdx}`);
+  },1000);
   // Normalize lotteries format
   if(!CFG.lotteries){
     CFG.lotteries=[{lottery:CFG.lottery||'euromillones',main:CFG.main||[],stars:CFG.stars||[],apuesta:'sencilla'}];
@@ -1455,6 +1463,7 @@ async function toggleBizum(name,btn){
     const myIdx=parseInt(localStorage.getItem(`lg_who_${CFG.name}`)??'-1');
     const payerIdx=getCurrentPayerIdx();
     const isPayer=myIdx>=0&&myIdx===payerIdx;
+    console.log('[PAYER CHECK] myIdx:',myIdx,'payerIdx:',payerIdx,'isPayer:',isPayer,'CFG.name:',CFG.name);
     if(!isPayer){
       const ov=document.createElement('div');
       ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:flex;align-items:flex-end;';
