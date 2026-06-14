@@ -438,6 +438,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 
   <!-- BIZUM -->
   <div class="section" id="tab-bizum">
+    <div id="next-draw-info" style="font-size:12px;color:#FF8C00;font-weight:700;text-align:center;padding:8px 16px;background:rgba(255,140,0,0.08);border-radius:10px;margin-bottom:8px;"></div>
     <div class="card">
       <div class="card-label" data-i18n="has_hecho_bizum">¿Has hecho el Bizum?</div>
       <p style="font-size:13px;color:var(--text2);margin-bottom:12px;" data-i18n="pulsa_confirmar">Pulsa para confirmar. Cualquiera puede actualizar.</p>
@@ -1637,6 +1638,25 @@ async function buildBizumConfirm(){
   const others=members.filter((_,i)=>i!==payerIdx);
   const list=document.getElementById('bizum-confirm-list');if(!list)return;
   list.innerHTML='<div style="text-align:center;padding:12px;color:var(--text3);font-size:13px;">Cargando...</div>';
+  // Show next draw date
+  const nextDrawEl=document.getElementById('next-draw-info');
+  if(nextDrawEl && CFG){
+    const daysMap={euromillones:[2,5],primitiva:[4,6],bonoloto:[1,2,3,4,5]};
+    const now=new Date();
+    const drawInfos=CFG.lotteries.map(l=>{
+      const days=daysMap[l.lottery]||[2,5];
+      const lot=LOTTERIES[l.lottery];
+      for(let i=1;i<=7;i++){
+        const d=new Date(now);d.setDate(now.getDate()+i);
+        if(days.includes(d.getDay())){
+          const fecha=d.toLocaleDateString('ca-ES',{weekday:'long',day:'numeric',month:'long'});
+          return `${lot.emoji} ${lot.name}: ${fecha}`;
+        }
+      }
+      return '';
+    }).filter(Boolean);
+    nextDrawEl.innerHTML='🗓️ '+drawInfos.join(' &nbsp;·&nbsp; ');
+  }
   const state=await loadBizumState();
   list.innerHTML='';
   const payerRow=document.createElement('div');payerRow.className='bizum-row';
@@ -1694,8 +1714,18 @@ function buildWABizum(stateParam){
   const state=stateParam||getBizumState();
   const done=others.filter(m=>state[m]);
   const pending=others.filter(m=>!state[m]);
+  // Next draw date
+  const daysMapWA={euromillones:[2,5],primitiva:[4,6],bonoloto:[1,2,3,4,5]};
+  const nowWA=new Date();
+  const nextDrawsWA=CFG.lotteries.map(l=>{
+    const days=daysMapWA[l.lottery]||[2,5];
+    const lot=LOTTERIES[l.lottery];
+    for(let i=1;i<=7;i++){const d=new Date(nowWA);d.setDate(nowWA.getDate()+i);if(days.includes(d.getDay())){return lot.emoji+' '+d.toLocaleDateString('ca-ES',{weekday:'long',day:'numeric',month:'long'});}}
+    return '';
+  }).filter(Boolean);
   const msg='💸 *'+CFG.name+'*'
     +'\n💳 '+twa('paga_ronda')+': *'+payer+'*'
+    +'\n📅 '+nextDrawsWA.join(' · ')
     +'\n'+'─'.repeat(24)
     +(done.length?'\n✅ '+twa('bizum_hecho').replace('✅ ','')+':\n'+done.map(m=>'   · '+m).join('\n'):'')
     +(pending.length?'\n⏳ '+twa('pendiente').replace('⏳ ','')+':\n'+pending.map(m=>'   · '+m).join('\n'):'')
@@ -2863,33 +2893,41 @@ async function exportSnapshotsExcel(){
   const bom = '﻿'; // UTF-8 BOM for Excel
   const blob = new Blob([bom + csv], {type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
+  const filename = 'lotogrupo_captures_'+CFG.name.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.csv';
+  // Try download link
   const a = document.createElement('a');
   a.href = url;
-  a.download = `lotogrupo_captures_${CFG.name}_${new Date().toISOString().slice(0,10)}.csv`;
+  a.download = filename;
+  document.body.appendChild(a);
   a.click();
-  URL.revokeObjectURL(url);
-  showToast('✅ Excel descarregat!');
+  document.body.removeChild(a);
+  setTimeout(()=>URL.revokeObjectURL(url), 1000);
+  showToast('✅ '+filename+' descarregat!');
 }
 
 // ── BIZUM SNAPSHOT ────────────────────────────────────────────────────────────
 async function takeSnapshot(lotKey, sorteoFecha, auto=false){
   const slug=getSlug();
-  const state=getBizumState()||{};
+  // Load fresh bizum state from Supabase
+  const state=await loadBizumState()||{};
   const turno=getCurrentPayerIdx();
   const now=new Date();
+  const members=getSavedMembers()||CFG.members;
+  const payer=members[turno%members.length];
+  const others=members.filter((_,i)=>i!==turno%members.length);
   
   const snapshot={
     grupo_slug: slug,
-    loteria: lotKey||'all',
+    loteria: lotKey||CFG.lotteries[0].lottery,
     sorteo_fecha: sorteoFecha||now.toISOString().slice(0,10),
     snapshot_at: now.toISOString(),
     origen: auto?'auto':'manual',
     turno_idx: turno,
-    payer: CFG.members[turno]||'?',
-    members: CFG.members.map(m=>({
+    payer: payer,
+    members: others.map(m=>({
       name: m,
-      confirmado: state[m]?.confirmado||false,
-      confirmado_at: state[m]?.confirmado_at||null
+      confirmado: state[m]===true||state[m]==='true'||false,
+      confirmado_at: null
     }))
   };
 
