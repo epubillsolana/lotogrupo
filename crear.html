@@ -748,7 +748,15 @@ function buildGrids(){
   if(lot.starMax>0){
     ss.style.display='block';
     const sg=document.getElementById('grid-star');sg.innerHTML='';
-    for(let i=1;i<=lot.starMax;i++){const b=document.createElement('button');b.className='num-btn'+(selStars.has(i)?' sel-star':'');b.textContent=i;b.onclick=()=>toggleNum(i,'star',lot.starCount,maxS,b);sg.appendChild(b);}
+    if(lot.starMax>=49&&lot.starCount===1){
+    const inp=document.createElement('input');
+    inp.type='number';inp.min=1;inp.max=49;inp.placeholder='Complementari (1-49)';
+    inp.id='star-input';
+    inp.style.cssText='width:100%;padding:10px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:16px;text-align:center;';
+    if(selStars.size>0) inp.value=[...selStars][0];
+    inp.oninput=()=>{const v=parseInt(inp.value);selStars.clear();if(v>=1&&v<=49)selStars.add(v);updCounts();};
+    sg.appendChild(inp);
+  }else{for(let i=1;i<=lot.starMax;i++){const b=document.createElement('button');b.className='num-btn'+(selStars.has(i)?' sel-star':'');b.textContent=i;b.onclick=()=>toggleNum(i,'star',lot.starCount,maxS,b);sg.appendChild(b);}}
   }else ss.style.display='none';
   updCounts();
 }
