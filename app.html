@@ -708,28 +708,717 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
     <!-- Compartir grup -->
     <div class="card" id="share-card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;"></div>
 <!-- Tutorial -->
-    <div class="card" style="background:var(--surface2);border:.5px solid var(--border2);">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div style="font-size:14px;font-weight:700;color:var(--text);" data-i18n="tutorial_card_title">📖 Tutorial</div>
-          <div style="font-size:12px;color:var(--text3);margin-top:2px;" data-i18n="tutorial_card_desc">Aprende a usar LotoGrupo</div>
+!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="theme-color" id="theme-color-meta" content="#0A1F0F">
+<title>LotoGrupo</title>
+<link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@tabler/icons-webfont@latest/tabler-icons.min.css">
+<style>
+:root{
+  --primary:#0A1F0F;--primary-light:rgba(10,31,15,0.1);
+  --gold:#F57F17;--gold-light:#FFF9C4;--gold-mid:#FFD54F;
+  --green:#2E7D32;--green-light:#E8F5E9;
+  --red:#C62828;--red-light:#FFEBEE;
+  --blue:#1565C0;--blue-light:#E3F2FD;
+  --bg:#F8F9FA;--surface:#FFFFFF;--surface2:#F1F3F4;
+  --text:#1A1A18;--text2:#5F6368;--text3:#9AA0A6;
+  --border:rgba(0,0,0,0.08);--border2:rgba(0,0,0,0.15);
+  --radius:16px;--radius-sm:10px;--wa:#25D366;
+  --shadow:0 2px 8px rgba(0,0,0,0.08);
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;background:var(--bg);color:var(--text);min-height:100vh;padding-bottom:env(safe-area-inset-bottom,24px);}
+
+/* SETUP */
+.setup{min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;background:var(--primary);}
+.setup-emoji{font-size:64px;margin-bottom:20px;}
+.setup-title{font-size:26px;font-weight:800;color:#fff;margin-bottom:8px;}
+.setup-sub{font-size:15px;color:rgba(255,255,255,0.6);margin-bottom:32px;line-height:1.6;}
+.setup-btn{display:inline-block;padding:14px 28px;background:#FF8C00;color:#fff;border-radius:99px;font-size:16px;font-weight:700;text-decoration:none;}
+
+/* HEADER */
+.header{padding:44px 20px 14px;text-align:center;position:relative;overflow:hidden;animation:fadeDown .4s ease-out;} @keyframes fadeDown{from{opacity:0;transform:translateY(-10px);}to{opacity:1;transform:translateY(0);}}
+.header::before{content:'';position:absolute;top:-30px;right:-30px;width:120px;height:120px;border-radius:50%;background:rgba(255,255,255,0.07);}
+.header::after{content:'';position:absolute;bottom:-40px;left:-20px;width:140px;height:140px;border-radius:50%;background:rgba(255,255,255,0.05);}
+.header-badge{background:#fff;border-radius:10px;padding:5px 14px;display:inline-block;margin-bottom:6px;}
+.header-badge span{font-size:16px;font-weight:900;letter-spacing:1px;}
+.header-divider{width:40px;height:2px;background:rgba(255,255,255,0.3);margin:8px auto 6px;border-radius:2px;}
+.header h1{font-size:22px;font-weight:900;letter-spacing:.8px;text-transform:uppercase;color:#fff;text-shadow:0 1px 4px rgba(0,0,0,0.2);}
+.header-loterias{display:flex;gap:6px;justify-content:center;flex-wrap:wrap;margin-top:8px;}
+.header-lot-badge{background:rgba(255,255,255,0.15);border:0.5px solid rgba(255,255,255,0.2);border-radius:99px;padding:3px 10px;font-size:11px;color:rgba(255,255,255,0.85);font-weight:600;}
+
+/* TABBAR */
+.tabbar{display:flex;background:var(--surface);border-bottom:.5px solid var(--border);position:sticky;top:0;z-index:100;box-shadow:0 2px 8px rgba(0,0,0,.06);overflow-x:auto;scrollbar-width:none;}
+.tabbar::-webkit-scrollbar{display:none;}
+.tab-btn{flex:0 0 auto;padding:13px 10px 10px;font-size:10px;font-weight:700;color:#9AA0A6;border:none;background:none;cursor:pointer;display:flex;flex-direction:column;align-items:center;gap:4px;border-bottom:2.5px solid transparent;transition:all .2s;min-width:62px;} .tab-btn:hover{color:#5F6368;} .tab-btn.active{font-weight:800;}
+.tab-btn i{font-size:20px;transition:transform .2s;} .tab-btn.active i{font-size:22px;transform:scale(1.1);}
+.tab-btn.active{color:var(--primary);border-bottom-color:var(--primary);}
+
+/* SECTIONS */
+.section{display:none;padding:14px 16px;} .section.active{animation:fadeIn .2s ease-out;} @keyframes fadeIn{from{opacity:0;transform:translateY(4px);}to{opacity:1;transform:translateY(0);}}
+.section.active{display:block;}
+
+/* CARDS */
+.card{background:var(--surface);border-radius:var(--radius);padding:16px;margin-bottom:12px;border:.5px solid var(--border);box-shadow:0 2px 12px rgba(0,0,0,.07);}
+.card-label{font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.08em;margin-bottom:12px;}
+
+/* BALLS */
+.ball-row{display:flex;align-items:center;gap:7px;flex-wrap:wrap;justify-content:center;}
+.ball{width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:800;}
+.ball.our-main{background:linear-gradient(135deg,#1976D2,#42A5F5);color:#fff;box-shadow:0 2px 8px rgba(21,101,192,.3);}
+.ball.our-star{background:linear-gradient(135deg,#F57F17,#FFD54F);color:#fff;box-shadow:0 2px 8px rgba(245,127,23,.3);}
+.ball.draw-main{background:#E8EAED;color:#3C4043;border:2px solid #BDBDBD;font-weight:800;}
+.ball.draw-star{background:#E8EAED;color:#3C4043;border:2px solid #BDBDBD;font-weight:800;}
+.ball.hit{background:linear-gradient(135deg,#2E7D32,#66BB6A);color:#fff;box-shadow:0 2px 8px rgba(46,125,50,.4);}
+.ball.no-hit{background:var(--surface2);color:var(--text3);opacity:.35;}
+.star-sep{font-size:14px;color:var(--gold);}
+
+/* RESULT BANNER */
+.result-banner{border-radius:var(--radius);padding:18px 16px;margin-bottom:12px;text-align:center;box-shadow:var(--shadow);}
+.result-banner.none{background:var(--surface2);border:.5px solid var(--border);}
+.result-banner.prize{background:linear-gradient(135deg,#FFF8E1,#FFF3E0);border:1.5px solid #FFD54F;box-shadow:0 4px 16px rgba(245,127,23,.15);}
+.result-banner.prize.big{background:linear-gradient(135deg,#E3F2FD,#E8EAF6);border:.5px solid #90CAF9;}
+.rb-emoji{font-size:56px;margin-bottom:10px;}
+.rb-title{font-size:18px;font-weight:800;margin-bottom:4px;}
+.rb-amount{font-size:26px;font-weight:800;margin-bottom:4px;}
+.rb-sub{font-size:13px;color:var(--text2);}
+
+/* LOT SECTION */
+.lot-header{display:flex;align-items:center;gap:8px;margin-bottom:10px;padding-bottom:8px;border-bottom:.5px solid var(--border);}
+.lot-name{font-size:14px;font-weight:700;color:var(--text);}
+.lot-date{font-size:11px;color:var(--text3);margin-left:auto;}
+
+/* BUTTONS */
+.btn{width:100%;padding:14px;border-radius:var(--radius-sm);font-size:15px;font-weight:700;cursor:pointer;border:none;margin-top:8px;}
+.btn-primary{color:#fff;} .btn#btn-check{background:linear-gradient(135deg,#1B5E20,#2E7D32,#388E3C)!important;font-size:17px;letter-spacing:.5px;box-shadow:0 4px 16px rgba(46,125,50,.35);transition:transform .15s,box-shadow .15s;} .btn#btn-check:active{transform:scale(.97);box-shadow:0 2px 8px rgba(46,125,50,.25);}
+.btn-gray{background:var(--surface2);color:var(--text);border:.5px solid var(--border2);}
+.btn:disabled{opacity:.35;cursor:not-allowed;}
+
+/* METRICS */
+.metrics{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.metric{background:var(--surface);border-radius:var(--radius);padding:18px 14px;border:.5px solid var(--border);text-align:center;box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.metric-val{font-size:26px;font-weight:900;color:var(--primary);letter-spacing:-.5px;}
+.metric-lbl{font-size:11px;color:var(--text3);margin-top:3px;font-weight:600;}
+
+/* PEOPLE */
+.person-row{display:flex;align-items:center;gap:12px;padding:11px 0;border-bottom:.5px solid var(--border);}
+.person-row:last-child{border-bottom:none;}
+.person-info{flex:1;}
+.person-name{font-size:14px;font-weight:600;}
+.person-sub{font-size:11px;color:var(--text3);margin-top:1px;}
+.badge{font-size:11px;font-weight:700;padding:4px 11px;border-radius:99px;}
+.badge-active{background:#2E7D32;color:#fff;}
+.badge-next{background:#F57F17;color:#fff;}
+.badge-wait{background:#ECEFF1;color:#78909C;}
+
+/* BIZUM */
+.bizum-row{display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);}
+.bizum-row:last-child{border-bottom:none;}
+.bizum-name{font-size:14px;font-weight:600;}
+.bizum-btn{padding:10px 18px;border-radius:99px;font-size:13px;font-weight:700;cursor:pointer;border:none;min-width:130px;text-align:center;}
+.bizum-btn.pending{background:var(--gold-light);color:var(--gold);border:1px solid var(--gold-mid);}
+.bizum-btn.done{background:var(--green-light);color:var(--green);border:1px solid #A5D6A7;}
+
+/* INFO BOX */
+.info-box{border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:12px;font-size:13px;line-height:1.6;}
+.info-box.green{background:linear-gradient(135deg,#E8F5E9,#F1F8E9);color:#1B5E20;border:.5px solid #A5D6A7;box-shadow:0 2px 8px rgba(46,125,50,.08);}
+.info-box.gold{background:var(--gold-light);color:var(--gold);border:.5px solid var(--gold-mid);}
+.info-box.blue{background:var(--blue-light);color:var(--blue);border:.5px solid #90CAF9;}
+
+/* WA */
+.wa-box{background:var(--surface2);border-radius:var(--radius-sm);padding:12px;font-size:12px;color:var(--text);line-height:1.7;white-space:pre-wrap;border:.5px solid var(--border);font-family:'Courier New',monospace;margin-bottom:10px;}
+.wa-btns{display:flex;gap:8px;}
+.btn-wa{flex:1;padding:11px 8px;border-radius:var(--radius-sm);font-size:13px;font-weight:700;cursor:pointer;border:none;}
+.btn-wa-green{background:var(--wa);color:#fff;}
+.btn-wa-copy{background:var(--surface2);color:var(--text);border:.5px solid var(--border2);}
+
+/* PRIZES */
+.total-box{border-radius:var(--radius);padding:14px 16px;text-align:center;margin-bottom:12px;color:#fff;}
+.total-label{font-size:11px;opacity:.75;text-transform:uppercase;letter-spacing:.07em;margin-bottom:6px;}
+.total-amount{font-size:36px;font-weight:900;letter-spacing:-1px;}
+.total-sub{font-size:12px;opacity:.7;margin-top:5px;}
+.balance-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.balance-card{border-radius:var(--radius);padding:18px 14px;text-align:center;border:.5px solid var(--border);background:var(--surface);box-shadow:0 3px 12px rgba(0,0,0,.08);}
+.balance-val{font-size:24px;font-weight:900;margin-bottom:4px;letter-spacing:-.5px;}
+.balance-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;}
+.stats-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px;}
+.stat-card{background:var(--surface);border-radius:var(--radius);padding:16px 14px;border:.5px solid var(--border);text-align:center;box-shadow:var(--shadow);}
+.stat-val{font-size:24px;font-weight:800;margin-bottom:4px;color:var(--primary);}
+.stat-lbl{font-size:11px;color:var(--text3);font-weight:600;text-transform:uppercase;letter-spacing:.05em;margin-top:2px;}
+.add-prize-row{display:flex;gap:8px;margin-top:8px;}
+.add-prize-row input{flex:1;padding:10px 12px;border-radius:var(--radius-sm);border:1px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-weight:600;}
+.add-prize-row button{padding:10px 14px;border-radius:var(--radius-sm);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;}
+.history-item{display:flex;align-items:center;justify-content:space-between;padding:11px 0;border-bottom:.5px solid var(--border);}
+.history-item:last-child{border-bottom:none;}
+.history-label{font-size:13px;font-weight:700;}
+.history-date{font-size:11px;color:var(--text3);margin-top:1px;}
+.history-amount{font-size:16px;font-weight:800;color:var(--green);}
+.history-del{background:none;border:none;color:var(--text3);font-size:16px;cursor:pointer;padding:4px 8px;}
+.empty-state{text-align:center;padding:28px 16px;color:var(--text3);font-size:14px;line-height:1.6;}
+
+/* PLAYED BTN */
+.played-bar{display:flex;align-items:center;justify-content:space-between;margin-top:12px;padding-top:12px;border-top:.5px solid var(--border);}
+.played-label{font-size:13px;color:var(--text2);}
+.played-btn{padding:7px 16px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:none;}
+.played-btn.yes{background:var(--green-light);color:var(--green);border:1px solid #A5D6A7;}
+.played-btn.no{background:var(--red-light);color:var(--red);border:1px solid #FFCDD2;}
+.played-btn.unknown{background:var(--surface2);color:var(--text2);border:1px solid var(--border2);}
+
+/* EDIT NUMS */
+.edit-nums-grid{display:flex;flex-wrap:wrap;gap:6px;margin-top:8px;}
+.edit-num-btn{width:38px;height:38px;border-radius:50%;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text2);font-size:12px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;}
+.edit-num-btn.sel-main{background:linear-gradient(135deg,#1976D2,#42A5F5);border-color:#1976D2;color:#fff;}
+.edit-num-btn.sel-star{background:linear-gradient(135deg,#F57F17,#FFD54F);border-color:#F57F17;color:#fff;}
+
+/* AVATAR */
+.avatar-section{margin-top:14px;padding-top:14px;border-top:.5px solid var(--border);}
+.av-current{display:flex;align-items:center;gap:10px;padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);margin-bottom:10px;cursor:pointer;}
+.av-current-emoji{font-size:28px;}
+.av-current-info{font-size:13px;color:var(--text2);flex:1;}
+.avatar-grid{display:flex;flex-wrap:wrap;gap:8px;}
+.av-opt{width:42px;height:42px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;cursor:pointer;border:2px solid transparent;background:var(--surface2);}
+.av-opt.selected{border-color:var(--green);transform:scale(1.15);background:var(--green-light);}
+.avatar-popup{position:fixed;bottom:0;left:0;right:0;background:var(--surface);border-radius:20px 20px 0 0;padding:20px 16px 32px;box-shadow:0 -4px 24px rgba(0,0,0,0.15);z-index:200;transform:translateY(100%);transition:transform .25s ease;}
+.avatar-popup.open{transform:translateY(0);}
+.avatar-popup-overlay{position:fixed;inset:0;background:rgba(0,0,0,0.4);z-index:199;display:none;}
+.avatar-popup-overlay.open{display:block;}
+.avatar-popup-title{font-size:14px;font-weight:700;color:var(--text);margin-bottom:14px;text-align:center;}
+.avatar-popup-grid{display:flex;flex-wrap:wrap;gap:8px;justify-content:center;max-height:240px;overflow-y:auto;}
+
+/* NOTIF */
+.notif-status{display:flex;align-items:center;gap:8px;padding:10px 14px;border-radius:var(--radius-sm);font-size:13px;font-weight:600;margin-bottom:10px;}
+.notif-status.ok{background:var(--green-light);color:var(--green);}
+.notif-status.warn{background:var(--gold-light);color:var(--gold);}
+.notif-status.off{background:var(--red-light);color:var(--red);}
+.dot{width:8px;height:8px;border-radius:50%;flex-shrink:0;}
+.dot.green{background:var(--green);}
+.dot.gold{background:var(--gold);}
+.dot.red{background:var(--red);}
+.schedule-list{display:flex;flex-direction:column;gap:6px;margin-top:8px;}
+.schedule-item{display:flex;justify-content:space-between;align-items:center;padding:8px 12px;background:var(--surface2);border-radius:var(--radius-sm);font-size:13px;}
+
+/* LOT TABS (stats per lottery) */
+.lot-tabs{display:flex;gap:8px;margin-bottom:12px;overflow-x:auto;scrollbar-width:none;padding-bottom:2px;}
+.lot-tabs::-webkit-scrollbar{display:none;}
+.lot-tab{padding:6px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text2);white-space:nowrap;}
+.lot-tab.active{background:var(--primary);color:#fff;border-color:var(--primary);}
+
+.prize-table{width:100%;border-collapse:collapse;font-size:12px;}
+.prize-table th{text-align:left;padding:6px 5px;color:var(--text3);font-weight:700;border-bottom:.5px solid var(--border);}
+.prize-table td{padding:7px 5px;border-bottom:.5px solid var(--border);color:var(--text);}
+.prize-table tr:last-child td{border-bottom:none;}
+.prize-table .amt{text-align:right;font-weight:700;color:var(--green);}
+
+select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;-webkit-appearance:none;}
+
+.scanner-num-row{display:flex;align-items:center;gap:8px;margin-bottom:10px;}
+.scanner-num-row label{font-size:12px;color:var(--text3);min-width:70px;}
+.scanner-num-input{flex:1;padding:8px 12px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;}
+.boleto-item{padding:10px 0;border-bottom:.5px solid var(--border);}
+.boleto-item:last-child{border-bottom:none;}
+.boleto-header{display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;}
+.boleto-name{font-size:13px;font-weight:700;}
+.boleto-date{font-size:11px;color:var(--text3);}
+.boleto-del{background:none;border:none;color:var(--text3);cursor:pointer;font-size:14px;padding:2px 6px;}
+.lang-opt{width:100%;padding:14px;border-radius:12px;border:1.5px solid var(--border2);background:var(--surface2);font-size:16px;font-weight:700;cursor:pointer;text-align:left;}
+.lang-opt.active{border-color:var(--primary);background:var(--primary);color:#fff;}
+/* RESPONSIVE - pantalles petites */
+@media(max-width:360px){
+  .ball{width:34px;height:34px;font-size:12px;}
+  .tab-btn{min-width:50px;padding:11px 6px 9px;font-size:9px;}
+  .tab-btn i{font-size:18px;}
+  .card{padding:12px;}
+  .metric-val{font-size:22px;}
+  .header h1{font-size:18px;}
+  .btn{font-size:14px;padding:12px;}
+  .ball-row{gap:5px;}
+  .metrics{gap:8px;}
+  .balance-grid{gap:8px;}
+  .stats-grid{gap:8px;}
+  .stat-val{font-size:20px;}
+  .total-amount{font-size:38px;}
+  .section{padding:12px 12px;}
+}
+@media(max-width:320px){
+  .ball{width:30px;height:30px;font-size:11px;}
+  .tab-btn{min-width:44px;font-size:8px;}
+  .metric-val{font-size:18px;}
+  .card{padding:10px;}
+}
+.toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
+.toast.show{opacity:1;}
+</style>
+</head>
+<body>
+
+<!-- IDENTITY POPUP -->
+<div id="identity-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.7);z-index:600;display:none;align-items:flex-end;">
+  <div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 20px 44px;width:100%;max-width:480px;margin:0 auto;">
+    <div style="font-size:22px;font-weight:800;color:#111827;margin-bottom:6px;text-align:center;" data-i18n="identity_title">👤 Qui ets tu?</div>
+    <div style="font-size:13px;color:#6B7280;margin-bottom:20px;text-align:center;" data-i18n="identity_desc">Selecciona el teu nom per personalitzar l'app</div>
+    <div id="identity-member-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:260px;overflow-y:scroll;padding-right:4px;"></div>
+    <div id="identity-dni-box" style="display:none;margin-bottom:16px;">
+      <div id="identity-dni-prompt" style="font-size:13px;color:#374151;margin-bottom:8px;" data-i18n="identity_dni_prompt">Introdueix els 4 últims dígits del teu DNI per verificar:</div>
+      <input type="text" id="identity-dni-input" maxlength="4" placeholder="ex: 456K"
+        style="width:100%;padding:12px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:18px;text-align:center;letter-spacing:4px;"
+        oninput="this.value=this.value.slice(0,4).toUpperCase()" style="text-transform:uppercase;">
+      <div id="identity-dni-error" style="color:#DC2626;font-size:12px;margin-top:6px;display:none;" data-i18n="identity_dni_error">DNI incorrecte. Torna-ho a intentar.</div>
+    </div>
+    <button id="identity-confirm-btn" onclick="confirmIdentity()" style="width:100%;padding:15px;border-radius:12px;background:#0A1F0F;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;display:none;" data-i18n="identity_confirm">Confirmar</button>
+    
+  </div>
+</div>
+
+<div id="onboarding-screen" style="display:none;min-height:100vh;background:#0A1F0F;color:#fff;flex-direction:column;align-items:center;justify-content:center;padding:32px 24px;text-align:center;position:fixed;inset:0;z-index:200;">
+  <div style="font-size:72px;margin-bottom:24px;">🍀</div>
+  <div style="font-size:13px;font-weight:700;color:#FF8C00;text-transform:uppercase;letter-spacing:.15em;margin-bottom:16px;">WELCOME!</div>
+  <div style="font-size:32px;font-weight:900;color:#fff;line-height:1.2;margin-bottom:16px;max-width:320px;" id="ob-group-name">Tu Peña</div>
+  <div style="width:40px;height:3px;background:#FF8C00;border-radius:2px;margin:0 auto 24px;"></div>
+  <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.4;margin-bottom:12px;max-width:300px;" id="ob-love"></div>
+  <div style="font-size:18px;font-weight:700;color:rgba(255,255,255,0.8);margin-bottom:8px;" id="ob-sub"></div>
+  <div style="font-size:20px;font-weight:900;color:#FF8C00;margin-bottom:40px;" id="ob-mas"></div>
+  <button onclick="finishOnboarding()" id="ob-btn" style="width:100%;max-width:320px;padding:18px;border-radius:99px;background:#FF8C00;color:#0A1F0F;border:none;font-size:18px;font-weight:900;cursor:pointer;letter-spacing:.5px;">¡ENTRAR A LA PEÑA! →</button>
+</div>
+
+<div id="splash-screen" style="display:flex;position:fixed;inset:0;background:#0A1F0F;z-index:9999;flex-direction:column;align-items:center;justify-content:center;gap:24px;">
+  <svg width="120" height="120" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
+  <div style="font-family:'Bebas Neue',sans-serif;font-size:52px;letter-spacing:6px;color:#fff;">Loto<span style="color:#FF8C00;">Grupo</span></div>
+</div></div>
+
+
+<div id="setup-screen" style="display:none;" class="setup">
+  <div class="setup-emoji">🎰</div>
+  <div class="setup-title">LotoGrupo</div>
+  <div class="setup-sub" data-i18n="setup_sub">No se ha encontrado la configuración.<br>Pide al administrador que te reenvíe el enlace.</div>
+  <a href="https://lotogrupo.es/crear.html" class="setup-btn">Crear una peña nueva →</a>
+</div>
+
+<div id="main-app" style="display:none;">
+  <div class="header" id="app-header">
+    <button id="lang-btn" onclick="openLangSelector()" style="position:absolute;top:44px;right:16px;background:rgba(255,255,255,0.15);border:1px solid rgba(255,255,255,0.25);border-radius:99px;padding:4px 10px;font-size:12px;font-weight:700;cursor:pointer;color:#fff;display:flex;align-items:center;gap:4px;z-index:10;">🌐 <span id="lang-label">ES</span></button>
+    <div style="display:flex;align-items:center;justify-content:center;gap:8px;margin-bottom:4px;">
+      <svg width="28" height="28" viewBox="0 0 44 44" xmlns="http://www.w3.org/2000/svg"><circle cx="22" cy="22" r="22" fill="#FF8C00" opacity="0.15"/><circle cx="22" cy="22" r="19" fill="#FF8C00" opacity="0.2"/><circle cx="22" cy="22" r="16" fill="#FF8C00"/><circle cx="22" cy="13" r="6" fill="white"/><circle cx="14" cy="21" r="6" fill="white"/><circle cx="30" cy="21" r="6" fill="white"/><circle cx="22" cy="19" r="5" fill="white"/><path d="M22 27 Q25 33 23 38" stroke="white" stroke-width="2.5" fill="none" stroke-linecap="round"/><circle cx="22" cy="19" r="2.5" fill="#FF8C00"/></svg>
+      <span style="font-family:'Bebas Neue',sans-serif;font-size:20px;letter-spacing:2px;color:#fff;">Loto<span id="grupo-text-color" style="color:#FF8C00;">Grupo</span></span>
+    </div>
+    <h1 id="header-title" style="font-size:clamp(15px,5vw,22px);font-weight:900;letter-spacing:.5px;padding:0 60px;line-height:1.2;">Mi Peña</h1>
+    <div class="header-loterias" id="header-loterias"></div>
+  </div>
+  <!-- Suggestion popup -->
+  <div id="sugg-overlay" onclick="closeSuggestions()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;"></div>
+  <div id="sugg-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:301;box-shadow:0 -4px 24px rgba(0,0,0,0.15);">
+    <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:16px;">
+      <div style="font-size:16px;font-weight:800;color:#111827;" data-i18n="sugg_title">💬 Suggeriments</div>
+      <button onclick="closeSuggestions()" style="background:none;border:none;font-size:20px;cursor:pointer;color:#9CA3AF;padding:0 4px;">✕</button>
+    </div>
+    <p style="font-size:13px;color:#6B7280;margin-bottom:12px;" data-i18n="sugg_desc">Tens alguna idea per millorar l'app? Explica'ns-ho.</p>
+    <textarea id="sugg-text" rows="4" id="sugg-placeholder" placeholder="Escriu aquí..."
+      style="width:100%;padding:12px 14px;border-radius:12px;border:1.5px solid #E5E7EB;background:#F9FAFB;color:#111827;font-size:15px;font-family:inherit;outline:none;resize:none;margin-bottom:12px;"></textarea>
+    <button onclick="sendSuggestion()" style="width:100%;padding:14px;border-radius:12px;background:#FF8C00;color:#fff;border:none;font-size:16px;font-weight:700;cursor:pointer;" data-i18n="sugg_btn">Enviar suggeriment</button>
+  </div>
+
+  <div id="lang-overlay" onclick="closeLangSelector()" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.5);z-index:300;"></div>
+  <div id="lang-popup" style="display:none;position:fixed;bottom:0;left:0;right:0;background:#fff;border-radius:20px 20px 0 0;padding:24px 16px 40px;z-index:301;box-shadow:0 -4px 24px rgba(0,0,0,0.15);">
+    <div style="font-size:16px;font-weight:800;text-align:center;margin-bottom:20px;">🌐 Idioma / Language</div>
+    <div style="font-size:11px;font-weight:700;color:#9AA0A6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">App</div>
+    <div style="display:flex;flex-direction:column;gap:8px;margin-bottom:20px;">
+      <button onclick="setLang('es')" class="lang-opt" data-lang="es">ES — Español</button>
+      <button onclick="setLang('ca')" class="lang-opt" data-lang="ca">CA — Català</button>
+      <button onclick="setLang('en')" class="lang-opt" data-lang="en">EN — English</button>
+    </div>
+    <div style="font-size:11px;font-weight:700;color:#9AA0A6;text-transform:uppercase;letter-spacing:.08em;margin-bottom:8px;">📲 Missatges WhatsApp</div>
+    <div style="display:flex;flex-direction:column;gap:8px;">
+      <button onclick="setWALang('es')" class="lang-opt wa-lang-opt" data-lang="es">ES — Español</button>
+      <button onclick="setWALang('ca')" class="lang-opt wa-lang-opt" data-lang="ca">CA — Català</button>
+      <button onclick="setWALang('en')" class="lang-opt wa-lang-opt" data-lang="en">EN — English</button>
+    </div>
+  </div>
+
+  <div class="tabbar">
+    <button class="tab-btn active" onclick="switchTab('inici',this)"><i class="ti ti-home"></i><span data-i18n="tab_inici">Inici</span></button>
+    <button class="tab-btn" onclick="switchTab('comprobar',this)"><i class="ti ti-search"></i><span data-i18n="tab_comprobar">Comprobar</span></button>
+    <button class="tab-btn" onclick="switchTab('turnos',this)"><i class="ti ti-users"></i><span data-i18n="tab_turnos">Turnos</span></button>
+    <button class="tab-btn" onclick="switchTab('bizum',this)"><i class="ti ti-cash"></i><span data-i18n="tab_bizum">Bizum</span></button>
+    <button class="tab-btn" onclick="switchTab('premios',this)"><i class="ti ti-trophy"></i><span data-i18n="tab_premios">Premios</span></button>
+    <button class="tab-btn" onclick="switchTab('avisos',this)"><i class="ti ti-bell"></i><span data-i18n="tab_avisos">Avisos</span></button>
+    <button class="tab-btn" onclick="switchTab('grupo',this)"><i class="ti ti-users"></i><span data-i18n="tab_grupo">Grupo</span></button>
+    <button class="tab-btn" onclick="switchTab('scanner',this)"><i class="ti ti-scan"></i><span data-i18n="tab_scanner">Scanner</span></button>
+  </div>
+
+  <!-- INICI -->
+  <div class="section active" id="tab-inici">
+    <div id="inici-content" style="padding:8px 0;"></div>
+  </div>
+
+  <!-- COMPROBAR -->
+  <div class="section" id="tab-comprobar">
+    <div id="loterias-comprobar"></div>
+    <button class="btn btn-primary" id="btn-check" onclick="checkAllPrizes()" disabled style="margin-bottom:12px;" data-i18n="btn_comprobar">Comprobar premio</button>
+    <div id="result-area" style="display:none;">
+      <div id="result-banner" class="result-banner none" style="display:none;">
+        <div id="rb-emoji" class="rb-emoji">🎰</div>
+        <div id="rb-title" class="rb-title"></div>
+        <div id="rb-amount" class="rb-amount" style="display:none;"></div>
+        <div id="rb-sub" class="rb-sub"></div>
+      </div>
+      <div id="hits-detail"></div>
+      <div id="add-prize-box" class="card" style="display:none;">
+        <div class="card-label" data-i18n="add_prize_label">💰 Añadir premio al historial</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:10px;" id="add-prize-hint">Introduce el importe real cobrado.</p>
+        <div class="add-prize-row">
+          <input type="number" id="real-amount" placeholder="€ importe real cobrado" min="0" step="0.01">
+          <button id="add-prize-btn" onclick="addPrizeFromResult()" style="background:var(--green);">+ Añadir</button>
         </div>
-        <button onclick="showTutorial()" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:#fff;color:var(--text);" data-i18n="tutorial_card_btn">Ver</button>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="wa_label">Mensaje WhatsApp</div>
+        <div class="wa-box" id="wa-text">—</div>
+        <div class="wa-btns">
+          <button class="btn-wa btn-wa-copy" onclick="copyMsg()">📋 Copiar todo</button>
+          <button class="btn-wa btn-wa-green" onclick="openWA()">📲 Enviar todo</button>
+        </div>
+        <div id="wa-btns-per-lot" class="wa-btns" style="margin-top:6px;flex-wrap:wrap;"></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- TURNOS -->
+  <div class="section" id="tab-turnos">
+    <div class="metrics">
+      <div class="metric"><div class="metric-val" id="m-payer">—</div><div class="metric-lbl" data-i18n="paga_ronda">Paga esta ronda</div></div>
+      <div class="metric"><div class="metric-val" id="m-bizum">—</div><div class="metric-lbl" data-i18n="bizum_persona">Bizum por persona</div></div>
+    </div>
+    <div class="info-box green"><p id="bizum-text">—</p></div>
+<div class="card">
+      <div class="card-label" data-i18n="importes">Importes</div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-bottom:.5px solid var(--border);">
+        <span style="font-size:13px;color:var(--text2);" data-i18n="coste_boleto">Cost total sortejos a jugar</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:15px;font-weight:700;">€</span>
+          <input type="number" id="grupo-ticket-cost" min="1" max="500" step="0.5"
+            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
+            onchange="recalcFromCost()">
+        </div>
+      </div>
+      <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;">
+        <span style="font-size:13px;color:var(--text2);" data-i18n="bizum_persona_lbl">Bizum por persona</span>
+        <div style="display:flex;align-items:center;gap:6px;">
+          <span style="font-size:15px;font-weight:700;">€</span>
+          <input type="number" id="grupo-bizum" min="0.5" max="100" step="0.5"
+            style="width:70px;padding:6px 8px;border-radius:8px;border:1.5px solid var(--border2);background:var(--surface2);font-size:15px;font-weight:700;color:var(--text);text-align:right;font-family:inherit;outline:none;"
+            onchange="saveImportes()">
+        </div>
+      </div>
+      <div style="font-size:11px;color:var(--text3);margin-top:4px;" data-i18n="actualiza_miembros">Se actualiza al añadir o eliminar miembros</div>
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="rotacion_grupo">Rotación del grupo</div>
+      <div id="turns-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="rotacion_pagos">Rotación de pagos</div>
+      <div style="display:flex;flex-direction:column;gap:10px;margin-bottom:12px;">
+        <label style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1.5px solid var(--border2);cursor:pointer;" id="rot-auto-label">
+          <input type="radio" name="rotation-mode" id="rot-auto" value="auto" onchange="saveRotationMode()" style="width:18px;height:18px;accent-color:var(--primary);">
+          <div>
+            <div style="font-size:14px;font-weight:700;" data-i18n="rot_auto_title">🔄 Rotación automática</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;" data-i18n="rot_auto_desc">Cada X sorteos cambia quien paga</div>
+          </div>
+        </label>
+        <label style="display:flex;align-items:center;gap:12px;padding:12px;border-radius:10px;border:1.5px solid var(--border2);cursor:pointer;" id="rot-fixed-label">
+          <input type="radio" name="rotation-mode" id="rot-fixed" value="fixed" onchange="saveRotationMode()" style="width:18px;height:18px;accent-color:var(--primary);">
+          <div>
+            <div style="font-size:14px;font-weight:700;" data-i18n="rot_fixed_title">📌 Siempre la misma persona</div>
+            <div style="font-size:12px;color:var(--text3);margin-top:2px;" data-i18n="rot_fixed_desc">Una persona paga siempre</div>
+          </div>
+        </label>
+      </div>
+      <div id="fixed-payer-selector" style="display:none;margin-top:4px;">
+        <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;" data-i18n="quien_paga_siempre">¿Quién paga siempre?</div>
+        <div id="fixed-payer-list" style="display:flex;flex-wrap:wrap;gap:8px;"></div>
+      </div>
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="aviso_turno">Aviso cambio de turno</div>
+      <div class="wa-box" id="wa-turn">—</div>
+      <div class="wa-btns">
+        <button class="btn-wa btn-wa-copy" onclick="copyTurn()">📋 Copiar</button>
+        <button class="btn-wa btn-wa-green" onclick="openWATurn()">📲 WhatsApp</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- BIZUM -->
+  <div class="section" id="tab-bizum">
+    <div id="next-draw-info" style="font-size:12px;color:#FF8C00;font-weight:700;text-align:center;padding:8px 16px;background:rgba(255,140,0,0.08);border-radius:10px;margin-bottom:8px;"></div>
+    <div class="card">
+      <div class="card-label" data-i18n="has_hecho_bizum">¿Has hecho el Bizum?</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:12px;" data-i18n="pulsa_confirmar">Pulsa para confirmar. Cualquiera puede actualizar.</p>
+      <div id="bizum-confirm-list"></div>
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="compartir_bizum">Compartir estado por WhatsApp</div>
+      <div class="wa-box" id="wa-bizum">—</div>
+      <div class="wa-btns">
+        <button class="btn-wa btn-wa-copy" onclick="copyBizum()">📋 Copiar</button>
+        <button class="btn-wa btn-wa-green" onclick="openWABizum()">📲 WhatsApp</button>
+      </div>
+    </div>
+    <div class="card" style="border:.5px dashed var(--border2);">
+      <div class="card-label" data-i18n="snapshot_title">📸 Captura del Bizum</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:12px;" data-i18n="snapshot_desc">Registra l'estat actual del Bizum per a aquest sorteig.</p>
+      <button onclick="takeSnapshot()" class="btn btn-primary" data-i18n="snapshot_btn">Fer captura ara</button>
+      <div id="last-snapshot-info" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
+    </div>
+    <div class="card" style="margin-top:8px;">
+      <div class="card-label" data-i18n="auto_snapshot_title">📸 Captura automàtica del Bizum</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" data-i18n="auto_snapshot_desc">La app fa la captura X hores abans de cada sorteig</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="font-size:13px;color:var(--text2);" data-i18n="auto_snapshot_hours">Hores abans:</label>
+        <select id="snapshot-hours-sel" onchange="saveSnapshotConfig()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);font-size:14px;color:var(--text);">
+          <option value="1">1h</option>
+          <option value="2">2h</option>
+          <option value="4" selected>4h</option>
+          <option value="12">12h</option>
+          <option value="24">24h</option>
+        </select>
+      </div>
+      <div id="auto-snapshot-status" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
+    </div>
+    <div class="card" style="margin-top:8px;">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:10px;">
+        <div class="card-label" style="margin-bottom:0;" data-i18n="snapshot_history_title">📋 Historial de captures</div>
+        <div style="display:flex;gap:6px;">
+          <button onclick="loadSnapshotHistory()" style="padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);" data-i18n="ver_historial">Veure</button>
+          <button onclick="exportSnapshotsExcel()" style="padding:5px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid #2E7D32;background:#E8F5E9;color:#2E7D32;">📊 Excel</button>
+        </div>
+      </div>
+      <div id="snapshot-history-list" style="display:none;flex-direction:column;gap:8px;"></div>
+    </div>
+  </div>
+
+  <!-- PREMIOS -->
+  <div class="section" id="tab-premios">
+    <div class="lot-tabs" id="premios-lot-tabs" style="display:none;"></div>
+    <div class="balance-grid">
+      <div class="balance-card" style="background:var(--red-light);border-color:#FFCDD2;">
+        <div class="balance-val" id="bal-gastado" style="color:var(--red);">0,00 €</div>
+        <div class="balance-lbl" data-i18n="total_gastado">Total gastado</div>
+      </div>
+      <div class="balance-card" style="background:var(--green-light);border-color:#A5D6A7;">
+        <div class="balance-val" id="bal-balance" style="color:var(--green);">0,00 €</div>
+        <div class="balance-lbl" data-i18n="balance_neto">Balance neto</div>
+      </div>
+    </div>
+    <div class="total-box" id="total-box">
+      <div class="total-label" data-i18n="total_ganado">Total ganado por el grupo</div>
+      <div class="total-amount" id="total-amount">0,00 €</div>
+      <div class="total-sub" id="total-sub" data-i18n="premios_registrados">Sin premios registrados</div>
+    </div>
+    <div class="card">
+      <div class="card-label" data-i18n="estadisticas">Estadísticas</div>
+      <div class="stats-grid">
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">😬</div><div class="stat-val" id="stat-peor-racha">—</div><div class="stat-lbl" data-i18n="peor_racha">Peor racha sin premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🔥</div><div class="stat-val" id="stat-mejor-racha">—</div><div class="stat-lbl" data-i18n="mejor_racha">Mejor racha con premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🏆</div><div class="stat-val" id="stat-mejor">—</div><div class="stat-lbl" data-i18n="mejor_premio">Mejor premio</div></div>
+        <div class="stat-card"><div style="font-size:20px;margin-bottom:4px;">🍀</div>
+          <div class="stat-val" id="stat-premiados">—</div>
+          <div id="stat-premiados-pct" style="font-size:11px;color:var(--text3);margin-top:2px;"></div>
+          <div class="stat-lbl" data-i18n="sorteos_premiados">Sorteos premiados</div>
+        </div>
+      </div>
+    </div>
+    <!-- Historial de joc: data + loteria + premi + jugat -->
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-label" style="margin-bottom:0;" data-i18n="historial_sortejos">Historial de joc</div>
+        <button onclick="toggleDrawsHistory()" id="btn-toggle-draws" style="padding:4px 12px;border-radius:99px;font-size:11px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);" data-i18n="ver_historial">Ver</button>
+      </div>
+      <div id="draws-history-list" style="display:none;flex-direction:column;gap:6px;"></div>
+      <!-- Add manual prize (hidden inside draws) -->
+      <div id="add-prize-manual" style="display:none;margin-top:10px;border-top:.5px solid var(--border);padding-top:10px;">
+        <div style="font-size:11px;color:var(--text3);margin-bottom:6px;" data-i18n="add_prize_hint">Añade premios anteriores a la app</div>
+        <div class="add-prize-row">
+          <input type="number" id="manual-amount" placeholder="€" min="0" step="0.01">
+          <button onclick="addManualPrize()" style="background:var(--green);">+ Añadir</button>
+        </div>
+      </div>
+    </div>
+    <div id="reset-box" style="display:none;">
+      <button class="btn btn-gray" onclick="resetPrizes()">🗑️ Borrar historial</button>
+    </div>
+  </div>
+
+  <!-- AVISOS -->
+  <div class="section" id="tab-avisos">
+    <div class="card">
+      <div class="card-label" data-i18n="quien_eres">¿Quién eres tú?</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;" data-i18n="selecciona_nombre">Selecciona tu nombre para personalizar los avisos.</p>
+      <select id="who-select" onchange="onPersonChange()">
+        <option value="">— Selecciona tu nombre —</option>
+      </select>
+    </div>
+    <div id="notif-status-box" style="display:none;">
+      <div id="notif-status-row" class="notif-status warn">
+        <div class="dot gold" id="notif-dot"></div>
+        <span id="notif-status-text">—</span>
+      </div>
+      <button class="btn btn-primary" id="btn-notif" onclick="requestNotifPermission()" style="margin-bottom:12px;" data-i18n="activar_notif">🔔 Activar notificaciones</button>
+    </div>
+    <div id="notif-preview" style="display:none;">
+      <div class="card">
+        <div class="card-label" data-i18n="proximo_aviso">Tu próximo aviso (lunes 10:00h)</div>
+        <div id="preview-notif" class="info-box gold"></div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="notif_schedule_title">🔔 Horari d'avís del grup</div>
+        <p style="font-size:12px;color:var(--text2);margin-bottom:12px;" data-i18n="notif_schedule_desc">Tots els membres rebran l'avís el mateix dia i hora.</p>
+        <div style="display:flex;gap:12px;margin-bottom:10px;">
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="notif_day_lbl">Dia</div>
+            <select id="notif-day-sel" onchange="saveGroupNotifSchedule()" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:14px;font-family:inherit;color:var(--text);">
+              <option value="1">Dilluns</option>
+              <option value="2">Dimarts</option>
+              <option value="3">Dimecres</option>
+              <option value="4">Dijous</option>
+              <option value="5">Divendres</option>
+              <option value="6">Dissabte</option>
+              <option value="0">Diumenge</option>
+            </select>
+          </div>
+          <div style="flex:1;">
+            <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="notif_hour_lbl">Hora</div>
+            <select id="notif-hour-sel" onchange="saveGroupNotifSchedule()" style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);font-size:14px;font-family:inherit;color:var(--text);">
+              <option value="7">07:00</option>
+              <option value="8">08:00</option>
+              <option value="9">09:00</option>
+              <option value="10">10:00</option>
+              <option value="11">11:00</option>
+              <option value="12">12:00</option>
+              <option value="13">13:00</option>
+              <option value="17">17:00</option>
+              <option value="18">18:00</option>
+              <option value="19">19:00</option>
+              <option value="20">20:00</option>
+              <option value="21">21:00</option>
+            </select>
+          </div>
+        </div>
+        <div style="display:flex;align-items:center;justify-content:space-between;padding:10px 0;border-top:.5px solid var(--border);">
+          <div>
+            <div style="font-size:13px;font-weight:700;" data-i18n="notif_pause_title">Silenciar aquesta setmana</div>
+            <div style="font-size:11px;color:var(--text3);margin-top:2px;" data-i18n="notif_pause_desc">Ja heu tirat la quiniela i no cal avís</div>
+          </div>
+          <button id="notif-pause-btn" onclick="togglePauseNotif()" style="padding:8px 16px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);">🔔 <span data-i18n="notif_pause_btn">Silenciar</span></button>
+        </div>
+      </div>
+      <div class="card">
+        <div class="card-label" data-i18n="proximos_lunes">Próximos lunes</div>
+        <div class="schedule-list" id="schedule-list"></div>
+      </div>
+      <div class="info-box blue" style="font-size:12px;">⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para recibir notificaciones.<br><br><strong>iPhone:</strong> Safari → Compartir → "Añadir a pantalla de inicio"<br><strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"</div>
+      
+      <button class="btn btn-gray" onclick="testNotif()" style="margin-bottom:12px;" data-i18n="notif_prueba">🧪 Notificación de prueba</button>
+    </div>
+  </div>
+
+  <!-- SCANNER -->
+  <div class="section" id="tab-scanner">
+    <div class="card">
+      <div class="card-label" data-i18n="fotografiar">📷 Fotografiar boleto</div>
+      <p style="font-size:13px;color:var(--text2);margin-bottom:14px;" data-i18n="foto_desc">Haz una foto al boleto como prueba de compra. Queda registrado quién juega y cuándo se compró.</p>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="loteria_lbl">Lotería</div>
+      <div id="scanner-loteria-selector" style="margin-bottom:14px;display:flex;flex-wrap:wrap;gap:8px;"></div>
+
+      <div style="font-size:12px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.06em;margin-bottom:6px;" data-i18n="quien_boleto">¿Quién tiene el boleto físicamente?</div>
+      <input type="text" id="scan-holder" placeholder="Nombre de quien lo tiene..." style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;margin-bottom:8px;">
+      <div id="scan-who-list" style="display:flex;flex-wrap:wrap;gap:6px;margin-bottom:14px;"></div>
+
+      <button onclick="openCamera()" class="btn btn-primary" style="margin-bottom:8px;font-size:16px;padding:16px;" data-i18n="hacer_foto">📷 Hacer foto al boleto</button>
+      <button onclick="openGallery()" class="btn btn-gray" style="font-size:15px;padding:14px;border:1.5px solid var(--border2);" data-i18n="elegir_galeria">🖼️ Elegir de galería</button>
+      <input type="file" id="scanner-file" accept="image/*" capture="environment" style="display:none;" onchange="processImage(this)">
+      <input type="file" id="gallery-file" accept="image/*" style="display:none;" onchange="processImage(this)">
+    </div>
+
+    <div id="scanner-preview-box" class="card" style="display:none;">
+      <div class="card-label" data-i18n="vista_previa">Vista previa del boleto</div>
+      <img id="scanner-img" style="width:100%;border-radius:10px;margin-bottom:12px;max-height:300px;object-fit:contain;">
+      <div style="font-size:13px;color:var(--text2);margin-bottom:10px;" id="scanner-who-confirm"></div>
+      <div style="display:flex;gap:8px;">
+        <button onclick="document.getElementById('scanner-preview-box').style.display='none'" class="btn btn-gray" style="margin-top:0;">Cancelar</button>
+        <button onclick="saveBoleto()" class="btn btn-primary" style="margin-top:0;">💾 Confirmar y guardar</button>
       </div>
     </div>
 
-    
-
-    <div id="suggestions-box" class="card" style="background:linear-gradient(135deg,#FFF5E6,#FFF9F0);border:1.5px solid #FF8C00;">
-      <div style="font-size:32px;margin-bottom:6px;">💬</div>
-      <div class="card-label" data-i18n="sugg_title" style="font-size:14px;color:#0A1F0F;">💬 Suggeriments</div>
-      <p style="font-size:13px;color:var(--text2);margin-bottom:10px;" data-i18n="sugg_desc">Tens alguna idea per millorar l'app? Explica'ns-ho.</p>
-      <textarea id="sugg-text-grup" rows="3" placeholder="Escriu aquí el teu suggeriment..."
-        style="width:100%;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:14px;font-family:inherit;outline:none;resize:none;"></textarea>
-      <button onclick="sendSuggestion()" class="btn btn-primary" style="margin-top:8px;font-size:15px;font-weight:700;" data-i18n="sugg_btn">Enviar suggeriment</button>
+    <div class="card">
+      <div class="card-label" data-i18n="boletos_registrados">Boletos registrados</div>
+      <div id="scanner-saved-list"></div>
+      <div class="empty-state" id="scanner-empty" style="padding:16px 0;font-size:13px;" data-i18n="scanner_empty">Sin boletos registrados todavía 🎟️<br><span style="font-size:11px;">Fotografía el boleto cada vez que lo compréis</span></div>
     </div>
   </div>
-</div>
+
+  <!-- GRUPO -->
+  <div class="section" id="tab-grupo">
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-label" style="margin-bottom:0;" data-i18n="nombre_grupo">Nombre del grupo</div>
+        <button onclick="toggleEditName()" id="edit-name-btn" style="padding:4px 12px;border-radius:99px;background:var(--surface2);border:1px solid var(--border2);font-size:11px;font-weight:700;cursor:pointer;color:var(--text2);">✏️ Editar</button>
+      </div>
+      <div id="name-view" style="font-size:18px;font-weight:700;color:var(--text);padding:4px 0;"></div>
+      <div id="name-editor" style="display:none;margin-top:8px;">
+        <input type="text" id="name-input" maxlength="30" style="width:100%;padding:10px 14px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:16px;font-family:inherit;outline:none;" placeholder="Nombre del grupo...">
+        <div style="display:flex;gap:8px;margin-top:8px;">
+          <button onclick="cancelEditName()" style="flex:1;padding:10px;border-radius:10px;background:var(--surface2);border:1px solid var(--border2);font-size:13px;font-weight:700;cursor:pointer;">Cancelar</button>
+          <button onclick="saveName()" style="flex:1;padding:10px;border-radius:10px;background:#2E7D32;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;">Guardar ✅</button>
+        </div>
+      </div>
+    </div>
+    <!-- Gestionar loterias -->
+    <div class="card">
+      <div class="card-label" data-i18n="gestionar_loterias_lbl">🎰 Loterias del grup</div>
+      <div id="grup-loterias-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:12px;"></div>
+      <button onclick="openAddLoteria()" id="btn-add-lot-grup" style="width:100%;padding:13px;border-radius:12px;background:var(--surface2);border:1.5px dashed #FF8C00;color:#FF8C00;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span style="font-size:20px;">🎰</span> <span data-i18n="añadir_loteria_btn">+ Añadir lotería</span></button>
+    </div>
+
+<!-- Identitat -->
+    <div class="card" id="identity-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="card-label" style="margin-bottom:2px;" data-i18n="identity_card_title">👤 La teva identitat</div>
+          <div id="identity-card-name" style="font-size:15px;font-weight:700;color:var(--text);"></div>
+        </div>
+        <button onclick="showIdentityPopup()" id="identity-card-btn" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);"></button>
+      </div>
+    </div>
+
+    <div class="card">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
+        <div class="card-label" style="margin-bottom:0;" data-i18n="miembros_grupo">Miembros del grupo</div>
+      </div>
+      <div id="members-list"></div>
+      <div style="margin-top:12px;padding-top:12px;border-top:.5px solid var(--border);">
+        <div style="font-size:12px;color:var(--text3);margin-bottom:8px;" data-i18n="añadir_miembro">Añadir miembro</div>
+        <div style="display:flex;gap:8px;">
+          <input type="text" id="new-member-input" maxlength="20" placeholder="Nombre..." id_ph="nombre_ph"
+            style="flex:1;padding:10px 12px;border-radius:10px;border:1.5px solid var(--border2);background:var(--surface2);color:var(--text);font-size:15px;font-family:inherit;outline:none;"
+            onkeydown="if(event.key==='Enter')addMemberFromGrupo()">
+          <button onclick="addMemberFromGrupo()"
+            style="padding:10px 16px;border-radius:10px;background:#2E7D32;color:#fff;border:none;font-size:13px;font-weight:700;cursor:pointer;">+ Añadir</button>
+        </div>
+      </div>
+    </div>
+        <!-- Suggeriments -->
+    
+
+    <!-- Compartir grup -->
+    <div class="card" id="share-card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;"></div>
+<!-- Tutorial -->
+
 
 <div class="avatar-popup-overlay" id="av-overlay" onclick="closeAvatarPopup()"></div>
 <div class="avatar-popup" id="av-popup">
@@ -1130,7 +1819,7 @@ async function buildInici(){
       <div style="font-size:11px;font-weight:700;color:rgba(255,255,255,0.5);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">${t('inici_proper_sorteig')}</div>
       ${nextDraws.map(d=>`<div style="display:flex;align-items:center;gap:10px;margin-bottom:4px;"><span style="font-size:24px;">${d.emoji}</span><div><div style="font-size:15px;font-weight:700;color:#fff;">${d.name}</div><div style="font-size:12px;color:rgba(255,255,255,0.6);">${d.date}</div></div></div>`).join('')}
     </div>`:''}
-    ${myName?`<div class="card" style="margin-bottom:10px;border:2px solid ${myBizumDone?'#A5D6A7':'#FFCC80'};">
+    ${myName&&!isPayer?`<div class="card" style="margin-bottom:10px;border:2px solid ${myBizumDone?'#A5D6A7':'#FFCC80'};">
       <div style="font-size:11px;font-weight:700;color:var(--text3);text-transform:uppercase;letter-spacing:.1em;margin-bottom:8px;">${t('inici_el_teu_bizum')}</div>
       ${myBizumDone?`<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:32px;">✅</span><div><div style="font-size:15px;font-weight:700;color:#2E7D32;">${t('inici_bizum_fet')}</div><div style="font-size:12px;color:var(--text3);">${amount}€ → ${payer}</div></div></div>`:`<div style="display:flex;align-items:center;gap:10px;margin-bottom:12px;"><span style="font-size:32px;">💸</span><div><div style="font-size:15px;font-weight:700;color:#E65100;">${amount}€ → ${payer}</div><div style="font-size:12px;color:var(--text3);">${t('inici_bizum_pendent')}</div></div></div><button onclick="switchTab('bizum',document.querySelector('[onclick*=tab-bizum]||[onclick*=bizum]'))" style="width:100%;padding:12px;border-radius:10px;background:#FF8C00;color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;">${t('inici_fer_bizum')}</button>`}
     </div>`:''}
@@ -1189,6 +1878,14 @@ async function buildInici(){
             <span style="font-size:14px;font-weight:800;color:var(--text);">${t('tab_grupo')}</span>
           </div>
           <div style="font-size:12px;color:var(--text3);line-height:1.6;">${t('inici_desc_grupo')}</div>
+        </div>
+
+        <div style="background:var(--surface2);border-radius:14px;padding:14px 16px;border-left:4px solid #00695C;">
+          <div style="display:flex;align-items:center;gap:8px;margin-bottom:6px;">
+            <span style="font-size:20px;">📷</span>
+            <span style="font-size:14px;font-weight:800;color:var(--text);">${t('tab_scanner')}</span>
+          </div>
+          <div style="font-size:12px;color:var(--text3);line-height:1.6;">${t('inici_desc_scanner')}</div>
         </div>
 
       </div>
