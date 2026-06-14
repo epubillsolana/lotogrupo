@@ -1452,9 +1452,9 @@ async function toggleBizum(name,btn){
   const current=btn.classList.contains('done');
   if(current){
     // Only payer can unmark
-    const myName=localStorage.getItem(`lg_who_${CFG.name}`)||'';
-    const payerName=CFG.members[getCurrentPayerIdx()]||'';
-    const isPayer=myName&&myName===payerName;
+    const myIdx=parseInt(localStorage.getItem(`lg_who_${CFG.name}`)??'-1');
+    const payerIdx=getCurrentPayerIdx();
+    const isPayer=myIdx>=0&&myIdx===payerIdx;
     if(!isPayer){
       const ov=document.createElement('div');
       ov.style.cssText='position:fixed;inset:0;background:rgba(0,0,0,0.6);z-index:400;display:flex;align-items:flex-end;';
