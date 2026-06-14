@@ -1204,6 +1204,55 @@ async function buildInici(){
         ${pendingBizums.map(m=>`<span style="padding:4px 10px;border-radius:99px;background:#FFEBEE;color:#C62828;font-size:12px;font-weight:600;">❌ ${m}</span>`).join('')}
       </div>
     </div>`:''} 
+
+    <!-- Explicació funcionament -->
+    <div style="margin-top:24px;padding-top:20px;border-top:.5px solid var(--border);">
+      <div style="font-size:12px;font-weight:900;color:var(--text3);text-transform:uppercase;letter-spacing:.12em;margin-bottom:16px;" data-i18n="inici_com_funciona">Com funciona LotoGrupo</div>
+
+      <div style="display:flex;flex-direction:column;gap:12px;">
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:22px;flex-shrink:0;">🔍</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px;" data-i18n="tab_comprobar">Comprobar</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.5;" data-i18n="inici_desc_comprobar">Aquí veus els teus números i els compares amb el sorteig oficial. Marca si heu jugat o no.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:22px;flex-shrink:0;">🔄</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px;" data-i18n="tab_turnos">Turnos</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.5;" data-i18n="inici_desc_tornos">Veus qui paga el bitllet en cada torn. Pots configurar imports i enviar un avís per WhatsApp.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:22px;flex-shrink:0;">💸</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px;" data-i18n="tab_bizum">Bizum</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.5;" data-i18n="inici_desc_bizum">Cada membre confirma que ha fet el Bizum. El pagador veu qui ha pagat i qui no.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:22px;flex-shrink:0;">🏆</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px;" data-i18n="tab_premios">Premios</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.5;" data-i18n="inici_desc_premios">Registra els premis guanyats. Veus estadístiques i l'historial de joc del grup.</div>
+          </div>
+        </div>
+
+        <div style="display:flex;gap:12px;align-items:flex-start;">
+          <span style="font-size:22px;flex-shrink:0;">👥</span>
+          <div>
+            <div style="font-size:13px;font-weight:800;color:var(--text);margin-bottom:2px;" data-i18n="tab_grupo">Grupo</div>
+            <div style="font-size:12px;color:var(--text3);line-height:1.5;" data-i18n="inici_desc_grupo">Gestiona els membres, la teva identitat i comparteix el link amb el grup.</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
   `;
 }
 
@@ -3411,6 +3460,7 @@ const T={
     snapshot_history_title:'📋 Historial de capturas',
     tab_inici:'Inicio',inici_hola:'Hola',inici_benvingut:'Bienvenido',inici_proper_sorteig:'Próximo sorteo',inici_el_teu_bizum:'Tu Bizum',inici_bizum_fet:'Bizum hecho ✅',inici_bizum_pendent:'Pendiente de pago',inici_fer_bizum:'Ir a Bizum',inici_torn:'Quién compra el boleto',inici_ets_tu_pagador:'Eres tú — toca comprar',inici_compra_bitllet:'Compra el boleto',inici_pendents:'Bizums pendientes',inici_manana:'mañana',inici_pasado:'pasado mañana',
     sortejos_per_bizum:'Sorteos por Bizum',sortejos_lbl:'sorteos',
+    inici_com_funciona:'Cómo funciona LotoGrupo',inici_desc_comprobar:'Aquí ves tus números y los comparas con el sorteo oficial. Marca si habéis jugado o no.',inici_desc_tornos:'Ves quién paga el boleto en cada turno. Puedes configurar importes y enviar un aviso por WhatsApp.',inici_desc_bizum:'Cada miembro confirma que ha hecho el Bizum. El pagador ve quién ha pagado y quién no.',inici_desc_premios:'Registra los premios ganados. Ves estadísticas e historial de juego del grupo.',inici_desc_grupo:'Gestiona los miembros, tu identidad y comparte el enlace con el grupo.',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3525,6 +3575,7 @@ const T={
     snapshot_history_title:'📋 Historial de captures',
     tab_inici:'Inici',inici_hola:'Hola',inici_benvingut:'Benvingut',inici_proper_sorteig:'Proper sorteig',inici_el_teu_bizum:'El teu Bizum',inici_bizum_fet:'Bizum fet ✅',inici_bizum_pendent:'Pendent de pagament',inici_fer_bizum:'Anar a Bizum',inici_torn:'Qui compra el bitllet',inici_ets_tu_pagador:'Ets tu — toca comprar',inici_compra_bitllet:'Compra el bitllet',inici_pendents:'Bizums pendents',inici_manana:'demà',inici_pasado:'demà passat',
     sortejos_per_bizum:'Sortejos per Bizum',sortejos_lbl:'sortejos',
+    inici_com_funciona:'Com funciona LotoGrupo',inici_desc_comprobar:'Aquí veus els teus números i els compares amb el sorteig oficial. Marca si heu jugat o no.',inici_desc_tornos:'Veus qui paga el bitllet en cada torn. Pots configurar imports i enviar un avís per WhatsApp.',inici_desc_bizum:'Cada membre confirma que ha fet el Bizum. El pagador veu qui ha pagat i qui no.',inici_desc_premios:'Registra els premis guanyats. Veus estadístiques i historial de joc del grup.',inici_desc_grupo:'Gestiona els membres, la teva identitat i comparteix el link amb el grup.',
     flag:'CA'
   },
   en:{
