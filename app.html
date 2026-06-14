@@ -452,10 +452,25 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
     <div class="card" style="border:.5px dashed var(--border2);">
-      <div class="card-label" data-i18n="snapshot_title">📸 Snapshot del Bizum</div>
+      <div class="card-label" data-i18n="snapshot_title">📸 Captura del Bizum</div>
       <p style="font-size:12px;color:var(--text3);margin-bottom:12px;" data-i18n="snapshot_desc">Registra l'estat actual del Bizum per a aquest sorteig.</p>
-      <button onclick="takeSnapshot()" class="btn btn-primary" data-i18n="snapshot_btn">Fer snapshot ara</button>
+      <button onclick="takeSnapshot()" class="btn btn-primary" data-i18n="snapshot_btn">Fer captura ara</button>
       <div id="last-snapshot-info" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
+    </div>
+    <div class="card" style="margin-top:8px;">
+      <div class="card-label" data-i18n="auto_snapshot_title">📸 Captura automàtica del Bizum</div>
+      <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" data-i18n="auto_snapshot_desc">La app fa la captura X hores abans de cada sorteig</div>
+      <div style="display:flex;align-items:center;gap:10px;">
+        <label style="font-size:13px;color:var(--text2);" data-i18n="auto_snapshot_hours">Hores abans:</label>
+        <select id="snapshot-hours-sel" onchange="saveSnapshotConfig()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);font-size:14px;color:var(--text);">
+          <option value="1">1h</option>
+          <option value="2">2h</option>
+          <option value="4" selected>4h</option>
+          <option value="12">12h</option>
+          <option value="24">24h</option>
+        </select>
+      </div>
+      <div id="auto-snapshot-status" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
     </div>
   </div>
 
@@ -579,21 +594,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         <div class="schedule-list" id="schedule-list"></div>
       </div>
       <div class="info-box blue" style="font-size:12px;">⚠️ <strong>Importante:</strong> Añade la app a la pantalla de inicio para recibir notificaciones.<br><br><strong>iPhone:</strong> Safari → Compartir → "Añadir a pantalla de inicio"<br><strong>Android:</strong> Chrome → Menú ⋮ → "Añadir a pantalla de inicio"</div>
-      <div class="card" style="margin-top:12px;">
-        <div class="card-label" data-i18n="auto_snapshot_title">📸 Captura automàtica del Bizum</div>
-        <div style="font-size:12px;color:var(--text3);margin-bottom:10px;" data-i18n="auto_snapshot_desc">La app fa la captura X hores abans de cada sorteig</div>
-        <div style="display:flex;align-items:center;gap:10px;">
-          <label style="font-size:13px;color:var(--text2);" data-i18n="auto_snapshot_hours">Hores abans:</label>
-          <select id="snapshot-hours-sel" onchange="saveSnapshotConfig()" style="padding:6px 10px;border-radius:8px;border:1px solid var(--border2);background:var(--surface2);font-size:14px;color:var(--text);">
-            <option value="1">1h</option>
-            <option value="2">2h</option>
-            <option value="4" selected>4h</option>
-            <option value="12">12h</option>
-            <option value="24">24h</option>
-          </select>
-        </div>
-        <div id="auto-snapshot-status" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
-      </div>
+      
       <button class="btn btn-gray" onclick="testNotif()" style="margin-bottom:12px;" data-i18n="notif_prueba">🧪 Notificación de prueba</button>
     </div>
   </div>
@@ -657,6 +658,17 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       <button onclick="openAddLoteria()" id="btn-add-lot-grup" style="width:100%;padding:13px;border-radius:12px;background:var(--surface2);border:1.5px dashed #FF8C00;color:#FF8C00;font-size:14px;font-weight:700;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:8px;"><span style="font-size:20px;">🎰</span> <span data-i18n="añadir_loteria_btn">+ Añadir lotería</span></button>
     </div>
 
+<!-- Identitat -->
+    <div class="card" id="identity-card">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div class="card-label" style="margin-bottom:2px;" data-i18n="identity_card_title">👤 La teva identitat</div>
+          <div id="identity-card-name" style="font-size:15px;font-weight:700;color:var(--text);"></div>
+        </div>
+        <button onclick="showIdentityPopup()" id="identity-card-btn" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);"></button>
+      </div>
+    </div>
+
     <div class="card">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;">
         <div class="card-label" style="margin-bottom:0;" data-i18n="miembros_grupo">Miembros del grupo</div>
@@ -674,18 +686,11 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
         <!-- Suggeriments -->
-    <!-- Identitat -->
-    <div class="card" id="identity-card">
-      <div style="display:flex;align-items:center;justify-content:space-between;">
-        <div>
-          <div class="card-label" style="margin-bottom:2px;" data-i18n="identity_card_title">👤 La teva identitat</div>
-          <div id="identity-card-name" style="font-size:15px;font-weight:700;color:var(--text);"></div>
-        </div>
-        <button onclick="showIdentityPopup()" id="identity-card-btn" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:var(--surface2);color:var(--text2);"></button>
-      </div>
-    </div>
+    
 
-    <!-- Tutorial -->
+    <!-- Compartir grup -->
+    <div class="card" id="share-card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;"></div>
+<!-- Tutorial -->
     <div class="card" style="background:var(--surface2);border:.5px solid var(--border2);">
       <div style="display:flex;align-items:center;justify-content:space-between;">
         <div>
@@ -696,8 +701,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
 
-    <!-- Compartir grup -->
-    <div class="card" id="share-card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;"></div>
+    
 
     <div id="suggestions-box" class="card" style="background:linear-gradient(135deg,#FFF5E6,#FFF9F0);border:1.5px solid #FF8C00;">
       <div style="font-size:32px;margin-bottom:6px;">💬</div>
@@ -3101,10 +3105,10 @@ const T={
     name_updated:'✅ Nombre actualizado',    historial_sortejos:'Historial de juego',ver_historial:'Ver',ocultar_historial:'Ocultar',jugado_lbl:'Jugado',no_jugado_lbl:'No jugado',sin_marcar_lbl:'Sin marcar',
     bizum_confirm_msg:'¿Confirmas que has hecho el Bizum de {amount}€ a {payer}? Quedará registrado con fecha y hora.',
     bizum_already_done:'Este Bizum ya está confirmado. Contacta con el pagador si hay un error.',
-    snapshot_title:'📸 Snapshot del Bizum',
+    snapshot_title:'📸 Captura del Bizum',
     snapshot_desc:'Registra el estado actual del Bizum para este sorteo.',
-    snapshot_btn:'Hacer snapshot ahora',
-    snapshot_done:'✅ Snapshot registrado',
+    snapshot_btn:'Fer captura ara',
+    snapshot_done:'✅ Captura registrada',
     snapshot_info:'Snapshot: {date}',
     bizum_timestamp:'Confirmado el {date} a las {time}',
     bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedará registrado con fecha y hora exacta',
@@ -3215,8 +3219,8 @@ const T={
     name_updated:'✅ Nom actualitzat',    historial_sortejos:'Historial de joc',ver_historial:'Veure',ocultar_historial:'Amagar',jugado_lbl:'Jugat',no_jugado_lbl:'No jugat',sin_marcar_lbl:'Sense marcar',
     bizum_confirm_msg:'Confirmes que has fet el Bizum de {amount}€ a {payer}? Quedarà registrat amb data i hora.',
     bizum_already_done:'Aquest Bizum ja està confirmat. Contacta amb el pagador si hi ha un error.',
-    snapshot_title:'📸 Snapshot del Bizum',snapshot_desc:'Registra l\'estat actual del Bizum per a aquest sorteig.',
-    snapshot_btn:'Fer snapshot ara',snapshot_done:'✅ Snapshot registrat',
+    snapshot_title:'📸 Captura del Bizum',snapshot_desc:'Registra l\'estat actual del Bizum per a aquest sorteig.',
+    snapshot_btn:'Fer captura ara',snapshot_done:'✅ Captura registrada',
     snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmat el {date} a les {time}',
     bizum_confirm_title:'Confirmar Bizum',bizum_confirm_note:'Quedarà registrat amb data i hora exacta',
     bizum_unmark_confirm:'Segur que vols desmarcar aquest Bizum?',
