@@ -2880,7 +2880,7 @@ async function exportSnapshotsExcel(){
     rows.push(['','','','']);
   });
 
-  const csv = 'sep=,\n' + rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(',')).join('\n');
+  const csv = 'sep=;\n' + rows.map(r=>r.map(c=>'"'+String(c).replace(/"/g,'""')+'"').join(';')).join('\n');
   const blob = new Blob(['\uFEFF'+csv],{type:'text/csv;charset=utf-8;'});
   const url = URL.createObjectURL(blob);
   const filename = 'lotogrupo_'+CFG.name.replace(/[^a-z0-9]/gi,'_')+'_'+new Date().toISOString().slice(0,10)+'.csv';
