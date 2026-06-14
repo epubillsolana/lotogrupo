@@ -243,16 +243,6 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
 .toast{position:fixed;bottom:90px;left:50%;transform:translateX(-50%);background:rgba(0,0,0,0.85);color:#fff;padding:10px 20px;border-radius:99px;font-size:13px;font-weight:500;opacity:0;transition:opacity .3s;pointer-events:none;z-index:999;white-space:nowrap;}
 .toast.show{opacity:1;}
 </style>
-  <!-- Open Graph / WhatsApp -->
-  <meta property="og:type" content="website">
-  <meta property="og:url" content="https://lotogrupo.es/app.html">
-  <meta property="og:title" content="LotoGrupo — T'han convidat a una penya!">
-  <meta property="og:description" content="Uneix-te al grup de loteria. Gestiona torns, Bizums i premis fàcilment.">
-  <meta property="og:image" content="https://lotogrupo.es/og-image.png">
-  <meta property="og:image:width" content="1200">
-  <meta property="og:image:height" content="630">
-  <meta name="twitter:card" content="summary_large_image">
-  <meta name="twitter:image" content="https://lotogrupo.es/og-image.png">
 </head>
 <body>
 
@@ -442,6 +432,12 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
         <button class="btn-wa btn-wa-copy" onclick="copyBizum()">📋 Copiar</button>
         <button class="btn-wa btn-wa-green" onclick="openWABizum()">📲 WhatsApp</button>
       </div>
+    </div>
+    <div class="card" style="border:.5px dashed var(--border2);">
+      <div class="card-label" data-i18n="snapshot_title">📸 Snapshot del Bizum</div>
+      <p style="font-size:12px;color:var(--text3);margin-bottom:12px;" data-i18n="snapshot_desc">Registra l'estat actual del Bizum per a aquest sorteig.</p>
+      <button onclick="takeSnapshot()" class="btn btn-primary" data-i18n="snapshot_btn">Fer snapshot ara</button>
+      <div id="last-snapshot-info" style="font-size:11px;color:var(--text3);margin-top:8px;"></div>
     </div>
   </div>
 
@@ -1385,14 +1381,14 @@ async function loadBizumState(){
   try{return JSON.parse(localStorage.getItem(getBizumKey())||'{}');}catch(e){return {};}
 }
 
-async function saveBizumState(name,confirmado){
+async function saveBizumState(name,confirmado,timestamp=null){
   const slug=getSlug();
   const turno=getCurrentPayerIdx();
   try{
     await fetch(`${SUPA_URL}/rest/v1/bizums`,{
       method:'POST',
       headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json','Prefer':'resolution=merge-duplicates'},
-      body:JSON.stringify({grupo_slug:slug,turno_idx:turno,member_name:name,confirmado,updated_at:new Date().toISOString()})
+      body:JSON.stringify({grupo_slug:slug,turno_idx:turno,member_name:name,confirmado_at:timestamp||new Date().toISOString(),confirmado,updated_at:new Date().toISOString()})
     });
   }catch(e){}
   try{
@@ -1433,11 +1429,28 @@ async function buildBizumConfirm(){
 
 async function toggleBizum(name,btn){
   const current=btn.classList.contains('done');
-  const newState=!current;
-  btn.className='bizum-btn '+(newState?'done':'pending');
-  btn.textContent=newState?t('bizum_hecho'):t('pendiente');
+  if(current){
+    // Already confirmed - can't unmark yourself
+    showToast(t('bizum_already_done'));
+    return;
+  }
+  // Confirmation dialog
+  const payer=CFG.members[getCurrentPayerIdx()]||'?';
+  const amount=CFG.bizumAmount||CFG.ticketCost||20;
+  const msg=t('bizum_confirm_msg').replace('{amount}',amount).replace('{payer}',payer);
+  if(!confirm(msg)) return;
+
+  // Record with timestamp
+  const now=new Date();
+  const dateStr=now.toLocaleDateString('ca-ES',{day:'2-digit',month:'2-digit',year:'numeric'});
+  const timeStr=now.toLocaleTimeString('ca-ES',{hour:'2-digit',minute:'2-digit'});
+  const timestamp=now.toISOString();
+
+  btn.className='bizum-btn done';
+  btn.textContent=t('bizum_hecho');
+  btn.title=t('bizum_timestamp').replace('{date}',dateStr).replace('{time}',timeStr);
   btn.disabled=true;
-  await saveBizumState(name,newState);
+  await saveBizumState(name,true,timestamp);
   btn.disabled=false;
   showToast(newState?`✅ ${name} confirmado`:`⏳ ${name} pendiente`);
   const state=await loadBizumState();
@@ -2460,6 +2473,53 @@ async function saveGroupConfig(){
   }catch(e){console.error(e);}
 }
 
+// ── BIZUM SNAPSHOT ────────────────────────────────────────────────────────────
+async function takeSnapshot(lotKey, sorteoFecha, auto=false){
+  const slug=getSlug();
+  const state=getBizumState()||{};
+  const turno=getCurrentPayerIdx();
+  const now=new Date();
+  
+  const snapshot={
+    grupo_slug: slug,
+    loteria: lotKey||'all',
+    sorteo_fecha: sorteoFecha||now.toISOString().slice(0,10),
+    snapshot_at: now.toISOString(),
+    origen: auto?'auto':'manual',
+    turno_idx: turno,
+    payer: CFG.members[turno]||'?',
+    members: CFG.members.map(m=>({
+      name: m,
+      confirmado: state[m]?.confirmado||false,
+      confirmado_at: state[m]?.confirmado_at||null
+    }))
+  };
+
+  try{
+    await fetch(SUPA_URL+'/rest/v1/eventos',{
+      method:'POST',
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY,'Content-Type':'application/json'},
+      body:JSON.stringify({grupo_slug:slug,tipo:'bizum_snapshot',metadata:snapshot})
+    });
+    if(!auto) showToast(t('snapshot_done'));
+    return snapshot;
+  }catch(e){
+    console.error('Snapshot error',e);
+    return null;
+  }
+}
+
+async function loadSnapshots(){
+  const slug=getSlug();
+  try{
+    const r=await fetch(SUPA_URL+'/rest/v1/eventos?grupo_slug=eq.'+encodeURIComponent(slug)+'&tipo=eq.bizum_snapshot&order=created_at.desc&limit=50',{
+      headers:{'apikey':SUPA_KEY,'Authorization':'Bearer '+SUPA_KEY}
+    });
+    const data=await r.json();
+    return data||[];
+  }catch(e){return [];}
+}
+
 // ── DRAWS HISTORY ────────────────────────────────────────────────────────────
 let _drawsHistoryOpen = false;
 
@@ -2754,6 +2814,14 @@ const T={
     share_grup_title:'Comparte con tu grupo',share_grup_sub:'Envía el enlace para que todos accedan',
     confirm_name_change:'¿Cambiar el nombre del grupo? El enlace permanece igual, no hace falta reenviarlo.',
     name_updated:'✅ Nombre actualizado',    historial_sortejos:'Historial de juego',ver_historial:'Ver',ocultar_historial:'Ocultar',jugado_lbl:'Jugado',no_jugado_lbl:'No jugado',sin_marcar_lbl:'Sin marcar',
+    bizum_confirm_msg:'¿Confirmas que has hecho el Bizum de {amount}€ a {payer}? Quedará registrado con fecha y hora.',
+    bizum_already_done:'Este Bizum ya está confirmado. Contacta con el pagador si hay un error.',
+    snapshot_title:'📸 Snapshot del Bizum',
+    snapshot_desc:'Registra el estado actual del Bizum para este sorteo.',
+    snapshot_btn:'Hacer snapshot ahora',
+    snapshot_done:'✅ Snapshot registrado',
+    snapshot_info:'Snapshot: {date}',
+    bizum_timestamp:'Confirmado el {date} a las {time}',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -2852,6 +2920,11 @@ const T={
     share_grup_title:'Comparteix amb el teu grup',share_grup_sub:'Envia l\'enllaç perquè tothom hi accedeixi',
     confirm_name_change:'Canviar el nom del grup? L\'enllaç és el mateix, no cal tornar-lo a enviar.',
     name_updated:'✅ Nom actualitzat',    historial_sortejos:'Historial de joc',ver_historial:'Veure',ocultar_historial:'Amagar',jugado_lbl:'Jugat',no_jugado_lbl:'No jugat',sin_marcar_lbl:'Sense marcar',
+    bizum_confirm_msg:'Confirmes que has fet el Bizum de {amount}€ a {payer}? Quedarà registrat amb data i hora.',
+    bizum_already_done:'Aquest Bizum ja està confirmat. Contacta amb el pagador si hi ha un error.',
+    snapshot_title:'📸 Snapshot del Bizum',snapshot_desc:'Registra l\'estat actual del Bizum per a aquest sorteig.',
+    snapshot_btn:'Fer snapshot ara',snapshot_done:'✅ Snapshot registrat',
+    snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmat el {date} a les {time}',
     flag:'CA'
   },
   en:{
@@ -2947,6 +3020,11 @@ const T={
     share_grup_title:'Share with your group',share_grup_sub:'Send the link so everyone can access',
     confirm_name_change:'Change the group name? The link stays the same, no need to reshare it.',
     name_updated:'✅ Name updated',    historial_sortejos:'Game history',ver_historial:'View',ocultar_historial:'Hide',jugado_lbl:'Played',no_jugado_lbl:'Not played',sin_marcar_lbl:'Not marked',
+    bizum_confirm_msg:'Do you confirm you sent the Bizum of {amount}€ to {payer}? It will be recorded with date and time.',
+    bizum_already_done:'This Bizum is already confirmed. Contact the payer if there is an error.',
+    snapshot_title:'📸 Bizum Snapshot',snapshot_desc:'Record the current Bizum status for this draw.',
+    snapshot_btn:'Take snapshot now',snapshot_done:'✅ Snapshot recorded',
+    snapshot_info:'Snapshot: {date}',bizum_timestamp:'Confirmed on {date} at {time}',
     flag:'EN'
   }
 };
