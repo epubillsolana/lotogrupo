@@ -670,6 +670,17 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
       </div>
     </div>
 
+    <!-- Tutorial -->
+    <div class="card" style="background:var(--surface2);border:.5px solid var(--border2);">
+      <div style="display:flex;align-items:center;justify-content:space-between;">
+        <div>
+          <div style="font-size:14px;font-weight:700;color:var(--text);" data-i18n="tutorial_card_title">📖 Tutorial</div>
+          <div style="font-size:12px;color:var(--text3);margin-top:2px;" data-i18n="tutorial_card_desc">Aprende a usar LotoGrupo</div>
+        </div>
+        <button onclick="showTutorial()" style="padding:8px 14px;border-radius:99px;font-size:12px;font-weight:700;cursor:pointer;border:1px solid var(--border2);background:#fff;color:var(--text);" data-i18n="tutorial_card_btn">Ver</button>
+      </div>
+    </div>
+
     <!-- Compartir grup -->
     <div class="card" id="share-card" style="background:linear-gradient(135deg,#0A1F0F,#1B5E35);border:none;"></div>
 
@@ -857,15 +868,17 @@ async function loadConfig(){
     checkIdentityOnLoad();
     const isFirstTime=!localStorage.getItem(`lg_ob_${CFG.name}`);
     localStorage.setItem(`lg_ob_${CFG.name}`,'1');
+    // Store if first time so identity popup can show tutorial after
+    window._isFirstTime = isFirstTime;
     setTimeout(()=>{
       const splashEl=document.getElementById('splash-screen');
       if(splashEl) splashEl.style.opacity='0';
       if(splashEl) splashEl.style.transition='opacity .4s';
       setTimeout(()=>{
         if(splashEl) splashEl.style.display='none';
-        if(isFirstTime) showTutorial();
+        // Tutorial only shown after identity (in confirmIdentity or checkIdentityOnLoad)
       },400);
-    },1500);
+    },2000);
   }catch(e){
     document.querySelector('.setup-sub').textContent='Error: '+e.message;
   }
@@ -1541,17 +1554,26 @@ async function confirmIdentity(){
   buildBizumConfirm();
   buildTurns();
   buildIdentityCard();
+  // Show tutorial only first time, after identity
+  if(window._isFirstTime){
+    window._isFirstTime = false;
+    setTimeout(showTutorial, 500);
+  }
 }
 
 function checkIdentityOnLoad(){
   const myIdx = getMyIdx();
   if(myIdx >= 0){
-    // Already identified - just sync who-select
+    // Already identified - sync who-select and show tutorial if first time
     const whoSel=document.getElementById('who-select');
     if(whoSel&&whoSel.value===''){whoSel.value=myIdx;onPersonChange();}
+    if(window._isFirstTime){
+      window._isFirstTime = false;
+      setTimeout(showTutorial, 600);
+    }
   } else {
-    // Not identified yet - show popup after splash
-    setTimeout(showIdentityPopup, 2200);
+    // Not identified yet - show identity popup after splash
+    setTimeout(showIdentityPopup, 2400);
   }
 }
 
@@ -3027,6 +3049,7 @@ const T={
     identity_card_title:'👤 Tu identidad',identity_not_set:'No identificado',identity_set:'Identificarme',identity_change:'No soy yo / Cambiar',
     identity_dni_verify:'Introduce los 4 últimos dígitos de tu DNI para verificar:',identity_dni_optional:'DNI opcional (3 números + letra). Puedes dejarlo en blanco.',
     identity_dni_registered:'✅ DNI ya registrado. Pulsa Confirmar para entrar.',
+    tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprende a usar LotoGrupo',tutorial_card_btn:'Ver',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3136,6 +3159,7 @@ const T={
     identity_card_title:'👤 La teva identitat',identity_not_set:'No identificat',identity_set:'Identificar-me',identity_change:'No sóc jo / Canviar',
     identity_dni_verify:'Introdueix els 4 últims dígits del DNI per verificar:',identity_dni_optional:'DNI opcional (3 números + lletra). Pots deixar-ho en blanc.',
     identity_dni_registered:'✅ DNI ja registrat. Prem Confirmar per entrar.',
+    tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Aprèn a usar LotoGrupo',tutorial_card_btn:'Veure',
     flag:'CA'
   },
   en:{
@@ -3241,6 +3265,7 @@ const T={
     identity_card_title:'👤 Your identity',identity_not_set:'Not identified',identity_set:'Identify me',identity_change:'Not me / Change',
     identity_dni_verify:'Enter the last 4 digits of your ID to verify:',identity_dni_optional:'Optional ID (3 digits + letter). You can leave it blank.',
     identity_dni_registered:'✅ ID already registered. Press Confirm to continue.',
+    tutorial_card_title:'📖 Tutorial',tutorial_card_desc:'Learn how to use LotoGrupo',tutorial_card_btn:'View',
     flag:'EN'
   }
 };
