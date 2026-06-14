@@ -1484,20 +1484,30 @@ function selectIdentityMember(idx, name, dni){
   const confirmBtn = document.getElementById('identity-confirm-btn');
   const dniError = document.getElementById('identity-dni-error');
   if(dniError) dniError.style.display = 'none';
-  if(dniInput) dniInput.value = '';
 
   if(dni){
-    // Has DNI configured - must verify
+    // Has DNI configured - show it filled and locked, just confirm
     if(dniBox) dniBox.style.display = 'block';
-    if(dniPrompt) dniPrompt.setAttribute('data-i18n','identity_dni_verify');
-    if(dniPrompt) dniPrompt.textContent = t('identity_dni_verify');
-    if(dniInput) dniInput.placeholder = '···';
+    if(dniPrompt) dniPrompt.textContent = t('identity_dni_registered');
+    if(dniInput){
+      dniInput.value = dni;
+      dniInput.readOnly = true;
+      dniInput.style.background = '#F0FDF4';
+      dniInput.style.color = '#2E7D32';
+      dniInput.style.fontWeight = '700';
+    }
   } else {
-    // No DNI - show optional field
+    // No DNI - optional field
     if(dniBox) dniBox.style.display = 'block';
-    if(dniPrompt) dniPrompt.setAttribute('data-i18n','identity_dni_optional');
     if(dniPrompt) dniPrompt.textContent = t('identity_dni_optional');
-    if(dniInput) dniInput.placeholder = 'ex: 456K';
+    if(dniInput){
+      dniInput.value = '';
+      dniInput.readOnly = false;
+      dniInput.style.background = '';
+      dniInput.style.color = '';
+      dniInput.style.fontWeight = '';
+      dniInput.placeholder = getLang()==='es'?'EJ: 000+A':'EX: 000+A';
+    }
   }
   if(confirmBtn) confirmBtn.style.display = 'block';
 }
@@ -1510,11 +1520,8 @@ async function confirmIdentity(){
   const dniError = document.getElementById('identity-dni-error');
 
   if(configuredDNI){
-    // Has configured DNI - must match
-    if(!inputDNI || inputDNI !== configuredDNI){
-      if(dniError) dniError.style.display = 'block';
-      return;
-    }
+    // DNI is pre-filled and readonly - always matches, just confirm
+    // (input value IS the configured DNI since we filled it automatically)
   }
 
   localStorage.setItem(getIdentityKey(), _selectedMemberIdx);
@@ -1538,8 +1545,14 @@ async function confirmIdentity(){
 
 function checkIdentityOnLoad(){
   const myIdx = getMyIdx();
-  if(myIdx < 0){ setTimeout(showIdentityPopup, 2200); }
-  else { const whoSel=document.getElementById('who-select'); if(whoSel&&whoSel.value===''){whoSel.value=myIdx;onPersonChange();} }
+  if(myIdx >= 0){
+    // Already identified - just sync who-select
+    const whoSel=document.getElementById('who-select');
+    if(whoSel&&whoSel.value===''){whoSel.value=myIdx;onPersonChange();}
+  } else {
+    // Not identified yet - show popup after splash
+    setTimeout(showIdentityPopup, 2200);
+  }
 }
 
 async function saveBizumState(name,confirmado,timestamp=null){
@@ -3013,6 +3026,7 @@ const T={
     identity_title:'👤 ¿Quién eres tú?',identity_desc:'Selecciona tu nombre para personalizar la app',identity_dni_prompt:'Introduce los 4 últimos dígitos de tu DNI para verificar:',identity_dni_error:'DNI incorrecto. Inténtalo de nuevo.',identity_confirm:'Confirmar',identity_note:'Podrás cambiarlo desde la pestaña Avisos',
     identity_card_title:'👤 Tu identidad',identity_not_set:'No identificado',identity_set:'Identificarme',identity_change:'No soy yo / Cambiar',
     identity_dni_verify:'Introduce los 4 últimos dígitos de tu DNI para verificar:',identity_dni_optional:'DNI opcional (3 números + letra). Puedes dejarlo en blanco.',
+    identity_dni_registered:'✅ DNI ya registrado. Pulsa Confirmar para entrar.',
     flag:'ES',
     notif_prompt_title:'¿Activar recordatorios?',notif_prompt_desc:'Te avisamos cada semana de quién paga y quién hace el Bizum.',notif_prompt_yes:'🔔 Sí, quiero avisos',notif_prompt_later:'Ahora no',notif_prompt_goto:'Ve a Avisos para completar la configuración',
     gestionar_loterias_lbl:'🎰 Loterías del grupo',añadir_loteria_btn:'+ Añadir lotería',eliminar_loteria_btn:'Eliminar',loteria_activa:'Activa',confirm_del_lot:'¿Eliminar esta lotería?',loteria_added:'✅ Lotería añadida',loteria_removed:'✅ Lotería eliminada',min_one_lot:'El grupo necesita al menos una lotería',nueva_combinacion:'Ya activa · Nueva combinación',nueva_combinacion_desc:'Añade una combinación de cualquier lotería',
@@ -3121,6 +3135,7 @@ const T={
     identity_title:'👤 Qui ets tu?',identity_desc:'Selecciona el teu nom per personalitzar l\'app',identity_dni_prompt:'Introdueix els 4 últims dígits del DNI:',identity_dni_error:'DNI incorrecte.',identity_confirm:'Confirmar',identity_note:'Podràs canviar-ho des d\'Avisos',
     identity_card_title:'👤 La teva identitat',identity_not_set:'No identificat',identity_set:'Identificar-me',identity_change:'No sóc jo / Canviar',
     identity_dni_verify:'Introdueix els 4 últims dígits del DNI per verificar:',identity_dni_optional:'DNI opcional (3 números + lletra). Pots deixar-ho en blanc.',
+    identity_dni_registered:'✅ DNI ja registrat. Prem Confirmar per entrar.',
     flag:'CA'
   },
   en:{
@@ -3225,6 +3240,7 @@ const T={
     bizum_unmark_confirm:'Are you sure you want to unmark this Bizum?',
     identity_card_title:'👤 Your identity',identity_not_set:'Not identified',identity_set:'Identify me',identity_change:'Not me / Change',
     identity_dni_verify:'Enter the last 4 digits of your ID to verify:',identity_dni_optional:'Optional ID (3 digits + letter). You can leave it blank.',
+    identity_dni_registered:'✅ ID already registered. Press Confirm to continue.',
     flag:'EN'
   }
 };
