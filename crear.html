@@ -219,22 +219,13 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
       </div>
     </div>
     <div class="num-section">
-      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
-        <div class="num-label" style="margin-bottom:0;"><span id="lbl-main">Números principales</span><span class="num-count" id="cnt-main">0/5</span></div>
-        <div style="display:flex;gap:6px;">
-          <button onclick="pickFrequent()" style="padding:5px 12px;border-radius:99px;background:#1565C0;color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;"><span data-i18n="btn_frecuentes">📊 Frecuentes</span></button>
-          <button onclick="pickRandom()" style="padding:5px 12px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:11px;font-weight:700;cursor:pointer;"><span data-i18n="btn_aleatorio">🎲 Aleatorio</span></button>
-        </div>
-      </div>
-      <div style="display:flex;gap:8px;margin-bottom:10px;">
-        <div style="flex:1;background:#E3F2FD;border-radius:8px;padding:6px 10px;font-size:11px;color:#1565C0;line-height:1.4;">
-          <strong data-i18n="btn_frecuentes">📊 Frecuentes</strong><br><span data-i18n="desc_frecuentes">Números que más han salido en los últimos 12 meses en cada lotería</span>
-        </div>
-        <div style="flex:1;background:#F1F3F4;border-radius:8px;padding:6px 10px;font-size:11px;color:#5F6368;line-height:1.4;">
-          <strong data-i18n="btn_aleatorio">🎲 Aleatorio</strong><br><span data-i18n="desc_aleatorio">Selección completamente al azar dentro del rango válido</span>
-        </div>
-      </div>
+      <div class="num-label"><span id="lbl-main">Números principales</span><span class="num-count" id="cnt-main">0/5</span></div>
       <div class="num-grid" id="grid-main"></div>
+      <div style="display:flex;gap:8px;margin-top:8px;">
+        <button onclick="pickFrequent()" style="flex:1;padding:8px;border-radius:99px;background:#1565C0;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_frecuentes">📊 Frecuentes</button>
+        <button onclick="pickRandom()" style="flex:1;padding:8px;border-radius:99px;background:#0A1F0F;color:#fff;border:none;font-size:12px;font-weight:700;cursor:pointer;" data-i18n="btn_aleatorio">🎲 Aleatorio</button>
+      </div>
+    </div>
     </div>
     <div class="num-section" id="star-section">
       <div class="num-label"><span id="lbl-star">Estrellas</span><span class="num-count" id="cnt-star">0/2</span></div>
@@ -624,21 +615,14 @@ function pickFrequent(){
   if(!lot||!freq) return pickRandom();
   const maxM=apuestaType==='multiple'?lot.maxMain:lot.mainCount;
   const maxS=apuestaType==='multiple'?lot.maxStar:lot.starCount;
-  // Shuffle top numbers with slight weight toward most frequent
-  const main=freq.main.slice(0,maxM*2);
-  const selected=[];
-  while(selected.length<maxM){
-    const idx=Math.floor(Math.random()*main.length);
-    if(!selected.includes(main[idx])) selected.push(main[idx]);
-  }
-  const stars=freq.stars.slice(0,maxS*3);
-  const selSt=[];
-  while(selSt.length<maxS){
-    const idx=Math.floor(Math.random()*stars.length);
-    if(!selSt.includes(stars[idx])) selSt.push(stars[idx]);
-  }
-  applySelection(selected,selSt);
-  toast('📊 Números frecuentes seleccionados');
+  // Pick from top 50% frequent numbers randomly (true randomness within frequent set)
+  const poolSize=Math.min(freq.main.length, Math.max(maxM+4, Math.floor(freq.main.length*0.6)));
+  const mainPool=freq.main.slice(0,poolSize);
+  const shuffled=[...mainPool].sort(()=>Math.random()-.5);
+  const main=shuffled.slice(0,maxM).sort((a,b)=>a-b);
+  const starPool=freq.stars?[...freq.stars].sort(()=>Math.random()-.5):[];
+  const stars=starPool.slice(0,maxS).sort((a,b)=>a-b);
+  applySelection(main,stars);
 }
 
 function updateFirstPayerSelector(){
