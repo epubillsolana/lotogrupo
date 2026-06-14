@@ -398,6 +398,7 @@ const TC={
     desc_frecuentes:'Números que más han salido en los últimos 12 meses en cada lotería',
     desc_aleatorio:'Selección completamente al azar dentro del rango válido',
     cancelar_lbl:'Cancelar',
+    dni_hint:'4 últimos dígitos DNI (opcional):',
     no_mas_loterias:'✅ No, avanzar al siguiente paso',
     elige_loteria:'Elige al menos una lotería',escribe_nombre:'Escribe el nombre del grupo',
     elige_min:'Elige al menos',numeros_lbl:'números',escribe_nombre_m:'Escribe un nombre',
@@ -435,6 +436,7 @@ const TC={
     desc_frecuentes:'Números que han sortit més els últims 12 mesos a cada loteria',
     desc_aleatorio:'Selecció completament a l\'atzar dins el rang vàlid',
     cancelar_lbl:'Cancel·lar',
+    dni_hint:'4 últims dígits DNI (opcional):',
     no_mas_loterias:'✅ No, avançar al següent pas',
     elige_loteria:'Tria almenys una loteria',escribe_nombre:'Escriu el nom del grup',
     elige_min:'Tria almenys',numeros_lbl:'números',escribe_nombre_m:'Escriu un nom',
@@ -472,6 +474,7 @@ const TC={
     desc_frecuentes:'Numbers drawn most often in the last 12 months for each lottery',
     desc_aleatorio:'Completely random selection within the valid range',
     cancelar_lbl:'Cancel',
+    dni_hint:'Last 4 digits of ID (optional):',
     no_mas_loterias:'✅ No, go to next step',
     elige_loteria:'Choose at least one lottery',escribe_nombre:'Enter the group name',
     elige_min:'Choose at least',numeros_lbl:'numbers',escribe_nombre_m:'Enter a name',
@@ -527,7 +530,29 @@ const _origRenderMembers=renderMembers;
 function renderMembers(){
   const list=document.getElementById('member-list');if(!list)return;
   list.innerHTML='';
-  members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?tc('primer_payer'):tc('miembro')}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
+  members.forEach((m,i)=>{
+    const name=typeof m==='object'?m.name:m;
+    const dni=typeof m==='object'?m.dni||'':'';
+    const row=document.createElement('div');
+    row.className='member-row';
+    row.style.cssText='display:flex;flex-direction:column;gap:4px;padding:8px 0;border-bottom:.5px solid var(--border, #E5E7EB);';
+    row.innerHTML=`
+      <div style="display:flex;align-items:center;gap:10px;">
+        <div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${name.slice(0,2).toUpperCase()}</div>
+        <div class="member-info" style="flex:1;">
+          <div class="member-name">${name}</div>
+          <div class="member-role">${i===0?tc('primer_payer'):tc('miembro')}</div>
+        </div>
+        <button class="member-del" onclick="removeMember(${i})">✕</button>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px;padding-left:46px;">
+        <span style="font-size:11px;color:#9CA3AF;">${tc('dni_hint')||'4 últims dígits DNI (opcional):'}</span>
+        <input type="number" maxlength="4" value="${dni}" placeholder="1234"
+          oninput="this.value=this.value.slice(0,4);members[${i}].dni=this.value;"
+          style="width:60px;padding:4px 8px;border-radius:6px;border:1px solid #E5E7EB;font-size:13px;text-align:center;">
+      </div>`;
+    list.appendChild(row);
+  });
 }
 
 
@@ -743,7 +768,7 @@ function renderMembers(){
   const list=document.getElementById('member-list');list.innerHTML='';
   members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?'Primer pagador':'Miembro'}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
 }
-function addMember(){const inp=document.getElementById('new-member');const name=inp.value.trim();if(!name){toast(tc('escribe_nombre_m'));return;}if(members.includes(name)){toast(tc('nombre_existe'));return;}if(members.length>=12){toast(tc('max_miembros'));return;}members.push(name);inp.value='';renderMembers();}
+function addMember(){const inp=document.getElementById('new-member');const name=inp.value.trim();if(!name){toast(tc('escribe_nombre_m'));return;}if(members.some(m=>(typeof m==='object'?m.name:m)===name)){toast(tc('nombre_existe'));return;}if(members.length>=12){toast(tc('max_miembros'));return;}members.push({name,dni:''});inp.value='';renderMembers();}
 function removeMember(i){members.splice(i,1);renderMembers();}
 
 // Rotation
@@ -893,7 +918,8 @@ function goBack(){if(typeof step==='number'&&step>1)step--;updateUI();window.scr
 
 async function createGroup(){
   const name=document.getElementById('f-name').value.trim();
-  const cfg={name,color:groupColor,lotteries:lotConfigs,members,ticketCost:parseFloat(document.getElementById('f-cost').value)||20,bizum:parseFloat(document.getElementById('f-bizum').value)||4,rotation:rotType,drawsPerTurn:rotType==='draws'?parseInt(document.getElementById('f-draws').value)||4:2,epoch:document.querySelector('input[name="epoch-type"]:checked')?.value==='past'?new Date(document.getElementById('f-epoch').value+'T00:00:00').toISOString():new Date().toISOString(),
+  const membersWithDNI=members.map(m=>typeof m==='object'?m:{name:m,dni:''});
+  const cfg={name,color:groupColor,lotteries:lotConfigs,members:membersWithDNI.map(m=>m.name),memberDNIs:Object.fromEntries(membersWithDNI.map(m=>[m.name,m.dni])),ticketCost:parseFloat(document.getElementById('f-cost').value)||20,bizum:parseFloat(document.getElementById('f-bizum').value)||4,rotation:rotType,drawsPerTurn:rotType==='draws'?parseInt(document.getElementById('f-draws').value)||4:2,epoch:document.querySelector('input[name="epoch-type"]:checked')?.value==='past'?new Date(document.getElementById('f-epoch').value+'T00:00:00').toISOString():new Date().toISOString(),
     firstPayer:rotType==='always'?document.getElementById('f-always-payer')?.value:(document.getElementById('f-first-payer')?.value||members[0]),
     alwaysSamePayer:rotType==='always'};
   
