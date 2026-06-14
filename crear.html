@@ -247,17 +247,17 @@ body{font-family:'Inter',sans-serif;background:#F5F5F3;min-height:100vh;padding-
     <div class="step-eyebrow" data-i18n="step3_eyebrow">El equipo</div>
     <div class="step-title" data-i18n="step3_title">¿Quiénes jugáis<br>en el grupo?</div>
     <div class="member-list" id="member-list"></div>
-    <div style="display:flex;gap:6px;align-items:center;margin-bottom:8px;">
-      <input type="text" id="new-member" placeholder="Nombre..." maxlength="20" onkeydown="if(event.key==='Enter')addMember()" style="flex:2;padding:10px 12px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:14px;">
-      <input type="text" id="new-member-dni" placeholder="DNI" maxlength="4" onkeydown="if(event.key==='Enter')addMember()" style="flex:1;padding:10px 8px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:14px;text-align:center;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
-      <button onclick="addMember()" style="padding:10px 14px;border-radius:10px;background:var(--green,#2E7D32);color:#fff;border:none;font-size:14px;font-weight:700;cursor:pointer;white-space:nowrap;">+</button>
+    <div style="display:flex;gap:6px;align-items:center;margin-bottom:4px;">
+      <input type="text" id="new-member" placeholder="Nom jugador/a..." maxlength="20" onkeydown="if(event.key==='Enter')addMember()" style="flex:1;padding:9px 10px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:14px;min-width:0;">
+      <input type="text" id="new-member-dni" placeholder="3díg+lletra" maxlength="4" onkeydown="if(event.key==='Enter')addMember()" style="width:76px;flex-shrink:0;padding:9px 6px;border-radius:10px;border:1.5px solid #E5E7EB;font-size:12px;text-align:center;text-transform:uppercase;" oninput="this.value=this.value.toUpperCase()">
+      <button onclick="addMember()" style="flex-shrink:0;padding:9px 14px;border-radius:10px;background:#2E7D32;color:#fff;border:none;font-size:15px;font-weight:700;cursor:pointer;">+</button>
     </div>
-    <div style="display:flex;gap:6px;padding:0 4px;margin-bottom:12px;">
-      <div style="flex:2;font-size:10px;color:#9CA3AF;">Nom</div>
-      <div style="flex:1;font-size:10px;color:#9CA3AF;text-align:center;">DNI (opcional)</div>
+    <div style="display:flex;gap:6px;padding:0 2px;margin-bottom:10px;">
+      <div style="flex:1;font-size:10px;color:#9CA3AF;">Nom</div>
+      <div style="width:76px;font-size:10px;color:#9CA3AF;text-align:center;">DNI (opcional)</div>
       <div style="width:42px;"></div>
     </div>
-    <div class="field-hint" style="margin-top:10px;" data-i18n="primer_pagador">El primero de la lista será el primer pagador.</div>
+    <div class="field-hint" id="primer-hint" style="margin-top:10px;" data-i18n="primer_pagador">El primero de la lista será el primer pagador.</div>
   </div>
 
   <!-- PASO 4 -->
@@ -758,6 +758,9 @@ function selRot(el){
   const af=document.getElementById('always-field');
   if(af) af.style.display=rotType==='always'?'block':'none';
   if(rotType==='always') populateAlwaysPayer();
+  // Show/hide primer pagador hint
+  const hint=document.getElementById('primer-hint');
+  if(hint) hint.style.display=rotType==='always'?'none':'block';
 }
 
 function populateAlwaysPayer(){
