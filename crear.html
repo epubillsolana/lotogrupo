@@ -745,8 +745,24 @@ function updCounts(){
 
 // Members
 function renderMembers(){
-  const list=document.getElementById('member-list');list.innerHTML='';
-  members.forEach((m,i)=>{const row=document.createElement('div');row.className='member-row';row.innerHTML=`<div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${m.slice(0,2).toUpperCase()}</div><div class="member-info"><div class="member-name">${m}</div><div class="member-role">${i===0?'Primer pagador':'Miembro'}</div></div><button class="member-del" onclick="removeMember(${i})">✕</button>`;list.appendChild(row);});
+  const list=document.getElementById('member-list');if(!list)return;list.innerHTML='';
+  members.forEach((m,i)=>{
+    const name=typeof m==='object'?m.name:m;
+    const dni=typeof m==='object'?m.dni||'':'';
+    const row=document.createElement('div');
+    row.className='member-row';
+    row.innerHTML=`
+      <div class="member-av" style="background:${AVG_BG[i%8]};color:${AVG_FG[i%8]};">${name.slice(0,2).toUpperCase()}</div>
+      <div class="member-info" style="flex:1;">
+        <div class="member-name">${name}</div>
+        <div class="member-role" style="display:flex;align-items:center;gap:6px;">
+          <span>${i===0?tc('primer_payer'):tc('miembro')}</span>
+          ${dni?`<span style="font-size:10px;color:#9CA3AF;">DNI: ***${dni}</span>`:''}
+        </div>
+      </div>
+      <button class="member-del" onclick="removeMember(${i})">✕</button>`;
+    list.appendChild(row);
+  });
 }
 function addMember(){const inp=document.getElementById('new-member');const dniInp=document.getElementById('new-member-dni-ph');const name=inp.value.trim();const dni=(dniInp?dniInp.value.trim().toUpperCase():'');if(!name){toast(tc('escribe_nombre_m'));return;}if(members.some(m=>(typeof m==='object'?m.name:m)===name)){toast(tc('nombre_existe'));return;}if(members.length>=12){toast(tc('max_miembros'));return;}members.push({name,dni});inp.value='';if(dniInp)dniInp.value='';renderMembers();}
 function removeMember(i){members.splice(i,1);renderMembers();}

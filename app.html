@@ -251,7 +251,7 @@ select{width:100%;padding:10px 12px;border-radius:var(--radius-sm);border:.5px s
   <div style="background:#fff;border-radius:20px 20px 0 0;padding:28px 20px 44px;width:100%;max-width:480px;margin:0 auto;">
     <div style="font-size:22px;font-weight:800;color:#111827;margin-bottom:6px;text-align:center;" data-i18n="identity_title">👤 Qui ets tu?</div>
     <div style="font-size:13px;color:#6B7280;margin-bottom:20px;text-align:center;" data-i18n="identity_desc">Selecciona el teu nom per personalitzar l'app</div>
-    <div id="identity-member-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:300px;overflow-y:auto;"></div>
+    <div id="identity-member-list" style="display:flex;flex-direction:column;gap:8px;margin-bottom:16px;max-height:260px;overflow-y:scroll;padding-right:4px;"></div>
     <div id="identity-dni-box" style="display:none;margin-bottom:16px;">
       <div id="identity-dni-prompt" style="font-size:13px;color:#374151;margin-bottom:8px;" data-i18n="identity_dni_prompt">Introdueix els 4 últims dígits del teu DNI per verificar:</div>
       <input type="text" id="identity-dni-input" maxlength="4" placeholder="ex: 456K"
@@ -1477,9 +1477,9 @@ function buildIdentityMemberList(){
   CFG.members.forEach((name, i) => {
     const dni = CFG.memberDNIs?.[name]||'';
     const btn = document.createElement('button');
-    btn.style.cssText = 'display:flex;align-items:center;gap:12px;width:100%;padding:12px 16px;border-radius:12px;background:#F9FAFB;border:1.5px solid #E5E7EB;cursor:pointer;text-align:left;margin-bottom:4px;';
-    btn.innerHTML = `<div style="width:36px;height:36px;border-radius:50%;background:#0A1F0F;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:14px;flex-shrink:0;">${name.slice(0,2).toUpperCase()}</div>
-      <div style="flex:1;"><div style="font-size:15px;font-weight:700;color:#111827;">${name}</div>${dni?`<div style="font-size:11px;color:#9CA3AF;">DNI: ***${dni}</div>`:''}</div>`;
+    btn.style.cssText = 'display:flex;align-items:center;gap:10px;width:100%;padding:10px 14px;border-radius:12px;background:#F9FAFB;border:1.5px solid #E5E7EB;cursor:pointer;text-align:left;margin-bottom:4px;box-sizing:border-box;';
+    btn.innerHTML = `<div style="width:28px;height:28px;border-radius:50%;background:#0A1F0F;color:#fff;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:11px;flex-shrink:0;">${name.slice(0,2).toUpperCase()}</div>
+      <div style="flex:1;"><div style="font-size:16px;font-weight:700;color:#111827;">${name}</div>${dni?`<div style="font-size:11px;color:#9CA3AF;">DNI: ***${dni}</div>`:''}</div>`;
     btn.onclick = () => selectIdentityMember(i, name, dni);
     list.appendChild(btn);
   });
