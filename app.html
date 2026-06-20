@@ -758,7 +758,7 @@ async function track(tipo,metadata={}){
 let CFG=null;
 const LOTTERIES={
   euromillones:{name:'Euromillones',emoji:'🌟',mainCount:5,mainMax:50,starCount:2,starMax:12,starLabel:'Estrellas',
-    fallback:{fecha:'12/06/2026',numeros:[4,7,14,22,23],estrellas:[1,7],bote:'—'},
+    fallback:{fecha:'19/06/2026',numeros:[8,34,39,41,42],estrellas:[2,7],bote:'38.000.000,00 €'},
     prizes:[
       {m:5,s:2,label:'JACKPOT 5+2⭐',approx:'El bote',cat:'big'},
       {m:5,s:1,label:'2ª 5+1⭐',approx:'~500.000€',cat:'big'},
@@ -1058,15 +1058,17 @@ async function initAllDraws(){
   });
   buildComprobar();
   document.getElementById('btn-check').disabled=false;
-  // Fetch fresh from API directly
+  // Fetch fresh from API - rebuild after each one
   for(const l of CFG.lotteries){
     dbg('Fetching: '+l.lottery);
     try{
       const fresh=await fetchDraw(l.lottery);
-      if(fresh) drawDataMap[l.lottery]=fresh;
-    }catch(e){}
+      if(fresh){
+        drawDataMap[l.lottery]=fresh;
+        buildComprobar(); // rebuild immediately when each draw arrives
+      }
+    }catch(e){dbg('fetchDraw error: '+e.message);}
   }
-  buildComprobar();
 }
 
 // ── INICI ─────────────────────────────────────────────────────────────────────
