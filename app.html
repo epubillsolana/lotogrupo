@@ -1023,31 +1023,29 @@ function dbg(msg){
 
 async function fetchDraw(lotKey){
   dbg('fetchDraw START: '+lotKey);
-  const lot=LOTTERIES[lotKey];
+  // Always clear old cache first to force fresh data
+  localStorage.removeItem('lg_draw_'+lotKey);
   try{
     const url=`https://api.lotogrupo.es/draw/${lotKey}?_=${Date.now()}`;
     dbg('URL: '+url);
-    const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
+    const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache','Pragma':'no-cache'}});
     if(!r.ok) throw new Error('HTTP '+r.status);
     const data=await r.json();
     if(data.error) throw new Error(data.error);
     dbg(lotKey+' OK: '+data.numeros?.join(',')+' est:'+data.estrellas?.join(','));
-    // Convert date from YYYY-MM-DD to DD/MM/YYYY
     const parts=(data.fecha||'').split('-');
     const fecha=parts.length===3?`${parts[2]}/${parts[1]}/${parts[0]}`:data.fecha||'—';
     const result={
       fecha,
       numeros:(data.numeros||[]).sort((a,b)=>a-b),
       estrellas:(data.estrellas||[]).sort((a,b)=>a-b),
-      bote:data.bote||'—'
+      bote:data.bote||'—',
+      fetched_at: Date.now()
     };
     localStorage.setItem('lg_draw_'+lotKey,JSON.stringify(result));
     return result;
   }catch(e){
     dbg('ERROR fetchDraw: '+e.message);
-    // Try cached result
-    const cached=localStorage.getItem('lg_draw_'+lotKey);
-    if(cached){try{const r=JSON.parse(cached);dbg('Using cache for '+lotKey);return r;}catch(e2){}}
   }
   return null;
 }
