@@ -1025,43 +1025,30 @@ async function fetchDraw(lotKey){
   dbg('fetchDraw START: '+lotKey);
   const lot=LOTTERIES[lotKey];
   try{
-    const now=new Date();
-    const pad=n=>String(n).padStart(2,'0');
-    const dateStr=`${now.getFullYear()}${pad(now.getMonth()+1)}${pad(now.getDate())}`;
-    const weekAgo=new Date(now-14*24*3600*1000);
-    const dateFrom=`${weekAgo.getFullYear()}${pad(weekAgo.getMonth()+1)}${pad(weekAgo.getDate())}`;
-    const gameIds={euromillones:'EMIL',primitiva:'LAPR',bonoloto:'BONO',gordo:'ELGR',loteria_nacional:'LNAC'};
-    const gameId=gameIds[lotKey]||'EMIL';
-    const url=`https://api.lotogrupo.es/servicios/buscadorSorteos?game_id=${gameId}&celebrados=true&num=3&fechaInicioInclusiva=${dateFrom}&fechaFinInclusiva=${dateStr}&_=${Date.now()}`;
-    dbg('URL: '+url.split('?')[1].split('&').slice(0,3).join('&'));
+    const url=`https://api.lotogrupo.es/draw/${lotKey}?_=${Date.now()}`;
+    dbg('URL: '+url);
     const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache'}});
     if(!r.ok) throw new Error('HTTP '+r.status);
-    const arr=await r.json();
-    dbg('Resultados: '+(arr?arr.length:0)+' | 1o: '+(arr[0]?arr[0].fecha_sorteo:'none'));
-    if(!arr||!arr.length) throw new Error('arr vacio');
-    arr.sort((a,b)=>b.fecha_sorteo.localeCompare(a.fecha_sorteo));
-    const s=arr[0];
-    const f=s.fecha_sorteo.replace(/\s.*/,'').replace(/-/g,'');
-    const fecha=`${f.slice(6,8)}/${f.slice(4,6)}/${f.slice(0,4)}`;
-    const allNums=s.combinacion.match(/\d+/g).map(Number).filter(n=>n>0);
-    // For Euromillones: 5 main + 2 stars. For Primitiva/Bonoloto: 6 main + 1 complementario
-    // The complementario is always the last number in combinacion
-    const numeros=allNums.slice(0,lot.mainCount).sort((a,b)=>a-b);
-    // For Primitiva/Bonoloto get complementario from reintegro or last number
-    let estrellas=allNums.slice(lot.mainCount,lot.mainCount+lot.starCount);
-    if(estrellas.length===0&&lot.starCount===1){
-      // Try reintegro field
-      if(s.reintegro) estrellas=[Number(s.reintegro)];
-      else if(allNums.length>lot.mainCount) estrellas=[allNums[lot.mainCount]];
-    }
-    estrellas=estrellas.sort((a,b)=>a-b);
-    if(numeros.length>=lot.mainCount){
-      const result={fecha,numeros,estrellas,bote:s.bote_ganado||s.premio_bote||'—'};
-      localStorage.setItem('lg_draw_'+lotKey,JSON.stringify(result));
-      dbg(lotKey+' OK: '+numeros.join(',')+' comp:'+estrellas.join(','));
-      return result;
-    }
-  }catch(e){dbg('ERROR: '+e.message);}
+    const data=await r.json();
+    if(data.error) throw new Error(data.error);
+    dbg(lotKey+' OK: '+data.numeros?.join(',')+' est:'+data.estrellas?.join(','));
+    // Convert date from YYYY-MM-DD to DD/MM/YYYY
+    const parts=(data.fecha||'').split('-');
+    const fecha=parts.length===3?`${parts[2]}/${parts[1]}/${parts[0]}`:data.fecha||'—';
+    const result={
+      fecha,
+      numeros:(data.numeros||[]).sort((a,b)=>a-b),
+      estrellas:(data.estrellas||[]).sort((a,b)=>a-b),
+      bote:data.bote||'—'
+    };
+    localStorage.setItem('lg_draw_'+lotKey,JSON.stringify(result));
+    return result;
+  }catch(e){
+    dbg('ERROR fetchDraw: '+e.message);
+    // Try cached result
+    const cached=localStorage.getItem('lg_draw_'+lotKey);
+    if(cached){try{const r=JSON.parse(cached);dbg('Using cache for '+lotKey);return r;}catch(e2){}}
+  }
   return null;
 }
 
