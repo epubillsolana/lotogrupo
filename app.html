@@ -973,6 +973,7 @@ function initApp(){
     });
   }
   // Init all draws
+  loadPlayedStatesDB();
   initAllDraws();
   buildTurns();
   buildBizumConfirm();
@@ -1442,17 +1443,46 @@ async function addPrizeFromResult(){
   }
 }
 
-function getPlayedKey(lotKey,fecha){return `lg_played_${CFG.name}_${lotKey}_${fecha}`;}
+function normalizeFecha(fecha){
+  // Convert DD/MM/YYYY to YYYY-MM-DD for consistent key
+  if(!fecha) return '';
+  if(fecha.includes('-')) return fecha.slice(0,10); // already YYYY-MM-DD
+  const p=fecha.split('/');
+  if(p.length===3) return `${p[2]}-${p[1]}-${p[0]}`;
+  return fecha;
+}
+function getPlayedKey(lotKey,fecha){return `lg_played_${CFG.name}_${lotKey}_${normalizeFecha(fecha)}`;}
 function getPlayedState(lotKey,fecha){return localStorage.getItem(getPlayedKey(lotKey,fecha));}
 
 function togglePlayed(lotKey,fecha,btn){
   const current=getPlayedState(lotKey,fecha);
   const next=(!current||current==='unknown')?'yes':current==='yes'?'no':'yes';
+  // Save with normalized key
   localStorage.setItem(getPlayedKey(lotKey,fecha),next);
+  // Also save to Supabase for persistence
+  savePlayedStateDB(lotKey,fecha,next);
   btn.className='played-btn '+next;
   btn.textContent=next==='yes'?t('jugado'):t('no_jugado');
   renderHistory();
   showToast(next==='yes'?'✅ Marcado como jugado':'❌ Marcado como no jugado');
+}
+
+async function savePlayedStateDB(lotKey,fecha,state){
+  try{
+    const key=getPlayedKey(lotKey,fecha);
+    if(!CFG.playedStates) CFG.playedStates={};
+    CFG.playedStates[key]=state;
+    await saveGroupConfig();
+  }catch(e){}
+}
+
+function loadPlayedStatesDB(){
+  try{
+    if(!CFG||!CFG.playedStates) return;
+    Object.entries(CFG.playedStates).forEach(([k,v])=>{
+      localStorage.setItem(k,v);
+    });
+  }catch(e){}
 }
 
 function countSorteosJugados(lotKey){
