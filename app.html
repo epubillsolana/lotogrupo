@@ -758,7 +758,7 @@ async function track(tipo,metadata={}){
 let CFG=null;
 const LOTTERIES={
   euromillones:{name:'Euromillones',emoji:'🌟',mainCount:5,mainMax:50,starCount:2,starMax:12,starLabel:'Estrellas',
-    fallback:{fecha:'19/06/2026',numeros:[8,34,39,41,42],estrellas:[2,7],bote:'38.000.000,00 €'},
+    fallback:{fecha:'23/06/2026',numeros:[3,33,36,45,46],estrellas:[5,6],bote:'48.000.000,00 €'},
     prizes:[
       {m:5,s:2,label:'JACKPOT 5+2⭐',approx:'El bote',cat:'big'},
       {m:5,s:1,label:'2ª 5+1⭐',approx:'~500.000€',cat:'big'},
@@ -1024,29 +1024,31 @@ function dbg(msg){
 
 async function fetchDraw(lotKey){
   dbg('fetchDraw START: '+lotKey);
-  // Always clear old cache first to force fresh data
   localStorage.removeItem('lg_draw_'+lotKey);
   try{
-    const url=`https://api.lotogrupo.es/draw/${lotKey}?_=${Date.now()}`;
-    dbg('URL: '+url);
-    const r=await fetch(url,{cache:'no-store',headers:{Accept:'application/json','Cache-Control':'no-cache','Pragma':'no-cache'}});
+    const url='https://api.lotogrupo.es/draw/'+lotKey+'?_='+Date.now();
+    dbg('Fetching: '+url);
+    // Add timeout of 8 seconds
+    const controller=new AbortController();
+    const timer=setTimeout(()=>controller.abort(),8000);
+    const r=await fetch(url,{
+      signal:controller.signal,
+      cache:'no-store',
+      headers:{Accept:'application/json','Cache-Control':'no-cache','Pragma':'no-cache'}
+    });
+    clearTimeout(timer);
     if(!r.ok) throw new Error('HTTP '+r.status);
     const data=await r.json();
-    if(data.error) throw new Error(data.error);
-    dbg(lotKey+' OK: '+data.numeros?.join(',')+' est:'+data.estrellas?.join(','));
+    if(data.error) throw new Error('API: '+data.error);
     const parts=(data.fecha||'').split('-');
     const fecha=parts.length===3?`${parts[2]}/${parts[1]}/${parts[0]}`:data.fecha||'—';
-    const result={
-      fecha,
-      numeros:(data.numeros||[]).sort((a,b)=>a-b),
-      estrellas:(data.estrellas||[]).sort((a,b)=>a-b),
-      bote:data.bote||'—',
-      fetched_at: Date.now()
-    };
+    const result={fecha,numeros:(data.numeros||[]).sort((a,b)=>a-b),estrellas:(data.estrellas||[]).sort((a,b)=>a-b),bote:data.bote||'—',fetched_at:Date.now()};
+    dbg(lotKey+' OK: '+fecha+' nums:'+result.numeros.join(','));
     localStorage.setItem('lg_draw_'+lotKey,JSON.stringify(result));
     return result;
   }catch(e){
-    dbg('ERROR fetchDraw: '+e.message);
+    dbg('ERROR fetchDraw '+lotKey+': '+e.message);
+    showToast('⚠️ Error carregant '+lotKey+': '+e.message);
   }
   return null;
 }

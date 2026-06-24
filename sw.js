@@ -1,5 +1,5 @@
 // Service Worker — LotoGrupo
-const CACHE = 'lotogrupo-v3';
+const CACHE = 'lotogrupo-v4';
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
 
@@ -18,7 +18,11 @@ self.addEventListener('periodicsync', e => {
 });
 
 self.addEventListener('fetch', e => {
-  if(e.request.url.includes('lotogrupo')) checkAndNotify();
+  // Never cache or intercept API calls
+  if(e.request.url.includes('api.lotogrupo.es')) return;
+  if(e.request.url.includes('supabase.co')) return;
+  // Only trigger notification check for page navigation
+  if(e.request.mode === 'navigate') checkAndNotify();
 });
 
 async function checkAndNotify(){
