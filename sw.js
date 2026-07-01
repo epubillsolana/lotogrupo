@@ -1,5 +1,6 @@
 // Service Worker — LotoGrupo
-const CACHE = 'lotogrupo-v4';
+const CACHE = 'lotogrupo-v5';
+
 self.addEventListener('install', () => self.skipWaiting());
 self.addEventListener('activate', e => e.waitUntil(clients.claim()));
 
@@ -17,11 +18,14 @@ self.addEventListener('periodicsync', e => {
   if(e.tag === 'euromillones-weekly') e.waitUntil(checkAndNotify());
 });
 
+// IMPORTANT: Never intercept or cache API calls
 self.addEventListener('fetch', e => {
-  // Never cache or intercept API calls
-  if(e.request.url.includes('api.lotogrupo.es')) return;
-  if(e.request.url.includes('supabase.co')) return;
-  // Only trigger notification check for page navigation
+  const url = e.request.url;
+  // Skip API calls - let them go to network always
+  if(url.includes('api.lotogrupo.es')) return;
+  if(url.includes('supabase.co')) return;
+  if(url.includes('loteriasapi.com')) return;
+  // Only check notifications on page navigation
   if(e.request.mode === 'navigate') checkAndNotify();
 });
 
@@ -29,13 +33,11 @@ async function checkAndNotify(){
   const config = await getStore('notif_config');
   if(!config) return;
 
-  // Check if paused this week
   const paused = await getStore('notif_paused_week');
   const now = new Date();
   const week = `${now.getFullYear()}-W${Math.ceil(now.getDate()/7)}`;
   if(paused === week) return;
 
-  // Use group schedule (default: Monday 10:00)
   const targetDay = config.notif_day !== undefined ? config.notif_day : 1;
   const targetHour = config.notif_hour !== undefined ? config.notif_hour : 10;
 
