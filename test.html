@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="ca">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Test API LotoGrupo</title>
+<style>
+body{font-family:sans-serif;padding:20px;background:#f5f5f5;}
+.box{background:#fff;border-radius:12px;padding:16px;margin-bottom:12px;box-shadow:0 2px 8px rgba(0,0,0,.1);}
+.ok{border-left:5px solid #2E7D32;}
+.err{border-left:5px solid #C62828;}
+h2{margin:0 0 8px;font-size:16px;}
+pre{white-space:pre-wrap;word-break:break-all;font-size:12px;background:#f0f0f0;padding:8px;border-radius:8px;}
+</style>
+</head>
+<body>
+<h1>🔬 Test API</h1>
+<div id="results"></div>
+<script>
+const results = document.getElementById('results');
+
+function log(title, content, isError) {
+  const div = document.createElement('div');
+  div.className = 'box ' + (isError ? 'err' : 'ok');
+  div.innerHTML = '<h2>' + title + '</h2><pre>' + content + '</pre>';
+  results.appendChild(div);
+}
+
+async function test() {
+  log('ℹ️ Info', 'URL: ' + location.href + '\nUser-Agent: ' + navigator.userAgent.slice(0,80));
+
+  // Test 1: Service Worker status
+  if ('serviceWorker' in navigator) {
+    const regs = await navigator.serviceWorker.getRegistrations();
+    log('🔧 Service Workers actius', regs.length === 0 ? 'Cap' : regs.map(r => r.scope + ' (actiu: ' + (r.active ? r.active.scriptURL : 'no') + ')').join('\n'));
+  }
+
+  // Test 2: Fetch to Worker
+  try {
+    const url = 'https://api.lotogrupo.es/draw/euromillones?_=' + Date.now();
+    log('📡 Provant fetch...', url);
+    const t0 = Date.now();
+    const r = await fetch(url, {cache:'no-store', headers:{Accept:'application/json'}});
+    const elapsed = Date.now() - t0;
+    if (!r.ok) {
+      log('❌ HTTP Error', 'Status: ' + r.status + ' ' + r.statusText + '\nTemps: ' + elapsed + 'ms', true);
+      return;
+    }
+    const data = await r.json();
+    log('✅ RESPOSTA OK (' + elapsed + 'ms)', JSON.stringify(data, null, 2));
+    if (data.fecha === '2026-07-10' || data.fecha === '2026-07-07') {
+      log('🎉 CONCLUSIÓ', 'El fetch funciona perfectament des d\'aquest dispositiu!\nSi l\'app no mostra aquesta data, el problema és a dins de l\'app.');
+    }
+  } catch(e) {
+    log('❌ FETCH HA FALLAT', 'Error: ' + e.name + '\nMissatge: ' + e.message + '\n\nAixò explica per què l\'app no actualitza!', true);
+  }
+}
+test();
+</script>
+</body>
+</html>
